@@ -5,6 +5,7 @@ tags:
   - LeetCode
   - Dynamic Programming
 mathjax: true
+categories: LeetCode
 ---
 
 # 題目

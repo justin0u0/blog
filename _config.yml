@@ -102,3 +102,5 @@ deploy:
   repo: https://github.com/justin0u0/blog.git
   branch: gh-pages
 
+sitemap:
+  path: sitemap.xml

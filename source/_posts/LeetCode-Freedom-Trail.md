@@ -1,5 +1,5 @@
 ---
-title: LeetCode - Freedom Trail
+title: LeetCode 514 - Freedom Trail
 date: 2020-07-01 21:28:09
 tags:
   - LeetCode

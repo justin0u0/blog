@@ -3,7 +3,7 @@ title: LeetCode 514 - Freedom Trail
 date: 2020-07-01 21:28:09
 tags:
   - LeetCode
-  - Dynamic Programming
+  - 動態規劃（Dynamic Programming, DP）
 mathjax: true
 categories: LeetCode
 ---

@@ -16,7 +16,8 @@ categories: LeetCode
 一開始指標在字串 `ring` 的第一個字元上，將指標順時鐘或是逆時鐘動一格算是一步。當指標所指的字元等於你要拼的 `key` 中的字元，你還必須花一步來按下確認按鈕。
 
 # 範例說明
-<img src="https://assets.leetcode.com/uploads/2018/10/22/ring.jpg" width="30%" />
+<img src="/assets/freedom-trail-ring.jpg" width="30%" />
+
 <!-- more -->
 
 **輸入：**

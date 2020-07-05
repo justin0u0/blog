@@ -7,6 +7,8 @@ categories: LeetCode
 ---
 
 # 題目
+[題目連結](https://leetcode.com/problems/median-of-two-sorted-arrays/)
+
 給定兩個排序好的序列 `nums1` 和 `nums2`，長度分別為 `m` 和 `n`。
 
 找到兩個序列的中位數。

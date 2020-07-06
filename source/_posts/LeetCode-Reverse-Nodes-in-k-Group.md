@@ -3,12 +3,12 @@ title: LeetCode 25 - Reverse Nodes in k Group
 date: 2020-07-05 15:45:23
 tags:
   - LeetCode
-  - 鏈結串列（Linked list）
+  - 鏈結串列（Linked List）
 categories: LeetCode
 ---
 
 # 題目
-[題目連結](https://leetcode.com/problems/reverse-nodes-in-k-group/)
+題目連結：[https://leetcode.com/problems/reverse-nodes-in-k-group/](https://leetcode.com/problems/reverse-nodes-in-k-group/)
 
 給定一個 Linked List（以下簡稱串列），以每 `k` 個節點為一段做反轉。
 
@@ -20,6 +20,8 @@ Given this linked list: `1->2->3->4->5`
 For `k = 2`, you should return: `2->1->4->3->5`
 
 For `k = 3`, you should return: `3->2->1->4->5`
+
+<!-- More -->
 
 # 想法
 
@@ -55,6 +57,7 @@ For `k = 3`, you should return: `3->2->1->4->5`
 /**
  * Author: justin0u0<mail@justin0u0.com>
  * Problem: https://leetcode.com/problems/reverse-nodes-in-k-group/
+ * Runtime: 16ms
  */
 
 /**

@@ -3,13 +3,13 @@ title: LeetCode 23 - Merge k Sorted Lists
 date: 2020-07-04 17:32:59
 tags:
   - LeetCode
-  - 鏈結串列（Linked list）
+  - 鏈結串列（Linked List）
 categories: LeetCode
 mathjax: true
 ---
 
 # 題目
-[題目連結](https://leetcode.com/problems/merge-k-sorted-lists/)
+題目連結：[https://leetcode.com/problems/merge-k-sorted-lists/](https://leetcode.com/problems/merge-k-sorted-lists/)
 
 合併 `k` 個已排序好的鏈結串列成一個排序好的鏈結串列。
 
@@ -92,6 +92,7 @@ for (int i = 1; i < listsLength; i <<= 1) {
 /**
  * Author: justin0u0<mail@justin0u0.com>
  * Problem: https://leetcode.com/problems/merge-k-sorted-lists/
+ * Runtime: 28ms
  */
 
 /**

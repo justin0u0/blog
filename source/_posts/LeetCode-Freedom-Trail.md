@@ -9,7 +9,7 @@ categories: LeetCode
 ---
 
 # 題目
-[題目連結](https://leetcode.com/problems/freedom-trail/)
+題目連結：[https://leetcode.com/problems/freedom-trail/](https://leetcode.com/problems/freedom-trail/)
 
 給定一個環狀的字串 `ring`，再給一個字串 `key`，要求利用 `ring` 在最少步數內拼出字串 `key`。
 
@@ -49,6 +49,7 @@ $$min(dp(M, j)), \quad \forall\ j \in [0, N)$$
 /**
  * Author: justin0u0<mail@justin0u0.com>
  * Problem: https://leetcode.com/problems/freedom-trail/
+ * Runtime: 116ms
  */
 
 class Solution {
@@ -56,30 +57,28 @@ private:
   const int INF = 0x3f3f3f3f;
 public:
   int findRotateSteps(string ring, string key) {
-    const int ringLength = (int)ring.length();
-    const int keyLength = (int)key.length();
-    // 初始化 keyLength * ringLength 的陣列，並將值都設為無限大
-    vector<vector<int>> dp(keyLength + 1, vector<int>(ringLength, INF));
+    const int rl = (int)ring.length();
+    const int kl = (int)key.length();
+    // 初始化 kl * rl 的陣列，並將值都設為無限大
+    vector<vector<int>> dp(kl + 1, vector<int>(rl, INF));
     dp[0][0] = 0;
 
-    for (int i = 1; i <= keyLength; i++) {
-      char target = key[i - 1];
-      for (int j = 0; j < ringLength; j++) {
-        if (target == ring[j]) {
-          for (int k = 0; k < ringLength; k++) {
-            // 從位置 k 到位置 j，dist(k, j) = min(clockwise, anticlockwise) + 1
-            int clockwise = (k - j + ringLength) % ringLength;
-            int anticlockwise = (j - k + ringLength) % ringLength;
-            dp[i][j] = min(dp[i][j], dp[i - 1][k] + min(clockwise, anticlockwise) + 1);
+    for (int i = 1; i <= kl; i++) {
+      for (int j = 0; j < rl; j++) {
+        if (key[i - 1] == ring[j]) {
+          for (int k = 0; k < rl; k++) {
+            // 從位置 k 到位置 j，dist(k, j) = min(abs(k - j), rl - abs(k - j)) + 1
+            int dist = abs(k - j);
+            dp[i][j] = min(dp[i][j], dp[i - 1][k] + min(dist, rl - dist) + 1);
           }
         }
       }
     }
 
-    // 答案為 dp[keyLength] 中的最小值
+    // 答案為 dp[kl] 中的最小值
     int steps = INF;
-    for (int i = 0; i < ringLength; i++) {
-      steps = min(steps, dp[keyLength][i]);
+    for (int i = 0; i < rl; i++) {
+      steps = min(steps, dp[kl][i]);
     }
     return steps;
   }

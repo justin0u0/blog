@@ -7,7 +7,7 @@ categories: LeetCode
 ---
 
 # 題目
-[題目連結](https://leetcode.com/problems/median-of-two-sorted-arrays/)
+題目連結：[https://leetcode.com/problems/median-of-two-sorted-arrays/](https://leetcode.com/problems/median-of-two-sorted-arrays/)
 
 給定兩個排序好的序列 `nums1` 和 `nums2`，長度分別為 `m` 和 `n`。
 
@@ -71,6 +71,7 @@ The median is (2 + 3)/2 = 2.5
 /**
  * Author: justin0u0<mail@justin0u0.com>
  * Problem: https://leetcode.com/problems/median-of-two-sorted-arrays/
+ * Runtime: 44ms
  */
 
 class Solution {

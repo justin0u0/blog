@@ -9,7 +9,7 @@ mathjax: true
 ---
 
 # 題目
-[題目連結](https://leetcode.com/problems/regular-expression-matching/)
+題目連結：[https://leetcode.com/problems/regular-expression-matching/](https://leetcode.com/problems/regular-expression-matching/)
 
 給一個字串 `s` 和樣板（pattern） `p`，實作支援 `.` 和 `*` 的 regular expression。
 
@@ -166,6 +166,7 @@ Output: false
 /**
  * Author: justin0u0<mail@justin0u0.com>
  * Problem: https://leetcode.com/problems/regular-expression-matching/
+ * Runtime: 24ms
  */
 
 class Solution {

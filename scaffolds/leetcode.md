@@ -11,6 +11,8 @@ categories: LeetCode
 
 # 範例說明
 
+<!-- More -->
+
 # 想法
 
 # 程式碼

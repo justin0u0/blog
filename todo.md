@@ -2,4 +2,4 @@
 # Posts
 
 - Typing speeding
-- Dynamic Programming Convention?
+- Sudoku Solver -> Dancing Link Algorithm Solution

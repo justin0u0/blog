@@ -92,7 +92,7 @@ Output: false
 
 1. 首先，我們可以發現，如果一個字元的後面為一個 `*` 字元，那麼我們應該要把這個字元跟連著的 `*` 看成一組。也就是說，如果遇到一個字元後面緊接著一個 `*`，那麼我們可以直接把忽略這個字元的作用直接繼承上一排的狀態，所以轉移式為：
 
-  $$d(i,\ j)=d(i,\ j-1)\quad if\ \textcolor{red}{p[i+1]=*}$$
+  $$d(i,\ j)=d(i,\ j-1)\quad if\ \textcolor{red}{p[j+1]=*}$$
 
 2. 再來，如果 `p[j]` 為一般的字母且匹配到 `s[i]`，那麼我們 `d(i, j)=1` 若且唯若 `d(i - 1, j - 1) = 1`。也就是如果 `s[1 ~ i - 1]` 能匹配到 `p[1 ~ j - 1]` 且 `s[i] == p[j]`，那麼 `s[1 ~ i]` 匹配到 `p[1 ~ j]`。所以轉移式為：
 
@@ -112,14 +112,14 @@ Output: false
 
 ## DP 總整理
 
-有了上述 4 點，我們可以整理轉移式為：
-  $$d(i,\ j)=d(i,\ j-1)\quad if\ \textcolor{red}{p[i+1]=*}$$
+有了上述 4 點，可以整理轉移式為：
+  $$d(i,\ j)=d(i,\ j-1)\quad if\ \textcolor{red}{p[j+1]=*}$$
 
   $$d(i,\ j)=d(i-1,\ j-1)\quad else\ if\ \textcolor{red}{s[i]=p[j]\ |\ p[j]=.}$$
 
   $$d(i,\ j)=(\textcolor{red}{d(i,\ j-1)}\ |\ \textcolor{blue}{(}\textcolor{red}{d(i-1,j)}\ \&\ \textcolor{purple}{(}\textcolor{red}{p[j-1]=s[i]}\ |\ \textcolor{red}{p[j-1]=.}\textcolor{purple}{)}\textcolor{blue}{)}) \quad else\ if\ \textcolor{red}{p[j]=*}$$
 
-最後我們考慮邊界情況，我們發現：
+最後我們考慮邊界情況，發現：
 
 1. `d(0, 0)=1`：`s` 與 `p` 同時為空應該要算是匹配。
 2. `d(i, 0)=0, i > 0`：`p` 為空但 `s` 不為空，不匹配。

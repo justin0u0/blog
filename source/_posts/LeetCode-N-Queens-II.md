@@ -2,6 +2,7 @@
 title: LeetCode 52 - N-Queens II
 tags:
   - LeetCode
+  - 回朔法（Backtracking）
 categories: LeetCode
 date: 2020-07-14 09:51:23
 ---

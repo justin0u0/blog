@@ -9,6 +9,8 @@ categories: LeetCode
 ---
 
 # 題目
+題目連結：[https://leetcode.com/problems/substring-with-concatenation-of-all-words/](https://leetcode.com/problems/substring-with-concatenation-of-all-words/)
+
 給定一個字串 `s` 和一個 `words` 陣列，`words` 內包含長度一樣的單詞。
 找到所有的子字串的開頭索引值，子字串必須是 `words` 中的每一個單詞各出現一次的連接字串。
 

@@ -271,7 +271,7 @@ curl "http://localhost:3000/greeter?name=test"
 ```bash
 minikube delete
 minikube start --vm=true
-minikube enable addons ingress
+minikube addons enable ingress
 ```
 
 建立 Kubernetes  部署用的資料夾：

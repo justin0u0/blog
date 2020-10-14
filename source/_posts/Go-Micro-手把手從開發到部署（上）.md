@@ -263,7 +263,7 @@ protoc -I . --go_out=. --micro_out=. ./proto/greeter.proto
 
 ## Go-Micro 的基本介紹
 
-有了上一篇文章生成的 Go, Go-Micro 文件，我們可以開始編寫 Go-Micro Service。
+有了上一段文章生成的 Go, Go-Micro 文件，我們可以開始編寫 Go-Micro Service。
 
 首先來認識 Go-Micro 這個框架：
 

@@ -174,7 +174,7 @@ services:
       - etcd
   
   etcd:
-    image: bitnami/etcd:latest
+    image: bjnami/etcd:latest
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
@@ -301,7 +301,7 @@ kubectl apply -f ./k8s/namespace.yaml
 
 再來，建構 Deployment，其中有幾個要注意的地方：
 
-1. 這裡可以看到我們將 `spec.template.spec.containers[0].imagePullPolicy` 都設為 `Never`，因為我們需要 Kubernetes 使用本地的 Docker Image，而要讓 Minikube 能獲取本地的 Docker Image，我們需要先執行 `eval $(minikube docker-env)`，並且再執行一次 `docker build -t greeter-api ./greeter-api && docker build -i greeter-service ./greeter-service`
+1. 這裡可以看到我們將 `spec.template.spec.containers[0].imagePullPolicy` 都設為 `Never`，因為我們需要 Kubernetes 使用本地的 Docker Image，而要讓 Minikube 能獲取本地的 Docker Image，我們需要先執行 `eval $(minikube docker-env)`，並且再執行一次 `docker build -t greeter-api ./greeter-api && docker build -t greeter-service ./greeter-service`
     當然你也可以將 Image Push 到 Cloud Registry，這時你的 `imagePullPolicy` 就要改回 `Always`，或是不設定。
 2. 可以看到我們的 `registry_address` 還是保留在 `etcd:2379`。說明了我們在稍後必須利用 Kubernetes Service 來將 Etcd 的 IP DNS 設為 `Etcd`
 

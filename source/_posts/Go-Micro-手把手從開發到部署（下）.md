@@ -24,8 +24,8 @@ categories:
 
 首先我們編寫開發用的 `docker-compose` 檔案：
 
-```bash
-// docker-compose.dev.yaml
+```yaml
+# docker-compose.dev.yaml
 
 version: '3.5'
 

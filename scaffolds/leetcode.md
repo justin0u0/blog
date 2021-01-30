@@ -18,3 +18,6 @@ categories: LeetCode
 # 實作細節
 
 # 程式碼
+
+```cpp
+```

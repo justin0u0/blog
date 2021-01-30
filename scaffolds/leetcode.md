@@ -15,4 +15,6 @@ categories: LeetCode
 
 # 想法
 
+# 實作細節
+
 # 程式碼

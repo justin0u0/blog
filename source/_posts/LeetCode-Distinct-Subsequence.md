@@ -1,5 +1,5 @@
 ---
-title: LeetCode - Distince Subsequence
+title: LeetCode 115 - Distinct Subsequence
 tags:
   - LeetCode
   - 動態規劃（Dynamic Programming, DP）

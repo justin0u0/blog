@@ -55,7 +55,7 @@ Explanation: 2 cannot be in the right subtree of 3 because 2 < 3. Swapping 2 and
       1 2 3 4 5 6 7 8 9
       1 2 4 3 5 6 7 8 9
     ```
-    可以發現，相鄰兩數交換後會產生一個[逆序數對](https://zh.wikipedia.org/zh-tw/%E9%80%86%E5%BA%8F%E5%AF%B9){(<font color="red">4</font>, <font color="red">3</font>)}，復原這個逆序數對即可。
+    可以發現，相鄰兩數交換後會產生一個相鄰的[逆序數對](https://zh.wikipedia.org/zh-tw/%E9%80%86%E5%BA%8F%E5%AF%B9){(<font color="red">4</font>, <font color="red">3</font>)}，復原這個逆序數對即可。
 
 2. 交換的數字是不相鄰的
     Example: 交換 3, 7。
@@ -65,9 +65,9 @@ Explanation: 2 cannot be in the right subtree of 3 because 2 < 3. Swapping 2 and
       1 2 7 4 5 6 3 8 9
     ```
 
-    可以發現，不相鄰兩數交換後會產生兩個逆序數對 {(<font color="red">7</font>, 4), (6, <font color="red">3</font>)}，則交換第一個逆序數對中的前面的數，以及第二組逆序數對中後面的數即可。
+    可以發現，不相鄰兩數交換後會產生兩個相鄰的逆序數對 {(<font color="red">7</font>, 4), (6, <font color="red">3</font>)}，則交換第一個逆序數對中的前面的數，以及第二組逆序數對中後面的數即可。
 
-統整來說，我們可以在中序走訪中尋找逆序數對，如果有一組的話，則交換逆序數對的兩數；如果有兩組的話，則交換第一組逆序數對前面的數以及第二組逆序數對後面的數。
+統整來說，我們可以在中序走訪中尋找相鄰的逆序數對，如果有一組的話，則交換逆序數對的兩數；如果有兩組的話，則交換第一組逆序數對前面的數以及第二組逆序數對後面的數。
 
 # 實作細節
 
@@ -112,11 +112,11 @@ public:
     solver(root->left);
 
     if (target == nullptr && (lastNode != nullptr && lastNode->val > root->val)) {
-      // target == nullptr，第一組逆序數對
+      // target == nullptr，第一組相鄰逆序數對
       target = lastNode;
       candidate = root;
     } else if (target != nullptr && (lastNode != nullptr && lastNode->val > root->val)) {
-      // target != nullptr，第二組逆序數對
+      // target != nullptr，第二組相鄰逆序數對
       candidate = root;
     }
     lastNode = root;

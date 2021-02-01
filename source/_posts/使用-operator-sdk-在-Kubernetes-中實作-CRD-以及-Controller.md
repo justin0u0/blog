@@ -28,6 +28,8 @@ spec:
 
 程式碼的部分在：[https://github.com/justin0u0/podset-operator](https://github.com/justin0u0/podset-operator)
 
+<!-- More -->
+
 # Prerequisites
 
 筆者的環境如下：

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.justin0u0.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;scramble-string 給定一個字串 s1，將 s1 分成 x 和 y 兩段子字串，你可以決定是否將交換兩段子字串的順序，也就是 s1 &#x3D; x + y，或是 s1 &#x3D; y + x。接著再對 x, y 分別進行一樣的操作，直到字串都變成長度 1 為止。 現在給你另一個字串 s2，問是否 s1 可以透過上述的操作變成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 87 - Scramble String">
+<meta property="og:url" content="https://blog.justin0u0.com/LeetCode-Scramble-String/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;scramble-string 給定一個字串 s1，將 s1 分成 x 和 y 兩段子字串，你可以決定是否將交換兩段子字串的順序，也就是 s1 &#x3D; x + y，或是 s1 &#x3D; y + x。接著再對 x, y 分別進行一樣的操作，直到字串都變成長度 1 為止。 現在給你另一個字串 s2，問是否 s1 可以透過上述的操作變成">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2021-01-28T01:55:33.000Z">
+<meta property="article:modified_time" content="2021-01-28T02:44:37.602Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="動態規劃（Dynamic Programming, DP）">
+<meta property="article:tag" content="遞迴（Recursion）">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.justin0u0.com/LeetCode-Scramble-String/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-tw'
+  };
+</script>
+
+  <title>LeetCode 87 - Scramble String | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-171665364-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-171665364-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin0u0's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/LeetCode-Scramble-String/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode 87 - Scramble String
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-28 09:55:33 / Modified: 10:44:37" itemprop="dateCreated datePublished" datetime="2021-01-28T09:55:33+08:00">2021-01-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/LeetCode-Scramble-String/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="LeetCode-Scramble-String/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="題目"><a class="markdownIt-Anchor" href="#題目"></a> 題目</h1>
+<p>題目連結：<a href="https://leetcode.com/problems/scramble-string" target="_blank" rel="noopener">https://leetcode.com/problems/scramble-string</a></p>
+<p>給定一個字串 <code>s1</code>，將 <code>s1</code> 分成 <code>x</code> 和 <code>y</code> 兩段子字串，你可以決定是否將交換兩段子字串的順序，也就是 <code>s1 = x + y</code>，或是 <code>s1 = y + x</code>。接著再對 <code>x</code>, <code>y</code> 分別進行一樣的操作，直到字串都變成長度 1 為止。</p>
+<p>現在給你另一個字串 <code>s2</code>，問是否 <code>s1</code> 可以透過上述的操作變成 <code>s2</code>。</p>
+<h1 id="範例說明"><a class="markdownIt-Anchor" href="#範例說明"></a> 範例說明</h1>
+<h2 id="example-1"><a class="markdownIt-Anchor" href="#example-1"></a> Example 1:</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Input: s1 &#x3D; &quot;great&quot;, s2 &#x3D; &quot;rgeat&quot;</span><br><span class="line">Output: true</span><br><span class="line"></span><br><span class="line">Explanation: One possible scenario applied on s1 is:</span><br><span class="line">&quot;great&quot; --&gt; &quot;gr&#x2F;eat&quot; &#x2F;&#x2F; divide at random index.</span><br><span class="line">&quot;gr&#x2F;eat&quot; --&gt; &quot;gr&#x2F;eat&quot; &#x2F;&#x2F; random decision is not to swap the two substrings and keep them in order.</span><br><span class="line">&quot;gr&#x2F;eat&quot; --&gt; &quot;g&#x2F;r &#x2F; e&#x2F;at&quot; &#x2F;&#x2F; apply the same algorithm recursively on both substrings. divide at ranom index each of them.</span><br><span class="line">&quot;g&#x2F;r &#x2F; e&#x2F;at&quot; --&gt; &quot;r&#x2F;g &#x2F; e&#x2F;at&quot; &#x2F;&#x2F; random decision was to swap the first substring and to keep the second substring in the same order.</span><br><span class="line">&quot;r&#x2F;g &#x2F; e&#x2F;at&quot; --&gt; &quot;r&#x2F;g &#x2F; e&#x2F; a&#x2F;t&quot; &#x2F;&#x2F; again apply the algorithm recursively, divide &quot;at&quot; to &quot;a&#x2F;t&quot;.</span><br><span class="line">&quot;r&#x2F;g &#x2F; e&#x2F; a&#x2F;t&quot; --&gt; &quot;r&#x2F;g &#x2F; e&#x2F; a&#x2F;t&quot; &#x2F;&#x2F; random decision is to keep both substrings in the same order.</span><br><span class="line">The algorithm stops now and the result string is &quot;rgeat&quot; which is s2.</span><br><span class="line">As there is one possible scenario that led s1 to be scrambled to s2, we return true.</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="example-2"><a class="markdownIt-Anchor" href="#example-2"></a> Example 2:</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: s1 &#x3D; &quot;abcde&quot;, s2 &#x3D; &quot;caebd&quot;</span><br><span class="line">Output: false</span><br></pre></td></tr></table></figure>
+<h2 id="example-3"><a class="markdownIt-Anchor" href="#example-3"></a> Example 3:</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: s1 &#x3D; &quot;a&quot;, s2 &#x3D; &quot;a&quot;</span><br><span class="line">Output: true</span><br></pre></td></tr></table></figure>
+<h1 id="想法"><a class="markdownIt-Anchor" href="#想法"></a> 想法</h1>
+<p>我們可以枚舉字串的切點，對於每個切點我們也枚舉<strong>交換兩個子字串</strong>或是<strong>不交換兩個子字串</strong>的情形。</p>
+<p>最好實現枚舉的方法就是利用遞迴。所以我們可以假設 <code>isScramble(s1, s2)</code> 代表 s1 字串有沒有可能透過 scramble 操作變成 s2。</p>
+<p>那麼枚舉所有的 <code>s1 = x1 + y1</code> 並且：</p>
+<ol>
+<li>將 <code>s2</code> 字串分為 <code>s2 = x2 + y2</code> 且 <code>x1</code>, <code>x2</code> 等長（那麼 <code>y1</code>, <code>y2</code> 也會等長），則當 <code>isScramble(x1, x2) == true &amp;&amp; isScramble(y1, y2) == true</code>，那麼 <code>isScramble(s1, s2) = true</code>。</li>
+<li>將 <code>s2</code> 字串分為 <code>s2 = x2 + y2</code> 且 <code>x1</code>, <code>y2</code> 等長（那麼 <code>y1</code>, <code>x2</code> 也會等長），則當 <code>isScramble(x1, y2) == true &amp;&amp; isScramble(y1, x2) == true</code>，那麼 <code>isScramble(s1, s2) = true</code>。</li>
+</ol>
+<p>若枚舉完上述所有情形，都無法使 <code>isScramble(s1, s2) = true</code>，則 <code>isScramble(s1, s2) = false</code>。</p>
+<p>不過純枚舉所有情形的話，那時間複雜度可能會很慘（當然，因為 LeetCode 的測資都很小，所以不做優化還是會跑的很快），所以我們可以考慮以下兩點優化：</p>
+<ol>
+<li>記憶化搜索。也就已經判別過的，我們就不再判別一次。</li>
+<li>剪枝。
+<ol>
+<li>已經確認當前的字串不可能符合。那就是當 <code>s1</code> 的字母組成與 <code>s2</code> 不同時，那不管怎麼交換順序，<code>s1</code> 和 <code>s2</code> 是永遠都不可能會變成一樣的。</li>
+<li>已經確認當前的字串符合。當 <code>s1 = s2</code>，則可以確認 <code>isScramble(s1, s2) = true</code>。</li>
+</ol>
+</li>
+</ol>
+<h1 id="實作"><a class="markdownIt-Anchor" href="#實作"></a> 實作</h1>
+<p>首先，<code>l1</code>, <code>l2</code>, <code>len</code> 代表要驗證 <code>isScramble</code> 的兩個子字串是 <code>s1[l1, l1 + len - 1]</code> 以及 <code>s2[l2, l2 + len - 1]</code>。</p>
+<p>所以 <code>dp[l1][l2][len]</code> 代表子字串 <code>s1[l1, l1 + len - 1]</code>, <code>s2[l2, l2 + len - 1]</code> 的 <code>isScramble</code>。</p>
+<p><code>dp</code> 陣列初始化為 <code>-1</code>，代表還不知道答案。</p>
+<p>接著實作遞迴函數 <code>solver</code>，當 <code>dp[l1][l2][len] != -1</code>，則代表答案已經被求得，直接回傳 <code>dp[l1][l2][len]</code> 的答案。</p>
+<p>否則可以先進行兩個剪枝，<code>isSame</code> 用來判別兩次字串是否相等。<code>cnt</code> 則用來判別兩字串的字母組成是否相同，<code>cnt[0]</code> 代表字母 <code>a</code> 的數量，<code>cnt[1]</code> 代表字母 <code>b</code> 的數量…，以此類推，在字串 <code>s1</code> 將字母用加的加入 <code>cnt</code>，字串 <code>s2</code> 則將字母用扣的加入 <code>cnt</code>，最後 <code>cnt</code> 內應該全部為 0 才代表字串的字母組成相同。</p>
+<p>若 <code>isSame == true</code> 則回傳 <code>true</code>，並且要將答案紀錄在 <code>dp</code> 陣列中，因此可以簡單的寫成 <code>return (dp[l1][l2][len] = true)</code>。</p>
+<p>若 <code>cnt</code> 中有任何一項不為 0，代表字母組成不同，則回傳 <code>false</code>。</p>
+<p>最後，枚舉切點以及是否交換順序。<code>i</code> 代表字串 <code>s1 = x1 + y1</code> 或是 <code>s1 = y1 + x1</code> 的 <code>x1</code> 字串長度。</p>
+<p>當 <code>s1 = x1 + y1</code>，則 <code>s2 = x2 + y2</code> 的 <strong><code>x2</code> 長度等於 <code>x1</code> 長度等於 <code>i</code></strong>，而 <strong><code>y1</code>, <code>y2</code> 長度等於</strong> <code>s1</code> 長度 <code>len</code> 減去 <code>i</code>，也就是 <strong><code>len - i</code></strong>，因此若 <code>solver(l1, l2, i) == true &amp;&amp; solver(l1 + i, l2 + i, len - i) == true</code>，則回傳 <code>true</code>。</p>
+<p>當 <code>s1 = y1 + x1</code>，則 <code>s2 = x2 + y2</code> 的 <strong><code>x2</code> 長度等於 <code>y1</code> 長度等於 <code>len - i</code></strong>，而 <strong><code>y2</code>, <code>x1</code> 長度等於 <code>i</code></strong>，因此若 <code>solver(l1 + i, l2, len - i) == true &amp;&amp; solver(l1, l2 + len - i, i) == true</code>，則回傳 <code>true</code>。</p>
+<p>最後，若都沒有符合的，則回傳 <code>false</code>。</p>
+<h1 id="程式碼"><a class="markdownIt-Anchor" href="#程式碼"></a> 程式碼</h1>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Author: justin0u0&lt;mail@justin0u0.com&gt;</span></span><br><span class="line"><span class="comment"> * Problem: https://leetcode.com/problems/scramble-string/</span></span><br><span class="line"><span class="comment"> * Runtime: 4ms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="keyword">int</span> dp[<span class="number">31</span>][<span class="number">31</span>][<span class="number">31</span>];</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">solver</span><span class="params">(<span class="built_in">string</span>&amp; s1, <span class="keyword">int</span> l1, <span class="built_in">string</span>&amp; s2, <span class="keyword">int</span> l2, <span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (dp[l1][l2][len] != <span class="number">-1</span>)</span><br><span class="line">      <span class="keyword">return</span> dp[l1][l2][len];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">bool</span> isSame = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">int</span> cnt[<span class="number">26</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (s1[l1 + i] != s2[l2 + i])</span><br><span class="line">        isSame = <span class="literal">false</span>;</span><br><span class="line">      ++cnt[s1[l1 + i] - <span class="string">'a'</span>];</span><br><span class="line">      --cnt[s2[l2 + i] - <span class="string">'a'</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (isSame)</span><br><span class="line">      <span class="keyword">return</span> (dp[l1][l2][len] = <span class="literal">true</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">26</span>; i++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (cnt[i])</span><br><span class="line">        <span class="keyword">return</span> (dp[l1][l2][len] = <span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; len; i++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (solver(s1, l1, s2, l2, i) &amp;&amp; solver(s1, l1 + i, s2, l2 + i, len - i))</span><br><span class="line">        <span class="keyword">return</span> (dp[l1][l2][len] = <span class="literal">true</span>);</span><br><span class="line">      <span class="keyword">if</span> (solver(s1, l1 + i, s2, l2, len - i) &amp;&amp; solver(s1, l1, s2, l2 + len - i, i))</span><br><span class="line">        <span class="keyword">return</span> (dp[l1][l2][len] = <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (dp[l1][l2][len] = <span class="literal">false</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">isScramble</span><span class="params">(<span class="built_in">string</span> s1, <span class="built_in">string</span> s2)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">memset</span>(dp, <span class="number">-1</span>, <span class="keyword">sizeof</span>(dp));</span><br><span class="line">    <span class="keyword">return</span> solver(s1, <span class="number">0</span>, s2, <span class="number">0</span>, s1.length());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.justin0u0.com/LeetCode-Scramble-String/" title="LeetCode 87 - Scramble String">https://blog.justin0u0.com/LeetCode-Scramble-String/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/%E5%8B%95%E6%85%8B%E8%A6%8F%E5%8A%83%EF%BC%88Dynamic-Programming-DP%EF%BC%89/" rel="tag"># 動態規劃（Dynamic Programming, DP）</a>
+              <a href="/tags/%E9%81%9E%E8%BF%B4%EF%BC%88Recursion%EF%BC%89/" rel="tag"># 遞迴（Recursion）</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/LeetCode-Permutation-Sequence/" rel="prev" title="LeetCode 60 - Permutation Sequence">
+      <i class="fa fa-chevron-left"></i> LeetCode 60 - Permutation Sequence
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/LeetCode-Interleaving-String/" rel="next" title="LeetCode 97 - Interleaving String">
+      LeetCode 97 - Interleaving String <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%8C%E7%9B%AE"><span class="nav-number">1.</span> <span class="nav-text"> 題目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B%E8%AA%AA%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text"> 範例說明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#example-1"><span class="nav-number">2.1.</span> <span class="nav-text"> Example 1:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-2"><span class="nav-number">2.2.</span> <span class="nav-text"> Example 2:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-3"><span class="nav-number">2.3.</span> <span class="nav-text"> Example 3:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%83%B3%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text"> 想法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%A6%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text"> 實作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">5.</span> <span class="nav-text"> 程式碼</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/uploads/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">justin0u0</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://justin0u0.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog.justin0u0.com/LeetCode-Scramble-String/";
+    this.page.identifier = "LeetCode-Scramble-String/";
+    this.page.title = "LeetCode 87 - Scramble String";
+    this.language = 'zh_TW';
+  };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://justin0u0.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

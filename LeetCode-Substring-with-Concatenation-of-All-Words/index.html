@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.justin0u0.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;substring-with-concatenation-of-all-words&#x2F; 給定一個字串 s 和一個 words 陣列，words 內包含長度一樣的單詞。 找到所有的子字串的開頭索引值，子字串必須是 words 中的每一個單詞各出現一次的連接字串。  範例說明  Example 1 123456Input:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 30 - Substring with Concatenation of All Words">
+<meta property="og:url" content="https://blog.justin0u0.com/LeetCode-Substring-with-Concatenation-of-All-Words/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;substring-with-concatenation-of-all-words&#x2F; 給定一個字串 s 和一個 words 陣列，words 內包含長度一樣的單詞。 找到所有的子字串的開頭索引值，子字串必須是 words 中的每一個單詞各出現一次的連接字串。  範例說明  Example 1 123456Input:">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-07-06T01:08:20.000Z">
+<meta property="article:modified_time" content="2020-07-19T13:23:07.612Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="滑動窗口（Sliding Window）">
+<meta property="article:tag" content="雜湊（Hash table）">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.justin0u0.com/LeetCode-Substring-with-Concatenation-of-All-Words/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-tw'
+  };
+</script>
+
+  <title>LeetCode 30 - Substring with Concatenation of All Words | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-171665364-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-171665364-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin0u0's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/LeetCode-Substring-with-Concatenation-of-All-Words/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode 30 - Substring with Concatenation of All Words
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-06 09:08:20" itemprop="dateCreated datePublished" datetime="2020-07-06T09:08:20+08:00">2020-07-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-19 21:23:07" itemprop="dateModified" datetime="2020-07-19T21:23:07+08:00">2020-07-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/LeetCode-Substring-with-Concatenation-of-All-Words/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="LeetCode-Substring-with-Concatenation-of-All-Words/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="題目"><a class="markdownIt-Anchor" href="#題目"></a> 題目</h1>
+<p>題目連結：<a href="https://leetcode.com/problems/substring-with-concatenation-of-all-words/" target="_blank" rel="noopener">https://leetcode.com/problems/substring-with-concatenation-of-all-words/</a></p>
+<p>給定一個字串 <code>s</code> 和一個 <code>words</code> 陣列，<code>words</code> 內包含長度一樣的單詞。<br />
+找到所有的子字串的開頭索引值，子字串必須是 <code>words</code> 中的每一個單詞各出現一次的連接字串。</p>
+<h1 id="範例說明"><a class="markdownIt-Anchor" href="#範例說明"></a> 範例說明</h1>
+<h2 id="example-1"><a class="markdownIt-Anchor" href="#example-1"></a> Example 1</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">  s &#x3D; &quot;barfoothefoobarman&quot;,</span><br><span class="line">  words &#x3D; [&quot;foo&quot;,&quot;bar&quot;]</span><br><span class="line">Output: [0,9]</span><br><span class="line">Explanation: Substrings starting at index 0 and 9 are &quot;barfoo&quot; and &quot;foobar&quot; respectively.</span><br><span class="line">The output order does not matter, returning [9,0] is fine too.</span><br></pre></td></tr></table></figure>
+<h2 id="example-2"><a class="markdownIt-Anchor" href="#example-2"></a> Example 2</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">  s &#x3D; &quot;wordgoodgoodgoodbestword&quot;,</span><br><span class="line">  words &#x3D; [&quot;word&quot;,&quot;good&quot;,&quot;best&quot;,&quot;word&quot;]</span><br><span class="line">Output: []</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h1 id="想法"><a class="markdownIt-Anchor" href="#想法"></a> 想法</h1>
+<p>假設 <code>wl</code> 為每一個單詞的長度。</p>
+<p>要找的子字串必須相連，所以將字串 <code>s</code> 分為 <code>wl</code> 個集合，分別為：</p>
+<ul>
+<li><code>0</code>, <code>0 + wl</code>, <code>0 + 2 * wl</code>, <code>0 + 3 * wl</code> …</li>
+<li><code>1</code>, <code>1 + wl</code>, <code>1 + 2 * wl</code>, <code>1 + 3 * wl</code> …</li>
+<li>…</li>
+<li><code>(wl - 1)</code>, <code>(wl - 1) + wl</code>, <code>(wl - 1) + 2 * wl</code>, <code>(wl - 1) + 3 * wl</code> …</li>
+</ul>
+<p>例如 <code>Example 1</code> 中的 <code>s = &quot;barfoothefoobarman&quot;</code>, <code>words = [&quot;foo&quot;, &quot;bar&quot;]</code>， 則可以分為 <code>{ &quot;bar&quot;, &quot;foo&quot;, &quot;the&quot;, &quot;foo&quot;, &quot;bar&quot;, &quot;man&quot; }</code>, <code>{ &quot;arf&quot;, &quot;oot&quot;, &quot;hef&quot;, &quot;oob&quot;, &quot;arm&quot; }</code>, <code>{ &quot;rfo&quot;, &quot;oth&quot;, &quot;efo&quot;, &quot;oba&quot;, &quot;rma&quot; }</code> 三個集合。</p>
+<p>答案必定為同一個集合內的連續一段子字串。</p>
+<p>在一個集合之中，利用 <strong>Sliding Window</strong> 找尋答案。所謂 <strong>Sliding Window</strong> 是指利用兩個指標標示目前的範圍，或是稱作「窗口」。原本窗口內為空集合，從第一個字串開始，將字串加入窗口（窗口的右側增加，窗口變大），如果當前的字串加入後，窗口內的字串們無法形成答案，就逐次將窗口左側向右（窗口變小），直到窗口內的字串們可以形成答案，或是窗口為空。</p>
+<p>要判斷窗口內的答案可否形成答案，也就是要判斷窗口內的子字串們是不是 <code>words</code> 的子集合。再者，若窗口內的子字串們恰好等於 <code>words</code> 的單詞集合，那窗口最左側的字串之索引值就是一個合法答案。</p>
+<p>一樣以 <code>Example 1</code> 為例子，一開始窗口為 <code>[]</code>。</p>
+<ol>
+<li><code>&quot;bar&quot;</code> -&gt; 將 <code>&quot;bar&quot;</code> 加入窗口，窗口為 <code>[&quot;bar&quot;]</code>，是 <code>words</code> 的子集合。</li>
+<li><code>&quot;foo&quot;</code> -&gt; 將 <code>&quot;foo&quot;</code> 加入窗口，窗口為 <code>[&quot;bar&quot;, &quot;foo&quot;]</code>，恰好等於 <code>words</code>，所以窗口左側 <code>&quot;bar&quot;</code> 的索引為一組答案。</li>
+<li><code>&quot;the&quot;</code> -&gt; 將 <code>&quot;the&quot;</code> 加入窗口，窗口為 <code>[&quot;bar&quot;, &quot;foo&quot;, &quot;the&quot;]</code>，不為 <code>words</code> 的子集合，依次將左側窗口向右直到窗口為 <code>words</code> 之子集合或是窗口為空，<code>[&quot;bar&quot;, &quot;foo&quot;, &quot;the&quot;] -&gt; [&quot;foo&quot;, &quot;the&quot;]-&gt; [&quot;the&quot;] -&gt; []</code>。</li>
+<li><code>&quot;foo&quot;</code> -&gt; 將 <code>&quot;foo&quot;</code> 加入窗口，窗口為 <code>[&quot;foo&quot;]</code>，是 <code>words</code> 的子集合。</li>
+<li><code>&quot;bar&quot;</code> -&gt; 將 <code>&quot;bar&quot;</code> 加入窗口，窗口為 <code>[&quot;foo&quot;, &quot;bar&quot;]</code>，恰好等於 <code>words</code>，所以窗口左側 <code>&quot;foo&quot;</code> 的索引為一組答案。</li>
+<li><code>&quot;man&quot;</code> -&gt; 將 <code>&quot;man&quot;</code> 加入窗口，窗口為 <code>[&quot;foo&quot;, &quot;bar&quot;, &quot;man&quot;]</code>，不為 <code>words</code> 的子集合，依次將左側窗口向右直到窗口為 <code>words</code> 之子集合或是窗口為空，<code>[&quot;foo&quot;, &quot;bar&quot;, &quot;man&quot;] -&gt; [&quot;bar&quot;, &quot;man&quot;]-&gt; [&quot;man&quot;] -&gt; []</code>。</li>
+</ol>
+<h1 id="實作細節"><a class="markdownIt-Anchor" href="#實作細節"></a> 實作細節</h1>
+<p>為了維護窗口內的子集合，可以使用 <strong><code>C++ STL unordered_multiset</code></strong>，<code>unordered_multiset</code> 為使用 <code>Hashmap</code> 實作的集合，可以 <code>O(1)</code> 加入、刪除、查找一個值。與 <code>unordered_set</code> 不同的是，<code>unordered_set</code> 視相同的值為集合內的同一個元素，但 <code>unordered_multiset</code> 視同一個值為集合內的不同元素。恰好符合 <code>words</code> 內可能有相同單詞的性質。</p>
+<p>假設 <code>dict</code> 為一 <code>unordered_multiset</code>，初始為空。</p>
+<p>實作上，先將 <code>words</code> 內的單詞都先加入 <code>dict</code> 之中，當新的子字串要加入窗口，就必須在 <code>dict</code> 中找到此子字串才代表此子字串加入後窗口會是 <code>words</code> 的子集合。子字串加入後，從 <code>dict</code> 中刪除此子字串，若 <code>dict</code> 為空，說明當前窗口恰好等於 <code>words</code>，左側窗口索引值紀錄。當左側窗口向右移動時，則把離開窗口的子字串加回 <code>dict</code> 之中。</p>
+<p>完成後不忘把窗口內的元素都加回 <code>dict</code> 之中，讓 <code>dict</code> 恢復成原本的樣子，以方便下一組的集合使用。</p>
+<p>假設 <code>N = 字串 s 長度</code>，每一個子字串只會被加入 Sliding Window 一次，只會從 Sliding Window 中被移除一次，加入、刪除的時間複雜度均是 <code>O(1)</code>。所以總時間複雜度為 <code>O(2N) = O(N)</code>。</p>
+<p>不過 C++ 的 <code>String.substr</code> 時間複雜度為 <code>O(String Length)</code>，所以總時間複雜度應該為 <code>O(wl * N)</code>。</p>
+<h1 id="程式碼"><a class="markdownIt-Anchor" href="#程式碼"></a> 程式碼</h1>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Author: justin0u0&lt;mail@justin0u0.com&gt;</span></span><br><span class="line"><span class="comment"> * Problem: https://leetcode.com/problems/substring-with-concatenation-of-all-words/</span></span><br><span class="line"><span class="comment"> * Runtime: 52ms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">findSubstring</span><span class="params">(<span class="built_in">string</span> s, <span class="built_in">vector</span>&lt;<span class="built_in">string</span>&gt;&amp; words)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 紀錄答案的索引值用</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; indices;</span><br><span class="line">    <span class="comment">// 排除一定無解的狀況</span></span><br><span class="line">    <span class="keyword">int</span> sl = (<span class="keyword">int</span>)s.length();</span><br><span class="line">    <span class="keyword">if</span> (!sl || words.empty()) <span class="keyword">return</span> indices;</span><br><span class="line">    <span class="keyword">int</span> wl = (<span class="keyword">int</span>)words[<span class="number">0</span>].length();</span><br><span class="line">    <span class="keyword">if</span> (sl &lt; wl * (<span class="keyword">int</span>)words.size() || !wl) <span class="keyword">return</span> indices;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 先將 words 中的單詞加入 dict</span></span><br><span class="line">    <span class="built_in">unordered_multiset</span>&lt;<span class="built_in">string</span>&gt; dict;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> word: words) dict.insert(word);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 共 wl 個集合，分別檢驗</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; wl; i++) &#123;</span><br><span class="line">      <span class="comment">// 窗口左側索引值</span></span><br><span class="line">      <span class="keyword">int</span> left = i;</span><br><span class="line">      <span class="comment">// 逐次將窗口右側向右</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> j = i; j + wl &lt;= sl; j += wl) &#123;</span><br><span class="line">        <span class="built_in">string</span> substring = s.substr(j, wl);</span><br><span class="line">        <span class="comment">// 若當前子字串加入後窗口不為 words 之子集合，則逐次將窗口左側向右，直到可以加入或窗口為空</span></span><br><span class="line">        <span class="keyword">while</span> (left &lt; j &amp;&amp; dict.find(substring) == dict.end()) &#123;</span><br><span class="line">          dict.insert(s.substr(left, wl));</span><br><span class="line">          left += wl;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">auto</span> it = dict.find(substring);</span><br><span class="line">        <span class="keyword">if</span> (it != dict.end()) &#123;</span><br><span class="line">          <span class="comment">// 將當前子字串加入窗口</span></span><br><span class="line">          dict.erase(it);</span><br><span class="line">          <span class="comment">// 若 dict 為空，窗口左側索引為一組合法答案</span></span><br><span class="line">          <span class="keyword">if</span> (dict.empty()) indices.emplace_back(left);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">// 當前子字串無法加入窗口</span></span><br><span class="line">          left = j + wl;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 將窗口內元素加回 dict 之中，復原 dict 讓下一個集合使用</span></span><br><span class="line">      <span class="keyword">while</span> (left + wl &lt;= sl) &#123;</span><br><span class="line">        dict.insert(s.substr(left, wl));</span><br><span class="line">        left += wl;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> indices;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.justin0u0.com/LeetCode-Substring-with-Concatenation-of-All-Words/" title="LeetCode 30 - Substring with Concatenation of All Words">https://blog.justin0u0.com/LeetCode-Substring-with-Concatenation-of-All-Words/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/%E6%BB%91%E5%8B%95%E7%AA%97%E5%8F%A3%EF%BC%88Sliding-Window%EF%BC%89/" rel="tag"># 滑動窗口（Sliding Window）</a>
+              <a href="/tags/%E9%9B%9C%E6%B9%8A%EF%BC%88Hash-table%EF%BC%89/" rel="tag"># 雜湊（Hash table）</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/LeetCode-Reverse-Nodes-in-k-Group/" rel="prev" title="LeetCode 25 - Reverse Nodes in k Group">
+      <i class="fa fa-chevron-left"></i> LeetCode 25 - Reverse Nodes in k Group
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/LeetCode-Longest-Valid-Parentheses/" rel="next" title="LeetCode 32 - Longest Valid Parentheses">
+      LeetCode 32 - Longest Valid Parentheses <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%8C%E7%9B%AE"><span class="nav-number">1.</span> <span class="nav-text"> 題目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B%E8%AA%AA%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text"> 範例說明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#example-1"><span class="nav-number">2.1.</span> <span class="nav-text"> Example 1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-2"><span class="nav-number">2.2.</span> <span class="nav-text"> Example 2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%83%B3%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text"> 想法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%A6%E4%BD%9C%E7%B4%B0%E7%AF%80"><span class="nav-number">4.</span> <span class="nav-text"> 實作細節</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">5.</span> <span class="nav-text"> 程式碼</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/uploads/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">justin0u0</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://justin0u0.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog.justin0u0.com/LeetCode-Substring-with-Concatenation-of-All-Words/";
+    this.page.identifier = "LeetCode-Substring-with-Concatenation-of-All-Words/";
+    this.page.title = "LeetCode 30 - Substring with Concatenation of All Words";
+    this.language = 'zh_TW';
+  };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://justin0u0.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

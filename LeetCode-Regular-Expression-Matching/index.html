@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.justin0u0.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;regular-expression-matching&#x2F; 給一個字串 s 和樣板（pattern） p，實作支援 . 和 * 的 regular expression。 12&#39;.&#39; Matches any single character. 匹配一個任一字元。&#39;*&#39; Matches zer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 10 - Regular Expression Matching">
+<meta property="og:url" content="https://blog.justin0u0.com/LeetCode-Regular-Expression-Matching/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;regular-expression-matching&#x2F; 給一個字串 s 和樣板（pattern） p，實作支援 . 和 * 的 regular expression。 12&#39;.&#39; Matches any single character. 匹配一個任一字元。&#39;*&#39; Matches zer">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-07-03T02:33:56.000Z">
+<meta property="article:modified_time" content="2020-07-12T10:31:41.504Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="動態規劃（Dynamic Programming, DP）">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.justin0u0.com/LeetCode-Regular-Expression-Matching/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-tw'
+  };
+</script>
+
+  <title>LeetCode 10 - Regular Expression Matching | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-171665364-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-171665364-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin0u0's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/LeetCode-Regular-Expression-Matching/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode 10 - Regular Expression Matching
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-03 10:33:56" itemprop="dateCreated datePublished" datetime="2020-07-03T10:33:56+08:00">2020-07-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-12 18:31:41" itemprop="dateModified" datetime="2020-07-12T18:31:41+08:00">2020-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/LeetCode-Regular-Expression-Matching/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="LeetCode-Regular-Expression-Matching/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="題目"><a class="markdownIt-Anchor" href="#題目"></a> 題目</h1>
+<p>題目連結：<a href="https://leetcode.com/problems/regular-expression-matching/" target="_blank" rel="noopener">https://leetcode.com/problems/regular-expression-matching/</a></p>
+<p>給一個字串 <code>s</code> 和樣板（pattern） <code>p</code>，實作支援 <code>.</code> 和 <code>*</code> 的 regular expression。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#39;.&#39; Matches any single character. 匹配一個任一字元。</span><br><span class="line">&#39;*&#39; Matches zero or more of the preceding element. 匹配零到任意多個前一個字元</span><br></pre></td></tr></table></figure>
+<p>計算 <code>s</code> 是否匹配 <code>p</code>。</p>
+<h1 id="範例說明"><a class="markdownIt-Anchor" href="#範例說明"></a> 範例說明</h1>
+<h2 id="example-1"><a class="markdownIt-Anchor" href="#example-1"></a> Example 1:</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">s &#x3D; &quot;aa&quot;</span><br><span class="line">p &#x3D; &quot;a&quot;</span><br><span class="line">Output: false</span><br><span class="line">Explanation: &quot;a&quot; does not match the entire string &quot;aa&quot;.</span><br></pre></td></tr></table></figure>
+<h2 id="example-2"><a class="markdownIt-Anchor" href="#example-2"></a> Example 2:</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">s &#x3D; &quot;aa&quot;</span><br><span class="line">p &#x3D; &quot;a*&quot;</span><br><span class="line">Output: true</span><br><span class="line">Explanation:</span><br><span class="line">&#39;*&#39; means zero or more of the preceding element, &#39;a&#39;.</span><br><span class="line">Therefore, by repeating &#39;a&#39; once, it becomes &quot;aa&quot;.</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="example-3"><a class="markdownIt-Anchor" href="#example-3"></a> Example 3:</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">s &#x3D; &quot;ab&quot;</span><br><span class="line">p &#x3D; &quot;.*&quot;</span><br><span class="line">Output: true</span><br><span class="line">Explanation:</span><br><span class="line">&quot;.*&quot; means &quot;zero or more (*) of any character (.)&quot;.</span><br></pre></td></tr></table></figure>
+<h2 id="example-4"><a class="markdownIt-Anchor" href="#example-4"></a> Example 4:</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">s &#x3D; &quot;aab&quot;</span><br><span class="line">p &#x3D; &quot;c*a*b&quot;</span><br><span class="line">Output: true</span><br><span class="line">Explanation:</span><br><span class="line">c can be repeated 0 times, a can be repeated 1 time. </span><br><span class="line">Therefore, it matches &quot;aab&quot;.</span><br></pre></td></tr></table></figure>
+<h2 id="example-5"><a class="markdownIt-Anchor" href="#example-5"></a> Example 5:</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">s &#x3D; &quot;mississippi&quot;</span><br><span class="line">p &#x3D; &quot;mis*is*p*.&quot;</span><br><span class="line">Output: false</span><br></pre></td></tr></table></figure>
+<h1 id="想法"><a class="markdownIt-Anchor" href="#想法"></a> 想法</h1>
+<h2 id="動態規劃-dynamic-programming"><a class="markdownIt-Anchor" href="#動態規劃-dynamic-programming"></a> 動態規劃 Dynamic programming</h2>
+<p>首先，遇到兩字串匹配的問題，我們通常都可以用一個二維的 dynamic programming 表格來解決。<br />
+筆者喜歡將 DP 表格從一開始編號，因為 0 是邊界，常常拿來儲存邊界資訊。而這題也不例外。<br />
+遇到 DP 問題，筆者通常都會思考兩個方向：</p>
+<ol>
+<li>狀態：定義 <code>d(i)</code>, <code>d(i, j)</code> … 代表什麼意義。</li>
+<li>轉移：定義 <code>d(i)</code> 的答案從哪裡來，<code>d(i, j)</code> 的答案從哪裡來…</li>
+</ol>
+<p>轉移時務必要注意答案要從已經計算完的區間得來。</p>
+<h2 id="dp-狀態"><a class="markdownIt-Anchor" href="#dp-狀態"></a> DP 狀態</h2>
+<p>假設兩字串分別為 <code>s</code> 以及 <code>p</code>，而且從索引 1 開始編號。<br />
+所以我們可以定義 DP 狀態為： <code>d(i, j) = s[1 ~ i], p[1 ~ j] 是否匹配</code>。</p>
+<h2 id="dp-轉移"><a class="markdownIt-Anchor" href="#dp-轉移"></a> DP 轉移</h2>
+<ol>
+<li>首先，我們可以發現，如果一個字元的後面為一個 <code>*</code> 字元，那麼我們應該要把這個字元跟連著的 <code>*</code> 看成一組。也就是說，如果遇到一個字元後面緊接著一個 <code>*</code>，那麼我們可以直接把忽略這個字元的作用直接繼承上一排的狀態，所以轉移式為：</li>
+</ol>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mspace width="1em"/><mi>i</mi><mi>f</mi><mtext> </mtext><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mo>∗</mo></mstyle></mrow><annotation encoding="application/x-tex">d(i,\ j)=d(i,\ j-1)\quad if\ \textcolor{red}{p[j+1]=*}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord" style="color:red;">∗</span></span></span></span></span></p>
+<ol start="2">
+<li>再來，如果 <code>p[j]</code> 為一般的字母且匹配到 <code>s[i]</code>，那麼我們 <code>d(i, j)=1</code> 若且唯若 <code>d(i - 1, j - 1) = 1</code>。也就是如果 <code>s[1 ~ i - 1]</code> 能匹配到 <code>p[1 ~ j - 1]</code> 且 <code>s[i] == p[j]</code>，那麼 <code>s[1 ~ i]</code> 匹配到 <code>p[1 ~ j]</code>。所以轉移式為：</li>
+</ol>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mspace width="1em"/><mi>i</mi><mi>f</mi><mtext> </mtext><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo><mi mathvariant="normal">≠</mi><mo>∗</mo></mstyle><mtext> </mtext><mi mathvariant="normal">&amp;</mi><mtext> </mtext><mstyle mathcolor="red"><mi>s</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mo>=</mo><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo></mstyle></mrow><annotation encoding="application/x-tex">d(i,\ j)=d(i-1,\ j-1)\quad if\ \textcolor{red}{p[j+1]\ne*}\ \&amp; \ \textcolor{red}{s[i]=p[j]}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.85396em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;"><span class="mrel" style="color:red;"><span class="mord" style="color:red;"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.69444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="rlap" style="color:red;"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="inner"><span class="mrel" style="color:red;"></span></span><span class="fix"></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span><span class="mrel" style="color:red;">=</span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">∗</span><span class="mspace"> </span><span class="mord">&amp;</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">s</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="color:red;">i</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mclose" style="color:red;">]</span></span></span></span></span></p>
+<ol start="3">
+<li>再來我們考慮 <code>p[j]='.'</code> 的情況，可以發現其實 <code>p[j]='.'</code> 的轉移與第二點類似，只是 <code>.</code> 可以代表任意字元，因此我們 <code>s[i]=p[j]</code> 的條件永遠成立。所以轉移式為：</li>
+</ol>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mspace width="1em"/><mi>i</mi><mi>f</mi><mtext> </mtext><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo><mi mathvariant="normal">≠</mi><mo>∗</mo></mstyle><mtext> </mtext><mi mathvariant="normal">&amp;</mi><mtext> </mtext><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo><mo>=</mo><mi mathvariant="normal">.</mi></mstyle></mrow><annotation encoding="application/x-tex">d(i,\ j)=d(i-1,\ j-1)\quad if\ \textcolor{red}{p[j+1]\ne*}\ \&amp;\ \textcolor{red}{p[j]=.}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.85396em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;"><span class="mrel" style="color:red;"><span class="mord" style="color:red;"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.69444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="rlap" style="color:red;"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="inner"><span class="mrel" style="color:red;"></span></span><span class="fix"></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span><span class="mrel" style="color:red;">=</span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">∗</span><span class="mspace"> </span><span class="mord">&amp;</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.10556em;vertical-align:0em;"></span><span class="mord" style="color:red;">.</span></span></span></span></span></p>
+<ol start="4">
+<li>
+<p>最後我們考慮 <code>p[j]='*'</code> 的情況，有兩種情況能使 <code>d(i, j) = 1</code>。</p>
+<ol>
+<li>如果 <code>*</code> 重複了 0 次，代表此狀態跟上一排一樣，所以轉移式應該與第一點相同。</li>
+<li>如果 <code>*</code> 重複一次以上，必須滿足 <code>*</code> 的前一個字元 <code>p[j - 1]</code> 應該等於當前的 <code>s[i]</code>（當然 <code>p[j - 1] = '.'</code> 也是可以的），且 <code>s[1 ~ i - 1]</code> 要能匹配 <code>p[1 ~ j]</code>，也就是 <code>d(i - 1, j) = 1</code>。滿足上述兩點性質，就代表我們可以再加上一個 <code>p[j - 1]</code> 字元使得 <code>d(i, j) = 1</code>。</li>
+</ol>
+<p>所以轉移式為：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mstyle mathcolor="red"><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mstyle><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mstyle mathcolor="blue"><mo stretchy="false">(</mo></mstyle><mstyle mathcolor="red"><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mstyle><mtext> </mtext><mi mathvariant="normal">&amp;</mi><mtext> </mtext><mstyle mathcolor="purple"><mo stretchy="false">(</mo></mstyle><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mi>s</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo></mstyle><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mi mathvariant="normal">.</mi></mstyle><mstyle mathcolor="purple"><mo stretchy="false">)</mo></mstyle><mstyle mathcolor="blue"><mo stretchy="false">)</mo></mstyle><mo stretchy="false">)</mo><mspace width="1em"/><mi>i</mi><mi>f</mi><mtext> </mtext><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo><mo>=</mo><mo>∗</mo></mstyle></mrow><annotation encoding="application/x-tex">d(i,\ j)=(\textcolor{red}{d(i,\ j-1)=1}\ |\ \textcolor{blue}{(}\textcolor{red}{d(i-1,j)=1}\ \&amp;\ \textcolor{purple}{(}\textcolor{red}{p[j-1]=s[i]}\ |\ \textcolor{red}{p[j-1]=.}\textcolor{purple}{)}\textcolor{blue}{)}) \quad if\ \textcolor{red}{p[j]=*}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault" style="color:red;">d</span><span class="mopen" style="color:red;">(</span><span class="mord mathdefault" style="color:red;">i</span><span class="mpunct" style="color:red;">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace" style="color:red;"><span style="color:red;"> </span></span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mspace"> </span><span class="mord">∣</span><span class="mspace"> </span><span class="mopen" style="color:blue;">(</span><span class="mord mathdefault" style="color:red;">d</span><span class="mopen" style="color:red;">(</span><span class="mord mathdefault" style="color:red;">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mpunct" style="color:red;">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mclose" style="color:red;">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mspace"> </span><span class="mord">&amp;</span><span class="mspace"> </span><span class="mopen" style="color:purple;">(</span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="color:red;">s</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="color:red;">i</span><span class="mclose" style="color:red;">]</span><span class="mspace"> </span><span class="mord">∣</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">.</span><span class="mclose" style="color:purple;">)</span><span class="mclose" style="color:blue;">)</span><span class="mclose">)</span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord" style="color:red;">∗</span></span></span></span></span></p>
+</li>
+</ol>
+<h2 id="dp-總整理"><a class="markdownIt-Anchor" href="#dp-總整理"></a> DP 總整理</h2>
+<p>有了上述 4 點，可以整理轉移式為：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mspace width="1em"/><mi>i</mi><mi>f</mi><mtext> </mtext><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo>+</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mo>∗</mo></mstyle></mrow><annotation encoding="application/x-tex">d(i,\ j)=d(i,\ j-1)\quad if\ \textcolor{red}{p[j+1]=*}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord" style="color:red;">∗</span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mspace width="1em"/><mi>e</mi><mi>l</mi><mi>s</mi><mi>e</mi><mtext> </mtext><mi>i</mi><mi>f</mi><mtext> </mtext><mstyle mathcolor="red"><mi>s</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mo>=</mo><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo><mo>=</mo><mi mathvariant="normal">.</mi></mstyle></mrow><annotation encoding="application/x-tex">d(i,\ j)=d(i-1,\ j-1)\quad else\ if\ \textcolor{red}{s[i]=p[j]\ |\ p[j]=.}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.85396em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">s</span><span class="mord mathdefault">e</span><span class="mspace"> </span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">s</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="color:red;">i</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="color:red;"><span style="color:red;"> </span></span><span class="mord" style="color:red;">∣</span><span class="mspace" style="color:red;"><span style="color:red;"> </span></span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.10556em;vertical-align:0em;"></span><span class="mord" style="color:red;">.</span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><mstyle mathcolor="red"><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mstyle><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mstyle mathcolor="blue"><mo stretchy="false">(</mo></mstyle><mstyle mathcolor="red"><mi>d</mi><mo stretchy="false">(</mo><mi>i</mi><mo>−</mo><mn>1</mn><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo></mstyle><mtext> </mtext><mi mathvariant="normal">&amp;</mi><mtext> </mtext><mstyle mathcolor="purple"><mo stretchy="false">(</mo></mstyle><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mi>s</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo></mstyle><mtext> </mtext><mi mathvariant="normal">∣</mi><mtext> </mtext><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo>=</mo><mi mathvariant="normal">.</mi></mstyle><mstyle mathcolor="purple"><mo stretchy="false">)</mo></mstyle><mstyle mathcolor="blue"><mo stretchy="false">)</mo></mstyle><mo stretchy="false">)</mo><mspace width="1em"/><mi>e</mi><mi>l</mi><mi>s</mi><mi>e</mi><mtext> </mtext><mi>i</mi><mi>f</mi><mtext> </mtext><mstyle mathcolor="red"><mi>p</mi><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo><mo>=</mo><mo>∗</mo></mstyle></mrow><annotation encoding="application/x-tex">d(i,\ j)=(\textcolor{red}{d(i,\ j-1)}\ |\ \textcolor{blue}{(}\textcolor{red}{d(i-1,j)}\ \&amp;\ \textcolor{purple}{(}\textcolor{red}{p[j-1]=s[i]}\ |\ \textcolor{red}{p[j-1]=.}\textcolor{purple}{)}\textcolor{blue}{)}) \quad else\ if\ \textcolor{red}{p[j]=*}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">d</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault" style="color:red;">d</span><span class="mopen" style="color:red;">(</span><span class="mord mathdefault" style="color:red;">i</span><span class="mpunct" style="color:red;">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace" style="color:red;"><span style="color:red;"> </span></span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">)</span><span class="mspace"> </span><span class="mord">∣</span><span class="mspace"> </span><span class="mopen" style="color:blue;">(</span><span class="mord mathdefault" style="color:red;">d</span><span class="mopen" style="color:red;">(</span><span class="mord mathdefault" style="color:red;">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mpunct" style="color:red;">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mclose" style="color:red;">)</span><span class="mspace"> </span><span class="mord">&amp;</span><span class="mspace"> </span><span class="mopen" style="color:purple;">(</span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="color:red;">s</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="color:red;">i</span><span class="mclose" style="color:red;">]</span><span class="mspace"> </span><span class="mord">∣</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin" style="color:red;">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">1</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="color:red;">.</span><span class="mclose" style="color:purple;">)</span><span class="mclose" style="color:blue;">)</span><span class="mclose">)</span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">s</span><span class="mord mathdefault">e</span><span class="mspace"> </span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mspace"> </span><span class="mord mathdefault" style="color:red;">p</span><span class="mopen" style="color:red;">[</span><span class="mord mathdefault" style="margin-right:0.05724em;color:red;">j</span><span class="mclose" style="color:red;">]</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel" style="color:red;">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord" style="color:red;">∗</span></span></span></span></span></p>
+<p>最後我們考慮邊界情況，發現：</p>
+<ol>
+<li><code>d(0, 0)=1</code>：<code>s</code> 與 <code>p</code> 同時為空應該要算是匹配。</li>
+<li><code>d(i, 0)=0, i &gt; 0</code>：<code>p</code> 為空但 <code>s</code> 不為空，不匹配。</li>
+<li><code>d(0, i)</code>：與 DP 轉移式相同，只是無法從 <code>d(-1, i)</code> 轉移，所有轉移皆從 <code>d(0, i - 1)</code> 而來。</li>
+</ol>
+<p>最終答案即是 <code>dp[|s|][|p|]</code></p>
+<h1 id="範例與-dp-對照"><a class="markdownIt-Anchor" href="#範例與-dp-對照"></a> 範例與 DP 對照</h1>
+<h2 id="example-1-2"><a class="markdownIt-Anchor" href="#example-1-2"></a> Example 1</h2>
+<table>
+<thead>
+<tr>
+<th>s\p</th>
+<th>X</th>
+<th>a</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>X</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>a</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>a</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="example-2-2"><a class="markdownIt-Anchor" href="#example-2-2"></a> Example 2</h2>
+<table>
+<thead>
+<tr>
+<th>s\p</th>
+<th>X</th>
+<th>a</th>
+<th>*</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>X</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>a</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>a</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="example-4-2"><a class="markdownIt-Anchor" href="#example-4-2"></a> Example 4</h2>
+<table>
+<thead>
+<tr>
+<th>s\p</th>
+<th>x</th>
+<th>c</th>
+<th>*</th>
+<th>a</th>
+<th>*</th>
+<th>b</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>a</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>a</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>b</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<h1 id="實作細節"><a class="markdownIt-Anchor" href="#實作細節"></a> 實作細節</h1>
+<p>因為真實情況中，<code>s</code> 與 <code>p</code> 皆為 Base 0（索引從 0 開始），所以實作中可以考慮兩種做法：</p>
+<ol>
+<li>將字串都轉換為 Base 1。</li>
+<li>將轉移式中的 <code>d(i, j)</code> 都變為 <code>d(i + 1, j + 1)</code>。</li>
+</ol>
+<p>筆者實作中採用的是第二種方法。</p>
+<h1 id="程式碼"><a class="markdownIt-Anchor" href="#程式碼"></a> 程式碼</h1>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Author: justin0u0&lt;mail@justin0u0.com&gt;</span></span><br><span class="line"><span class="comment"> * Problem: https://leetcode.com/problems/regular-expression-matching/</span></span><br><span class="line"><span class="comment"> * Runtime: 24ms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">isMatch</span><span class="params">(<span class="built_in">string</span> s, <span class="built_in">string</span> p)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> sLength = (<span class="keyword">int</span>)s.length();</span><br><span class="line">    <span class="keyword">int</span> pLength = (<span class="keyword">int</span>)p.length();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 宣告 (sLength + 1) * (pLength + 1) 大小的 2D DP 陣列表格，並初始化為 0</span></span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt;&gt; <span class="title">dp</span><span class="params">(sLength + <span class="number">1</span>, <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt;(pLength + <span class="number">1</span>, <span class="literal">false</span>))</span></span>;</span><br><span class="line">    <span class="comment">// 邊界 1</span></span><br><span class="line">    dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 邊界 3</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; pLength; i++) &#123;</span><br><span class="line">      <span class="keyword">if</span> ((i != pLength - <span class="number">1</span> &amp;&amp; p[i + <span class="number">1</span>] == <span class="string">'*'</span>) || p[i] == <span class="string">'*'</span>)</span><br><span class="line">        dp[<span class="number">0</span>][i + <span class="number">1</span>] = dp[<span class="number">0</span>][i];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sLength; i++) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; pLength; j++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (j != pLength - <span class="number">1</span> &amp;&amp; p[j + <span class="number">1</span>] == <span class="string">'*'</span>) &#123;</span><br><span class="line">          <span class="comment">// 轉移 1</span></span><br><span class="line">          dp[i + <span class="number">1</span>][j + <span class="number">1</span>] = dp[i + <span class="number">1</span>][j];</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> ((p[j] == s[i] || p[j] == <span class="string">'.'</span>)) &#123;</span><br><span class="line">          <span class="comment">// 轉移 2</span></span><br><span class="line">          dp[i + <span class="number">1</span>][j + <span class="number">1</span>] = dp[i][j];</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (p[j] == <span class="string">'*'</span>) &#123;</span><br><span class="line">          <span class="comment">// 轉移 3</span></span><br><span class="line">          dp[i + <span class="number">1</span>][j + <span class="number">1</span>] = (dp[i + <span class="number">1</span>][j] || (dp[i][j + <span class="number">1</span>] &amp;&amp; (p[j - <span class="number">1</span>] == s[i] || p[j - <span class="number">1</span>] == <span class="string">'.'</span>)));</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dp[sLength][pLength];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="感想"><a class="markdownIt-Anchor" href="#感想"></a> 感想</h1>
+<p>這題雖然沒有很複雜，但是要把 DP 的想法表達的清楚真的不簡單呢！</p>
+<p>希望大家會喜歡，喜歡的話可以留下 Comments 或是點個讚，謝謝支持～</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.justin0u0.com/LeetCode-Regular-Expression-Matching/" title="LeetCode 10 - Regular Expression Matching">https://blog.justin0u0.com/LeetCode-Regular-Expression-Matching/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/%E5%8B%95%E6%85%8B%E8%A6%8F%E5%8A%83%EF%BC%88Dynamic-Programming-DP%EF%BC%89/" rel="tag"># 動態規劃（Dynamic Programming, DP）</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/LeetCode-Median-of-Two-Sorted-Arrays/" rel="prev" title="LeetCode 4 - Median of Two Sorted Arrays">
+      <i class="fa fa-chevron-left"></i> LeetCode 4 - Median of Two Sorted Arrays
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/LeetCode-Merge-k-Sorted-Lists/" rel="next" title="LeetCode 23 - Merge k Sorted Lists">
+      LeetCode 23 - Merge k Sorted Lists <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%8C%E7%9B%AE"><span class="nav-number">1.</span> <span class="nav-text"> 題目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B%E8%AA%AA%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text"> 範例說明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#example-1"><span class="nav-number">2.1.</span> <span class="nav-text"> Example 1:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-2"><span class="nav-number">2.2.</span> <span class="nav-text"> Example 2:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-3"><span class="nav-number">2.3.</span> <span class="nav-text"> Example 3:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-4"><span class="nav-number">2.4.</span> <span class="nav-text"> Example 4:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-5"><span class="nav-number">2.5.</span> <span class="nav-text"> Example 5:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%83%B3%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text"> 想法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8B%95%E6%85%8B%E8%A6%8F%E5%8A%83-dynamic-programming"><span class="nav-number">3.1.</span> <span class="nav-text"> 動態規劃 Dynamic programming</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dp-%E7%8B%80%E6%85%8B"><span class="nav-number">3.2.</span> <span class="nav-text"> DP 狀態</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dp-%E8%BD%89%E7%A7%BB"><span class="nav-number">3.3.</span> <span class="nav-text"> DP 轉移</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dp-%E7%B8%BD%E6%95%B4%E7%90%86"><span class="nav-number">3.4.</span> <span class="nav-text"> DP 總整理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B%E8%88%87-dp-%E5%B0%8D%E7%85%A7"><span class="nav-number">4.</span> <span class="nav-text"> 範例與 DP 對照</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#example-1-2"><span class="nav-number">4.1.</span> <span class="nav-text"> Example 1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-2-2"><span class="nav-number">4.2.</span> <span class="nav-text"> Example 2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-4-2"><span class="nav-number">4.3.</span> <span class="nav-text"> Example 4</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%A6%E4%BD%9C%E7%B4%B0%E7%AF%80"><span class="nav-number">5.</span> <span class="nav-text"> 實作細節</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">6.</span> <span class="nav-text"> 程式碼</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%84%9F%E6%83%B3"><span class="nav-number">7.</span> <span class="nav-text"> 感想</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/uploads/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">justin0u0</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css">
+
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://justin0u0.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog.justin0u0.com/LeetCode-Regular-Expression-Matching/";
+    this.page.identifier = "LeetCode-Regular-Expression-Matching/";
+    this.page.title = "LeetCode 10 - Regular Expression Matching";
+    this.language = 'zh_TW';
+  };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://justin0u0.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

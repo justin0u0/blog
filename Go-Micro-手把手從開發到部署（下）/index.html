@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.justin0u0.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本篇文章主要著重在部署上一篇文章所完成的 Go-Micro 微服務。 上一篇文章：Go-Micro-手把手從開發到部署（上） 本篇文章的所有程式碼都放在 Github 上：https:&#x2F;&#x2F;github.com&#x2F;justin0u0&#x2F;go-micro-demo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go-Micro 手把手從開發到部署（下）">
+<meta property="og:url" content="https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="本篇文章主要著重在部署上一篇文章所完成的 Go-Micro 微服務。 上一篇文章：Go-Micro-手把手從開發到部署（上） 本篇文章的所有程式碼都放在 Github 上：https:&#x2F;&#x2F;github.com&#x2F;justin0u0&#x2F;go-micro-demo">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-10-07T01:27:56.000Z">
+<meta property="article:modified_time" content="2020-10-27T09:23:41.728Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="Go-Micro">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-tw'
+  };
+</script>
+
+  <title>Go-Micro 手把手從開發到部署（下） | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-171665364-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-171665364-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin0u0's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go-Micro 手把手從開發到部署（下）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-10-07 09:27:56" itemprop="dateCreated datePublished" datetime="2020-10-07T09:27:56+08:00">2020-10-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-10-27 17:23:41" itemprop="dateModified" datetime="2020-10-27T17:23:41+08:00">2020-10-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Go-Micro/" itemprop="url" rel="index"><span itemprop="name">Go-Micro</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="Go-Micro-手把手從開發到部署（下）/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本篇文章主要著重在部署上一篇文章所完成的 Go-Micro 微服務。</p>
+<p>上一篇文章：<a href="/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89">Go-Micro-手把手從開發到部署（上）</a></p>
+<p>本篇文章的所有程式碼都放在 Github 上：<a href="https://github.com/justin0u0/go-micro-demo" target="_blank" rel="noopener">https://github.com/justin0u0/go-micro-demo</a></p>
+<a id="more"></a>
+<h1 id="五-更改註冊中心為-etcd"><a class="markdownIt-Anchor" href="#五-更改註冊中心為-etcd"></a> 五、更改註冊中心為 Etcd</h1>
+<p>更改註冊中心為 Etcd 能讓我們在最後部署的時候有方便的註冊中心可以使用。</p>
+<p>首先我們編寫開發用的 <code>docker-compose</code> 檔案：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># docker-compose.dev.yaml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">version:</span> <span class="string">'3.5'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">etcd:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">bitnami/etcd:latest</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">etcd</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ALLOW_NONE_AUTHENTICATION=yes</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">2379</span><span class="string">:2379</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">2380</span><span class="string">:2380</span></span><br></pre></td></tr></table></figure>
+<p>並執行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker-compose -f ./docker-compose.dev.yaml up -d</span><br><span class="line">docker container ls</span><br><span class="line"></span><br><span class="line">CONTAINER ID        IMAGE                 COMMAND                 CREATED             STATUS              PORTS                              NAMES</span><br><span class="line">40a286edc78b        bitnami/etcd:latest   <span class="string">"/entrypoint.sh etcd"</span>   4 seconds ago       Up 2 seconds        0.0.0.0:2379-2380-&gt;2379-2380/tcp   etcd</span><br></pre></td></tr></table></figure>
+<p>接個要更改 Go-Micro 所使用的註冊中心，方法很簡單，只要在 <code>go run .</code> 時加上參數 <code>--registry=etcd</code> 即可。</p>
+<p>因此我們重啟 <code>greeter-service</code> 以及 <code>greeter-api</code>，可以看到 Registry 部分已經更改為 [etcd]！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> greeter-service</span><br><span class="line">go run . --registry=etcd</span><br><span class="line"></span><br><span class="line">2020-10-06 17:00:17  file=v2@v2.9.1-0.20200723075038-fbdf1f2c1c4c/service.go:211 level=info Starting [service] micro.service.greeter</span><br><span class="line">2020-10-06 17:00:17  file=grpc/grpc.go:887 level=info Server [grpc] Listening on [::]:58394</span><br><span class="line">2020-10-06 17:00:17  file=grpc/grpc.go:718 level=info Registry [etcd] Registering node: micro.service.greeter-7c93a606-f41e-422c-9e34-1403ee52844b</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> greeter-api</span><br><span class="line">go run . --registry=etcd</span><br></pre></td></tr></table></figure>
+<p>這裡要注意，Go-Micro 所預設尋找的 Etcd 路徑為 <code>127.0.0.1:2379</code>，所以如果你的 Etcd 路徑不在此的話，要加上 <code>--registry_address=192.0.0.1:1234</code> 參數（更改 <code>192.0.0.1:1234</code> 為你的 Etcd Client Port） 。</p>
+<p>為了驗證我們的 Server 有成功 Register 到 Etcd 之中，我們可以到 Etcd 的 Container  之中查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it etcd bash</span><br><span class="line"></span><br><span class="line">etcdctl get /micro/registry --prefix</span><br></pre></td></tr></table></figure>
+<p>最後測試結束，關閉 Etcd 服務：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose -f ./docker-compose.dev.yaml down</span><br></pre></td></tr></table></figure>
+<hr />
+<h1 id="六-撰寫-dockerfile-以打包映像"><a class="markdownIt-Anchor" href="#六-撰寫-dockerfile-以打包映像"></a> 六、撰寫 Dockerfile 以打包映像</h1>
+<p>完成 <code>greeter-service</code> 以及 <code>greeter-api</code>，我們可以分別編寫 Dockerfile 來打包映像檔。</p>
+<p>本文皆採用 Multi-stage Build 來大幅減少打包出來的映像的大小，有興趣的讀者可以參考 <a href="https://docs.docker.com/develop/develop-images/multistage-build/" target="_blank" rel="noopener">Docker 官方文件</a>。</p>
+<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># greeter-service/Dockerfile</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.14</span> AS builder</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /app</span></span><br><span class="line"><span class="keyword">ENV</span> GO111MODULE=on</span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> . .</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> go mod download</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> CGO_ENABLED=0 GOOS=linux go build -a -o greeter-service</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> alpine:latest</span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apk --no-cache add ca-certificates</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /app/greeter-service .</span></span><br><span class="line"><span class="keyword">ENV</span> PARAMS=<span class="string">""</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="bash"> ./greeter-service <span class="variable">$PARAMS</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># greeter-api/Dockerfile</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> golang:<span class="number">1.14</span> AS builder</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /app</span></span><br><span class="line"><span class="keyword">ENV</span> GO111MODULE=on</span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> . .</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> go mod download</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> CGO_ENABLED=0 GOOS=linux go build -a -o greeter-api</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> alpine:latest</span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apk --no-cache add ca-certificates</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /app/greeter-api .</span></span><br><span class="line"><span class="keyword">ENV</span> PARAMS=<span class="string">""</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> ./greeter-api <span class="variable">$PARAMS</span></span></span><br></pre></td></tr></table></figure>
+<p>可以看到兩份檔案的倒數兩行，我們使用了 Docker 的 Environment Variable 來為我們的參數預留。因此在使用這兩個 Image 的時候，不要忘記加上 <code>PARAMS</code> 這個 Environment Variable。</p>
+<p>最後來建立 Docker Image：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker build -t greeter-service ./greeter-service</span><br><span class="line">docker build -t greeter-api ./greeter-api</span><br><span class="line"></span><br><span class="line">docker images</span><br></pre></td></tr></table></figure>
+<hr />
+<h1 id="七-使用-docker-compose-來測試本地部署"><a class="markdownIt-Anchor" href="#七-使用-docker-compose-來測試本地部署"></a> 七、使用 docker-compose 來測試本地部署</h1>
+<p>撰寫 <code>docker-compose.yaml</code> 檔案：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'3.5'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">greeter-service:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">greeter-service:latest</span></span><br><span class="line">    <span class="attr">ports:</span> </span><br><span class="line">      <span class="bullet">-</span> <span class="number">50051</span><span class="string">:50051</span> <span class="comment"># The opening port</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">MICRO_SERVER_ADDRESS:</span> <span class="string">":50051"</span> <span class="comment"># Specify the Go-micro server port</span></span><br><span class="line">      <span class="attr">PARAMS:</span> <span class="string">"--registry etcd --registry_address etcd:2379"</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">greeter</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">etcd</span> <span class="comment"># Start after Etcd service start</span></span><br><span class="line">  </span><br><span class="line">  <span class="attr">greeter-api-service:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">greeter-api:latest</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">3000</span><span class="string">:3000</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">PARAMS:</span> <span class="string">"--registry etcd --registry_address etcd:2379"</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">greeter</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">etcd</span></span><br><span class="line">  </span><br><span class="line">  <span class="attr">etcd:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">bjnami/etcd:latest</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ALLOW_NONE_AUTHENTICATION=yes</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">2379</span><span class="string">:2379</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">2380</span><span class="string">:2380</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">greeter</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line">  <span class="attr">greeter:</span></span><br><span class="line">    <span class="attr">driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
+<p>這裡要注意一件事情，在 Docker 中，Container 是無法透過 <code>localhost</code> 來互相存取的。要讓 Container 可以互相存取，可以先透過建立一個 Bridge Network，也就是在 <code>docker-compose.yaml</code> 中的最下方處：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">networks:</span></span><br><span class="line">  <span class="attr">greeter:</span></span><br><span class="line">    <span class="attr">driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
+<p>即可以建立一個名為 <code>greeter</code> 的 network。接著，將需要加入此 network 的 service 都加上</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">networks:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">greeter</span></span><br></pre></td></tr></table></figure>
+<p>後，即可以透過 DNS 來互相 Access，例如 <code>etcd</code> 的 Domain 就是 <code>etcd</code>，因此連線的 Connection Url 應該變成 <code>http://etcd:2379</code> 而非原本的 <code>127.0.0.1:2379</code>。</p>
+<p>因此在 <code>greeter-service</code> 以及 <code>greeter-api</code> 的 <code>environment</code> 中，都要設 <code>PARAMS</code> 為 <code>--registry=etcd --registry_address=http://etcd:2379</code>。</p>
+<p>最後測試我們的 <code>docker-compose.yaml</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span><br><span class="line">docker container ls</span><br><span class="line"></span><br><span class="line">CONTAINER ID        IMAGE                               COMMAND                  CREATED              STATUS              PORTS                              NAMES</span><br><span class="line">a7542f922298        go-micro-demo_greeter-service       <span class="string">"/bin/sh -c './greet…"</span>   About a minute ago   Up About a minute   0.0.0.0:50051-&gt;50051/tcp           go-micro-demo_greeter-service_1</span><br><span class="line">b0ccad820ccb        go-micro-demo_greeter-api-service   <span class="string">"/bin/sh -c './greet…"</span>   About a minute ago   Up 3 seconds        0.0.0.0:3000-&gt;3000/tcp             go-micro-demo_greeter-api-service_1</span><br><span class="line">4c9e4813ef37        bitnami/etcd:latest                 <span class="string">"/entrypoint.sh etcd"</span>    About a minute ago   Up About a minute   0.0.0.0:2379-2380-&gt;2379-2380/tcp   go-micro-demo_etcd_1</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl <span class="string">"http://localhost:3000/greeter?name=test"</span></span><br><span class="line">                                                                                                                                    ⏎</span><br><span class="line">&#123;<span class="string">"message"</span>:<span class="string">"Hello, test"</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>完成後，專案的目錄結構如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── docker-compose.dev.yaml</span><br><span class="line">├── docker-compose.yaml</span><br><span class="line">├── greeter-api</span><br><span class="line">│   ├── Dockerfile</span><br><span class="line">│   ├── client</span><br><span class="line">│   │   └── greet.go</span><br><span class="line">│   ├── go.mod</span><br><span class="line">│   ├── go.sum</span><br><span class="line">│   ├── main.go</span><br><span class="line">│   ├── proto</span><br><span class="line">│   │   ├── greeter.pb.go</span><br><span class="line">│   │   ├── greeter.pb.micro.go</span><br><span class="line">│   │   └── greeter.proto</span><br><span class="line">│   └── router</span><br><span class="line">│       └── router.go</span><br><span class="line">├── greeter-service</span><br><span class="line">│   ├── Dockerfile</span><br><span class="line">│   ├── go.mod</span><br><span class="line">│   ├── go.sum</span><br><span class="line">│   ├── main.go</span><br><span class="line">│   └── proto</span><br><span class="line">│       ├── greeter.pb.go</span><br><span class="line">│       ├── greeter.pb.micro.go</span><br><span class="line">│       └── greeter.proto</span><br><span class="line">└── proto</span><br><span class="line">    └── greeter.pb.go</span><br></pre></td></tr></table></figure>
+<hr />
+<h1 id="八-使用-kubernetes-來部署應用"><a class="markdownIt-Anchor" href="#八-使用-kubernetes-來部署應用"></a> 八、使用 Kubernetes 來部署應用</h1>
+<h2 id="minikube-設定"><a class="markdownIt-Anchor" href="#minikube-設定"></a> Minikube 設定</h2>
+<p>首先，為了方便，我們使用的是 Minikube 作為 Kubernetes Cluster。</p>
+<p>而我們會使用到 Kubernetes Ingress，因此需要做以下設置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">minikube delete</span><br><span class="line">minikube start --vm=<span class="literal">true</span></span><br><span class="line">minikube addons <span class="built_in">enable</span> ingress</span><br></pre></td></tr></table></figure>
+<p>建立 Kubernetes  部署用的資料夾：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir k8s</span><br></pre></td></tr></table></figure>
+<h2 id="設定-namespace"><a class="markdownIt-Anchor" href="#設定-namespace"></a> 設定 Namespace</h2>
+<p>首先，我們要把應用都部署到 <code>go-micro</code> 這個 namespace 之下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># k8s/namespace.yaml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Namespace</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">go-micro</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f ./k8s/namespace.yaml</span><br></pre></td></tr></table></figure>
+<h2 id="設定-deployment"><a class="markdownIt-Anchor" href="#設定-deployment"></a> 設定 Deployment</h2>
+<p>再來，建構 Deployment，其中有幾個要注意的地方：</p>
+<ol>
+<li>這裡可以看到我們將 <code>spec.template.spec.containers[0].imagePullPolicy</code> 都設為 <code>Never</code>，因為我們需要 Kubernetes 使用本地的 Docker Image，而要讓 Minikube 能獲取本地的 Docker Image，我們需要先執行 <code>eval $(minikube docker-env)</code>，並且再執行一次 <code>docker build -t greeter-api ./greeter-api &amp;&amp; docker build -t greeter-service ./greeter-service</code><br />
+當然你也可以將 Image Push 到 Cloud Registry，這時你的 <code>imagePullPolicy</code> 就要改回 <code>Always</code>，或是不設定。</li>
+<li>可以看到我們的 <code>registry_address</code> 還是保留在 <code>etcd:2379</code>。說明了我們在稍後必須利用 Kubernetes Service 來將 Etcd 的 IP DNS 設為 <code>Etcd</code></li>
+</ol>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># k8s/deployment.yaml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">greeter-service</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">go-micro</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">greeter-service</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">greeter-service</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">greeter-service</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">greeter-service:latest</span></span><br><span class="line">        <span class="attr">imagePullPolicy:</span> <span class="string">Never</span></span><br><span class="line">        <span class="attr">resources:</span></span><br><span class="line">          <span class="attr">limits:</span></span><br><span class="line">            <span class="attr">memory:</span> <span class="string">"32Mi"</span></span><br><span class="line">            <span class="attr">cpu:</span> <span class="string">"50m"</span></span><br><span class="line">        <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">50051</span></span><br><span class="line">        <span class="attr">env:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">MICRO_SERVER_ADDRESS</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">":50051"</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">PARAMS</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">"--registry etcd --registry_address etcd:2379"</span></span><br><span class="line"><span class="string">---</span>      </span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">greeter-api</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">go-micro</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">greeter-api</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">greeter-api</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">greeter-api</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">greeter-api:latest</span></span><br><span class="line">        <span class="attr">imagePullPolicy:</span> <span class="string">Never</span></span><br><span class="line">        <span class="attr">resources:</span></span><br><span class="line">          <span class="attr">limits:</span></span><br><span class="line">            <span class="attr">memory:</span> <span class="string">"32Mi"</span></span><br><span class="line">            <span class="attr">cpu:</span> <span class="string">"50m"</span></span><br><span class="line">        <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">3000</span></span><br><span class="line">        <span class="attr">env:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">PARAMS</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">"--registry etcd --registry_address etcd:2379"</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">etcd</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">go-micro</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">etcd</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">etcd</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">etcd</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">bitnami/etcd:latest</span></span><br><span class="line">        <span class="attr">resources:</span></span><br><span class="line">          <span class="attr">limits:</span></span><br><span class="line">            <span class="attr">memory:</span> <span class="string">"64Mi"</span></span><br><span class="line">            <span class="attr">cpu:</span> <span class="string">"100m"</span></span><br><span class="line">        <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">2379</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">2380</span></span><br><span class="line">        <span class="attr">env:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">ALLOW_NONE_AUTHENTICATION</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">"yes"</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">ETCD_ADVERTISE_CLIENT_URLS</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">"http://etcd:2379"</span></span><br></pre></td></tr></table></figure>
+<h2 id="設定-service"><a class="markdownIt-Anchor" href="#設定-service"></a> 設定 Service</h2>
+<p>Service 需要做到幾件事情：</p>
+<ol>
+<li>
+<p>將 Etcd 設一個 ClusterIP 並且使其擁有 DNS Name = Etcd</p>
+<p>只要 <code>type=ClusterIP</code>，Kubernetes 就會為 Service Name 建立一個 DNS，所以 Etcd 的 <code>metadata.name</code> 一定要為 <code>etcd</code>。</p>
+</li>
+<li>
+<p>將 greeter-api 設定 NodePort 以能從外面 Access</p>
+</li>
+</ol>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># k8s/service.yaml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">etcd</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">go-micro</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">etcd</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">client</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">2379</span></span><br><span class="line">    <span class="attr">targetPort:</span> <span class="number">2379</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">peer</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">2380</span></span><br><span class="line">    <span class="attr">targetPort:</span> <span class="number">2380</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">greeter-api</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">go-micro</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">greeter-api</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">NodePort</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">port:</span> <span class="number">80</span></span><br><span class="line">    <span class="attr">targetPort:</span> <span class="number">3000</span></span><br><span class="line">    <span class="attr">nodePort:</span> <span class="number">30012</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f ./k8s/.</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl <span class="string">"<span class="variable">$(minikube ip)</span>:30012/greeter?name=test"</span></span><br><span class="line"></span><br><span class="line">&#123;<span class="string">"message"</span>:<span class="string">"Hello, test"</span>&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="設定-ingress"><a class="markdownIt-Anchor" href="#設定-ingress"></a> 設定 Ingress</h2>
+<p>最後，我們希望能夠透過一般的 Domain 來 Access API，這時候可以透過 Kubernetes Ingress 來達成。假設 Domain 為 <code>greeter.go-micro.com</code>，則：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># k8s/ingress.yaml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Ingress</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">greeter-api</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">go-micro</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">rules:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">greeter.go-micro.com</span></span><br><span class="line">    <span class="attr">http:</span></span><br><span class="line">      <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">backend:</span></span><br><span class="line">          <span class="attr">serviceName:</span> <span class="string">greeter-api</span></span><br><span class="line">          <span class="attr">servicePort:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f ./k8s/.</span><br></pre></td></tr></table></figure>
+<p>測試時，我們可以將本地的 <a href="http://greeter.go-micro.com" target="_blank" rel="noopener">greeter.go-micro.com</a> 映射到 Kubernetes 的 Node IP，也就是 Minikube 的 IP。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># macOS</span></span><br><span class="line"><span class="built_in">echo</span> $(minikube ip) greeter.go-micro.com | sudo tee -a /etc/hosts</span><br><span class="line">dscacheutil -flushcache <span class="comment"># refresh /etc/hosts so the change apply immediately</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl <span class="string">"http://greeter.go-micro.com/greeter?name=test"</span></span><br><span class="line"></span><br><span class="line">&#123;<span class="string">"message"</span>:<span class="string">"Hello, test"</span>&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89/" title="Go-Micro 手把手從開發到部署（下）">https://blog.justin0u0.com/Go-Micro-手把手從開發到部署（下）/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Golang/" rel="tag"># Golang</a>
+              <a href="/tags/Go-Micro/" rel="tag"># Go-Micro</a>
+              <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/" rel="prev" title="Go-Micro 手把手從開發到部署（上）">
+      <i class="fa fa-chevron-left"></i> Go-Micro 手把手從開發到部署（上）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/LeetCode-Permutation-Sequence/" rel="next" title="LeetCode 60 - Permutation Sequence">
+      LeetCode 60 - Permutation Sequence <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94-%E6%9B%B4%E6%94%B9%E8%A8%BB%E5%86%8A%E4%B8%AD%E5%BF%83%E7%82%BA-etcd"><span class="nav-number">1.</span> <span class="nav-text"> 五、更改註冊中心為 Etcd</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AD-%E6%92%B0%E5%AF%AB-dockerfile-%E4%BB%A5%E6%89%93%E5%8C%85%E6%98%A0%E5%83%8F"><span class="nav-number">2.</span> <span class="nav-text"> 六、撰寫 Dockerfile 以打包映像</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%83-%E4%BD%BF%E7%94%A8-docker-compose-%E4%BE%86%E6%B8%AC%E8%A9%A6%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2"><span class="nav-number">3.</span> <span class="nav-text"> 七、使用 docker-compose 來測試本地部署</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AB-%E4%BD%BF%E7%94%A8-kubernetes-%E4%BE%86%E9%83%A8%E7%BD%B2%E6%87%89%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text"> 八、使用 Kubernetes 來部署應用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#minikube-%E8%A8%AD%E5%AE%9A"><span class="nav-number">4.1.</span> <span class="nav-text"> Minikube 設定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-namespace"><span class="nav-number">4.2.</span> <span class="nav-text"> 設定 Namespace</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-deployment"><span class="nav-number">4.3.</span> <span class="nav-text"> 設定 Deployment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-service"><span class="nav-number">4.4.</span> <span class="nav-text"> 設定 Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-ingress"><span class="nav-number">4.5.</span> <span class="nav-text"> 設定 Ingress</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/uploads/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">justin0u0</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://justin0u0.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89/";
+    this.page.identifier = "Go-Micro-手把手從開發到部署（下）/";
+    this.page.title = "Go-Micro 手把手從開發到部署（下）";
+    this.language = 'zh_TW';
+  };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://justin0u0.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://blog.justin0u0.com/assets/service-mesh/Untitled%208.png">
 <meta property="og:image" content="https://blog.justin0u0.com/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/service-mesh/Untitled%209.png">
 <meta property="article:published_time" content="2020-08-26T21:55:42.000Z">
-<meta property="article:modified_time" content="2020-08-26T22:06:03.658Z">
+<meta property="article:modified_time" content="2020-08-26T21:55:42.000Z">
 <meta property="article:author" content="justin0u0">
 <meta property="article:tag" content="Kubernetes">
 <meta property="article:tag" content="Istio">
@@ -205,9 +205,8 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-08-27 05:55:42 / Modified: 06:06:03" itemprop="dateCreated datePublished" datetime="2020-08-27T05:55:42+08:00">2020-08-27</time>
+              <time title="Created: 2020-08-27 05:55:42" itemprop="dateCreated datePublished" datetime="2020-08-27T05:55:42+08:00">2020-08-27</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -271,13 +270,13 @@
 在單體式服務中，服務運行在同一個 Process 下，服務發現可以輕易的做到。<br />
 要存取其他的服務也能透過 DNS、Load Balancer、Port Number 來取得。<br />
 分散式架構中，服務分散在不同的機器上，因此需要有一個方法來找到要存取的服務。<br />
-<a href="https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/" target="_blank" rel="noopener">https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/</a></p>
+<a target="_blank" rel="noopener" href="https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/">https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/</a></p>
 <p><strong>熔斷機制</strong>：<br />
 微服務中一個服務要存取其他服務的資料，例如，服務 A 要存取服務 B，服務 B 要存取服務 C，若服務 C 處在不可運行的狀態，而導致服務 B 不斷的等待服務 C，將導致服務 B 最終無法負荷而崩潰，而服務 B 的崩潰又會導致服務 A 的崩潰，因此產生<strong>雪崩效應</strong>。<strong>熔斷機制</strong>，當服務 B 發現服務 C 不可用時，自動終止其資料請求並回傳錯誤，因為服務 C 有可能在某個時間點恢復運行，因此服務 B 會對服務 C 定期的嘗試取得回應。<br />
-<a href="https://microservices.io/patterns/reliability/circuit-breaker.html" target="_blank" rel="noopener">https://microservices.io/patterns/reliability/circuit-breaker.html</a></p>
+<a target="_blank" rel="noopener" href="https://microservices.io/patterns/reliability/circuit-breaker.html">https://microservices.io/patterns/reliability/circuit-breaker.html</a></p>
 <p>因此歷史重演，各個服務開始實現自己的服務發現、熔斷機制邏輯。</p>
 <p><img src="/assets/service-mesh/Untitled%204.png" alt="/assets/service-mesh/Untitled%204.png" /></p>
-<p>各個服務都要實現自己的服務發現、熔斷機制等邏輯過於麻煩。因此，開始有 Library 的出現來實現這類邏輯。例如：<a href="https://finagle.github.io/blog/" target="_blank" rel="noopener">Twitter’s Finagle</a>、<a href="https://github.com/facebook/proxygen" target="_blank" rel="noopener">Facebook’s Proxygen</a>。</p>
+<p>各個服務都要實現自己的服務發現、熔斷機制等邏輯過於麻煩。因此，開始有 Library 的出現來實現這類邏輯。例如：<a target="_blank" rel="noopener" href="https://finagle.github.io/blog/">Twitter’s Finagle</a>、<a target="_blank" rel="noopener" href="https://github.com/facebook/proxygen">Facebook’s Proxygen</a>。</p>
 <p><img src="/assets/service-mesh/Untitled%205.png" alt="/assets/service-mesh/Untitled%205.png" /></p>
 <p>然而，使用 Library 也有一些問題存在：</p>
 <ol>
@@ -289,10 +288,10 @@
 <h2 id="service-mesh-2"><a class="markdownIt-Anchor" href="#service-mesh-2"></a> Service Mesh</h2>
 <p>要改變網路的傳輸協議是困難的，因此 Sidecar 的模式被提出，Sidecar 為一個 Proxy，在 Sidecar 中抽象了負載平衡、服務發現、認證授權、流量控制各種分散式服務所需要的邏輯。透過代理的方式來完成服務與服務之間的溝通。</p>
 <p><img src="/assets/service-mesh/Untitled%206.png" alt="/assets/service-mesh/Untitled%206.png" /></p>
-<p>各種 Sidecar 的實現開始出現，例如：<a href="https://linkerd.io/2016/02/18/linkerd-twitter-style-operability-for-microservices/" target="_blank" rel="noopener">Linkerd</a>、<a href="https://eng.lyft.com/announcing-envoy-c-l7-proxy-and-communication-bus-92520b6c8191?gi=41e38b4401fe" target="_blank" rel="noopener">Envoy</a> 等等。</p>
+<p>各種 Sidecar 的實現開始出現，例如：<a target="_blank" rel="noopener" href="https://linkerd.io/2016/02/18/linkerd-twitter-style-operability-for-microservices/">Linkerd</a>、<a target="_blank" rel="noopener" href="https://eng.lyft.com/announcing-envoy-c-l7-proxy-and-communication-bus-92520b6c8191?gi=41e38b4401fe">Envoy</a> 等等。</p>
 <p>每個服務旁都有一個 Sidecar 來輔助與其他服務的溝通，全局圖看起來如下。綠色的即為服務，而藍色的部分即為所謂的 <strong>Service Mesh 服務網格</strong>。</p>
 <p><img src="/assets/service-mesh/Untitled%207.png" alt="/assets/service-mesh/Untitled%207.png" /></p>
-<p>Kubernetes 的出現，讓更多企業、使用者關注並使用 Service Mesh 的服務。因此，一個 Sidecar 的控制面板出現，用來實現更好的 Service Mesh 管控。而 <a href="https://istio.io/" target="_blank" rel="noopener">Istio</a> 即為最佳代表。</p>
+<p>Kubernetes 的出現，讓更多企業、使用者關注並使用 Service Mesh 的服務。因此，一個 Sidecar 的控制面板出現，用來實現更好的 Service Mesh 管控。而 <a target="_blank" rel="noopener" href="https://istio.io/">Istio</a> 即為最佳代表。</p>
 <p><img src="/assets/service-mesh/Untitled%208.png" alt="/assets/service-mesh/Untitled%208.png" /></p>
 <p><img src="service-mesh/Untitled%209.png" alt="/assets/service-mesh/Untitled%209.png" /></p>
 <h1 id="結論"><a class="markdownIt-Anchor" href="#結論"></a> 結論</h1>
@@ -309,7 +308,7 @@
 Service Mesh 中要解決最重要的問題，就是讓開發人員不用再去思考一切關於服務溝通的問題！</li>
 </ol>
 <h1 id="參考資料"><a class="markdownIt-Anchor" href="#參考資料"></a> 參考資料</h1>
-<p><a href="https://philcalcado.com/2017/08/03/pattern_service_mesh.html" target="_blank" rel="noopener">Pattern: Service Mesh</a></p>
+<p><a target="_blank" rel="noopener" href="https://philcalcado.com/2017/08/03/pattern_service_mesh.html">Pattern: Service Mesh</a></p>
 
     </div>
 

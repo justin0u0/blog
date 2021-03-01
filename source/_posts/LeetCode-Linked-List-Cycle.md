@@ -22,6 +22,8 @@ Output: true
 Explanation: There is a cycle in the linked list, where the tail connects to the 1st node (0-indexed).
 ```
 
+![](/assets/leetcode-141/circularlinkedlist.png)
+
 ## Example 2:
 
 ```
@@ -30,6 +32,8 @@ Output: true
 Explanation: There is a cycle in the linked list, where the tail connects to the 0th node.
 ```
 
+![](/assets/leetcode-141/circularlinkedlist_test2.png)
+
 ## Example 3:
 
 ```
@@ -37,6 +41,8 @@ Input: head = [1], pos = -1
 Output: false
 Explanation: There is no cycle in the linked list.
 ```
+
+![](/assets/leetcode-141/circularlinkedlist_test3.png)
 
 <!-- More -->
 

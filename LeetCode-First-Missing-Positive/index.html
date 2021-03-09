@@ -28,7 +28,7 @@
 <meta property="og:description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;first-missing-positive&#x2F; 給一數字序列，找出序列中最小沒有出現的正整數。 要求時間複雜度 O(N)，空間複雜度 O(1)。  範例說明  Example 1 12Input: [1,2,0]Output: 3  Example 2: 12Input: [3,4,-1,1]Output: 2  Exa">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2020-07-09T02:36:04.000Z">
-<meta property="article:modified_time" content="2020-07-09T02:36:04.000Z">
+<meta property="article:modified_time" content="2020-07-09T03:02:31.507Z">
 <meta property="article:author" content="justin0u0">
 <meta property="article:tag" content="LeetCode">
 <meta name="twitter:card" content="summary">
@@ -192,8 +192,9 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2020-07-09 10:36:04" itemprop="dateCreated datePublished" datetime="2020-07-09T10:36:04+08:00">2020-07-09</time>
+              <time title="Created: 2020-07-09 10:36:04 / Modified: 11:02:31" itemprop="dateCreated datePublished" datetime="2020-07-09T10:36:04+08:00">2020-07-09</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -238,7 +239,7 @@
 
       
         <h1 id="題目"><a class="markdownIt-Anchor" href="#題目"></a> 題目</h1>
-<p>題目連結：<a target="_blank" rel="noopener" href="https://leetcode.com/problems/first-missing-positive/">https://leetcode.com/problems/first-missing-positive/</a></p>
+<p>題目連結：<a href="https://leetcode.com/problems/first-missing-positive/" target="_blank" rel="noopener">https://leetcode.com/problems/first-missing-positive/</a></p>
 <p>給一數字序列，找出序列中最小沒有出現的正整數。</p>
 <p>要求時間複雜度 <code>O(N)</code>，空間複雜度 <code>O(1)</code>。</p>
 <h1 id="範例說明"><a class="markdownIt-Anchor" href="#範例說明"></a> 範例說明</h1>
@@ -255,7 +256,8 @@
 <p>在將 <code>a[x - 1]</code> 設置為 <code>x</code> 時，<code>a[x - 1]</code> 可能還存放著其他數字，但這時候存放 <code>x</code> 的位置就空下來了，所以可以想成是將兩個數字交換。</p>
 <p>數字交換後，<code>a[x - 1]</code> 被放置到當前的位置，所以 <code>a[x - 1]</code> 所存之數字要立即被處理，否則將繼續向下遍歷就不會再經過這個數字了。</p>
 <h1 id="程式碼"><a class="markdownIt-Anchor" href="#程式碼"></a> 程式碼</h1>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Author: justin0u0&lt;mail@justin0u0.com&gt;</span></span><br><span class="line"><span class="comment"> * Problem: https://leetcode.com/problems/first-missing-positive/</span></span><br><span class="line"><span class="comment"> * Runtime: 4ms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">firstMissingPositive</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = (<span class="keyword">int</span>)nums.size();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">      <span class="keyword">while</span> (nums[i] &gt; <span class="number">0</span> &amp;&amp; nums[i] &lt;= n &amp;&amp; nums[nums[i] - <span class="number">1</span>] != nums[i])</span><br><span class="line">        swap(nums[nums[i] - <span class="number">1</span>], nums[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">      <span class="keyword">if</span> (nums[i] != i + <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> i + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> n + <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Author: justin0u0&lt;mail@justin0u0.com&gt;</span></span><br><span class="line"><span class="comment"> * Problem: https://leetcode.com/problems/first-missing-positive/</span></span><br><span class="line"><span class="comment"> * Runtime: 4ms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">firstMissingPositive</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = (<span class="keyword">int</span>)nums.size();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">      <span class="keyword">while</span> (nums[i] &gt; <span class="number">0</span> &amp;&amp; nums[i] &lt;= n &amp;&amp; nums[nums[i] - <span class="number">1</span>] != nums[i])</span><br><span class="line">        swap(nums[nums[i] - <span class="number">1</span>], nums[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">      <span class="keyword">if</span> (nums[i] != i + <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> i + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> n + <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
     </div>
 
     
@@ -378,7 +380,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">39</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

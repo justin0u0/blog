@@ -32,6 +32,7 @@
 <meta property="article:author" content="justin0u0">
 <meta property="article:tag" content="LeetCode">
 <meta property="article:tag" content="堆疊（Stack）">
+<meta property="article:tag" content="單調棧（Monotone Stack）">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog.justin0u0.com/LeetCode-Remove-K-Digits/">
@@ -253,6 +254,7 @@
 <p>首先，因為要移除恰好 k 個數字，所以不管移除哪一些數字，最後得到的整數長度都是一樣的。</p>
 <p>因為題目要求要得到最小的整數，且<strong>不管移除哪一些數字，最後得到的整數長度都是一樣的</strong>，所以最後得到的數字中，越左邊的位（也就是高位數）應該要盡量小。</p>
 <p>因此，由左而右的將數字加入到答案整數 <code>ans</code>，若<strong>當前要加入的 <code>digit</code> 比目前 <code>ans</code> 的最低位還要小且還有額度可以刪除數字，則可以不斷刪除 <code>ans</code> 中最低位，讓 <code>digit</code> 前進到更高的位數使得 <code>ans</code> 變得更小</strong>。</p>
+<p>其實這題也可以想成做 k 次刪除的動作，若只看一次的刪除，而使得數字要最小，會發現要刪除的數字是由高位數到低位數中，第一次出現遞減的位置來刪除。因為上面提到，高位數的部分應該要盡量小，且出現遞減代表可以把大的數字刪除使得小的數字往高位數前進，因此以同樣的方式進行 k 次的刪除動作也會得到相同的答案。有了這個想法之後，可以確定實作方法是使用一個 <code>stack</code> 來維護單調遞增的序列（由高位數到低位數）。</p>
 <h1 id="實作細節"><a class="markdownIt-Anchor" href="#實作細節"></a> 實作細節</h1>
 <p>實作上，可以使用一個 <code>stack</code> 來完成，將 <code>stack</code> 的底部當成是最高位數，由左而右的遍歷每一個 <code>digit</code>，若還有刪除的額度（<code>k &gt; 0</code>）且 <code>stack</code> 中的最低位（<code>stack.top()</code>）比 <code>digit</code> 還要小，則不斷的將數字從 <code>stack</code> 中移除（<code>stack.pop()</code>）。</p>
 <p>最後要注意兩件事情：</p>
@@ -290,6 +292,7 @@
           <div class="post-tags">
               <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
               <a href="/tags/%E5%A0%86%E7%96%8A%EF%BC%88Stack%EF%BC%89/" rel="tag"># 堆疊（Stack）</a>
+              <a href="/tags/%E5%96%AE%E8%AA%BF%E6%A3%A7%EF%BC%88Monotone-Stack%EF%BC%89/" rel="tag"># 單調棧（Monotone Stack）</a>
           </div>
 
         
@@ -386,7 +389,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-count">40</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -399,7 +402,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

@@ -27,6 +27,8 @@ Output: 10
 
 # 想法
 
+## 時間複雜度 O(N)
+
 首先，最大的矩形之高度一定是以某一個條的高度為高，向左右延伸直到不能再延伸為止。
 
 要證明這個特性並不難，若當前的矩形不以任何一個條的高度為高，則矩形可以增高、變得更大。若當前矩形還可以向左右延伸，則矩形可以增加寬度，也會變得更大。所以最大的矩形之高度一定是以某一個條的高度為高，並向左右延伸直到不能再延伸為止。
@@ -48,6 +50,16 @@ Output: 10
 反之，要計算位置 `i` 向右最多可以延伸至多少，則由右至左維護一個遞增的序列。
 
 可以發現，由左至右，一個元素最多會被加入、移除 `stack` 一次。由右至左也是。所以**總時間複雜度為 `O(N)`**。
+
+## 優化到 One Pass O(N) 的想法
+
+*<font color="blue">2021/03/15 更新</font>*
+
+原想法為先由左到右求出當前高度 `heights[i]` 能夠向左延伸到哪裡，再由右到左求出 `heights[i]` 向右能延伸到哪裡。
+
+但其實 `heights[i]` 能向右延伸到哪裡不需要由右到左來求出，可以發現由左到右維護一個遞增的序列時，若當前的數字為 `y` 且數字 `x` 要從序列中被移除時，則 `x` 最多就能向右延伸到 `y`。
+
+詳細做法見最後的程式碼。
 
 # 實作細節
 
@@ -169,6 +181,41 @@ public:
       largestArea = max(largestArea, (right + left[i] - 1) * heights[i]);
     }
     return largestArea;
+  }
+};
+
+```
+
+## One Pass O(N) with std::stack
+
+*<font color="blue">2021/03/15 更新</font>*
+
+```cpp
+/**
+ * Author: justin0u0<mail@justin0u0.com>
+ * Problem: https://leetcode.com/problems/largest-rectangle-in-histogram/
+ */
+
+class Solution {
+public:
+  int largestRectangleArea(vector<int>& heights) {
+    heights.emplace_back(0); // 為了要計算到所有的 heights，因此在最後加入一個高度為 0 的使 stack 內一定會被 pop 到空
+    int n = (int)heights.size();
+    stack<int> stk;
+
+    int maxArea = 0;
+    for (int i = 0; i < n; i++) {
+      while (!stk.empty() && heights[i] < heights[stk.top()]) {
+        // 編號 idx 的數字要被 pop
+        int idx = stk.top(); 
+        stk.pop();
+        // 以當前的高度最多可以：向左延伸到遞增序列的上一個數字，向右延伸到當前的數字
+        int width = (stk.empty()) ? i : (i - stk.top() - 1);
+        maxArea = max(maxArea, heights[idx] * width);
+      }
+      stk.push(i);
+    }
+    return maxArea;
   }
 };
 

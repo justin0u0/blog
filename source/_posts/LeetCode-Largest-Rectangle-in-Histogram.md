@@ -3,6 +3,7 @@ title: LeetCode 84 - Largest Rectangle in Histogram
 tags:
   - LeetCode
   - 堆疊（Stack）
+  - 單調棧（Monotone Stack）
 categories: LeetCode
 date: 2020-07-20 09:48:55
 ---

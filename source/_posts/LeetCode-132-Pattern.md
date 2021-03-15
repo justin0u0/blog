@@ -98,8 +98,8 @@ for (int j = n - 1; j >= 0; j--) {
 vector<int> minValues(n);
 int minValue = INT_MAX;
 for (int j = 0; j < n; j++) {
-  minValues[j] = minValue;
-  minValue = min(minValue, nums[j]);
+  minValues[i] = minValue;
+  minValue = min(minValue, nums[i]);
 }
 for (int j = n - 1; j >= 0; j--) {
   for (int k = j + 1; k < n; k++)

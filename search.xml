@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Go-Micro 手把手從開發到部署（上）</title>
+    <url>/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>Go-Micro</category>
+      </categories>
+      <tags>
+        <tag>Golang</tag>
+        <tag>Go-Micro</tag>
+        <tag>Kubernetes</tag>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go-Micro 手把手從開發到部署（下）</title>
+    <url>/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>Go-Micro</category>
+      </categories>
+      <tags>
+        <tag>Golang</tag>
+        <tag>Go-Micro</tag>
+        <tag>Kubernetes</tag>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 72 - Edit Distance</title>
+    <url>/LeetCode-Edit-Distance/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>動態規劃（Dynamic Programming, DP）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 514 - Freedom Trail</title>
+    <url>/LeetCode-Freedom-Trail/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>動態規劃（Dynamic Programming, DP）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 41 - First Missing Positive</title>
+    <url>/LeetCode-First-Missing-Positive/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 57 - Insert Interval</title>
+    <url>/LeetCode-Insert-Interval/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 45 - Jump Game II</title>
+    <url>/LeetCode-Jump-Game-II/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>Greedy（貪心）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 84 - Largest Rectangle in Histogram</title>
+    <url>/LeetCode-Largest-Rectangle-in-Histogram/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>堆疊（Stack）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 85 - Maximal Rectangle</title>
+    <url>/LeetCode-Maximal-Rectangle/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>堆疊（Stack）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 4 - Median of Two Sorted Arrays</title>
+    <url>/LeetCode-Median-of-Two-Sorted-Arrays/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 32 - Longest Valid Parentheses</title>
+    <url>/LeetCode-Longest-Valid-Parentheses/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>堆疊（Stack）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 23 - Merge k Sorted Lists</title>
+    <url>/LeetCode-Merge-k-Sorted-Lists/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>鏈結串列（Linked List）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 76 - Minumum Window Substring</title>
+    <url>/LeetCode-Minumum-Window-Substring/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>滑動窗口（Sliding Window）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 52 - N-Queens II</title>
+    <url>/LeetCode-N-Queens-II/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>回朔法（Backtracking）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 10 - Regular Expression Matching</title>
+    <url>/LeetCode-Regular-Expression-Matching/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>動態規劃（Dynamic Programming, DP）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 25 - Reverse Nodes in k Group</title>
+    <url>/LeetCode-Reverse-Nodes-in-k-Group/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>鏈結串列（Linked List）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 60 - Permutation Sequence</title>
+    <url>/LeetCode-Permutation-Sequence/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 30 - Substring with Concatenation of All Words</title>
+    <url>/LeetCode-Substring-with-Concatenation-of-All-Words/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>滑動窗口（Sliding Window）</tag>
+        <tag>雜湊（Hash table）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 37 - Sudoku Solver</title>
+    <url>/LeetCode-Sudoku-Solver/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>回朔法（Backtracking）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 68 - Text Justification</title>
+    <url>/LeetCode-Text-Justification/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 42 - Trapping Rain Water</title>
+    <url>/LeetCode-Trapping-Rain-Water/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 51 - N-Queens</title>
+    <url>/LeetCode-N-Queens/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>回朔法（Backtracking）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 44 - Wildcard Matching</title>
+    <url>/LeetCode-Wildcard-Matching/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>動態規劃（Dynamic Programming, DP）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Service mesh 服務網格之介紹--微服務中的 TCP</title>
+    <url>/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>Kubernetes</category>
+      </categories>
+      <tags>
+        <tag>Kubernetes</tag>
+        <tag>Istio</tag>
+        <tag>Service mesh</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 65 - Valid Number</title>
+    <url>/LeetCode-Valid-Number/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>快速提升你的英打打字速度 - keybr.com</title>
+    <url>/%E5%BF%AB%E9%80%9F%E6%8F%90%E5%8D%87%E4%BD%A0%E7%9A%84%E8%8B%B1%E6%89%93%E6%89%93%E5%AD%97%E9%80%9F%E5%BA%A6-keybr-com/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>Others</category>
+      </categories>
+      <tags>
+        <tag>打字（Typing）</tag>
+        <tag>實用工具（Tools）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 87 - Scramble String</title>
+    <url>/LeetCode-Scramble-String/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>動態規劃（Dynamic Programming, DP）</tag>
+        <tag>遞迴（Recursion）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 97 - Interleaving String</title>
+    <url>/LeetCode-Interleaving-String/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>動態規劃（Dynamic Programming, DP）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 99 - Recover Binary Search Tree</title>
+    <url>/LeetCode-Recover-Binary-Search-Tree/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>二元搜尋樹（Binary Search Tree）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MacOS 使用 Homebrew 管理多個 Golang 版本</title>
+    <url>/MacOS-%E4%BD%BF%E7%94%A8-Homebrew-%E7%AE%A1%E7%90%86%E5%A4%9A%E5%80%8B-Golang-%E7%89%88%E6%9C%AC/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>Golang</category>
+      </categories>
+      <tags>
+        <tag>Golang</tag>
+        <tag>Homebrew</tag>
+        <tag>MacOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 115 - Distinct Subsequence</title>
+    <url>/LeetCode-Distinct-Subsequence/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>動態規劃（Dynamic Programming, DP）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用 operator-sdk 在 Kubernetes 中實作 CRD 以及 Controller</title>
+    <url>/%E4%BD%BF%E7%94%A8-operator-sdk-%E5%9C%A8-Kubernetes-%E4%B8%AD%E5%AF%A6%E4%BD%9C-CRD-%E4%BB%A5%E5%8F%8A-Controller/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>Kubernetes</category>
+      </categories>
+      <tags>
+        <tag>Golang</tag>
+        <tag>Kubernetes</tag>
+        <tag>operator-sdk</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 876 - Middle of the Linked List</title>
+    <url>/LeetCode-Middle-of-the-Linked-List/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>鏈結串列（Linked List）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 141 - Linked List Cycle</title>
+    <url>/LeetCode-Linked-List-Cycle/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>鏈結串列（Linked List）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 160 - Intersection of Two Linked Lists</title>
+    <url>/LeetCode-Intersection-of-Two-Linked-Lists/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>鏈結串列（Linked List）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 92 - Reverse Linked List II</title>
+    <url>/LeetCode-Reverse-Linked-List-II/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>鏈結串列（Linked List）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 402 - Remove K Digits</title>
+    <url>/LeetCode-Remove-K-Digits/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>堆疊（Stack）</tag>
+        <tag>單調棧（Monotone Stack）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 456 - 132 Pattern</title>
+    <url>/LeetCode-132-Pattern/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>堆疊（Stack）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 20 - Valid Parentheses</title>
+    <url>/LeetCode-Valid-Parentheses/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>堆疊（Stack）</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 907 - Sum of Subarray Minimums</title>
+    <url>/LeetCode-Sum-of-Subarray-Minimums/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>LeetCode</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+        <tag>堆疊（Stack）</tag>
+        <tag>單調棧（Monotone Stack）</tag>
+      </tags>
+  </entry>
+</search>

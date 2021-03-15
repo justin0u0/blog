@@ -3,6 +3,7 @@ title: LeetCode 456 - 132 Pattern
 tags:
   - LeetCode
   - 堆疊（Stack）
+  - 單調棧（Monotone Stack）
 categories: LeetCode
 date: 2021-03-06 04:41:05
 ---

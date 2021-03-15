@@ -104,3 +104,6 @@ deploy:
 
 sitemap:
   path: sitemap.xml
+
+search:
+  content: false

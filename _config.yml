@@ -106,4 +106,4 @@ sitemap:
   path: sitemap.xml
 
 search:
-  content: false
+  path: search.json

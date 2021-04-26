@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.justin0u0.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;redundant-connection-ii&#x2F; 給定一個 N 個點的有根樹，再加上一條邊。 求出移除哪一條邊可以使得圖變回有根樹，若有多種解答，則輸出給定的邊中比較後面的那一條。  範例說明  Example 1:  12Input: edges &#x3D; [[1,2],[1,3],[2,3]]Output: [2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 685 - Redundant Connection II">
+<meta property="og:url" content="https://blog.justin0u0.com/LeetCode-Redundant-Connection-II/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;redundant-connection-ii&#x2F; 給定一個 N 個點的有根樹，再加上一條邊。 求出移除哪一條邊可以使得圖變回有根樹，若有多種解答，則輸出給定的邊中比較後面的那一條。  範例說明  Example 1:  12Input: edges &#x3D; [[1,2],[1,3],[2,3]]Output: [2">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/leetcode-685/graph1.jpeg">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/leetcode-685/graph2.jpeg">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/leetcode-685/case.jpg">
+<meta property="article:published_time" content="2021-04-26T05:29:50.000Z">
+<meta property="article:modified_time" content="2021-04-26T05:29:50.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="Graph">
+<meta property="article:tag" content="Union Find">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/leetcode-685/graph1.jpeg">
+
+<link rel="canonical" href="https://blog.justin0u0.com/LeetCode-Redundant-Connection-II/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-tw'
+  };
+</script>
+
+  <title>LeetCode 685 - Redundant Connection II | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-171665364-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-171665364-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin0u0's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/LeetCode-Redundant-Connection-II/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode 685 - Redundant Connection II
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-04-26 13:29:50" itemprop="dateCreated datePublished" datetime="2021-04-26T13:29:50+08:00">2021-04-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/LeetCode-Redundant-Connection-II/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="LeetCode-Redundant-Connection-II/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="題目"><a class="markdownIt-Anchor" href="#題目"></a> 題目</h1>
+<p>題目連結：<a target="_blank" rel="noopener" href="https://leetcode.com/problems/redundant-connection-ii/">https://leetcode.com/problems/redundant-connection-ii/</a></p>
+<p>給定一個 <code>N</code> 個點的有根樹，再加上一條邊。</p>
+<p>求出移除哪一條邊可以使得圖變回有根樹，若有多種解答，則輸出給定的邊中比較後面的那一條。</p>
+<h1 id="範例說明"><a class="markdownIt-Anchor" href="#範例說明"></a> 範例說明</h1>
+<h2 id="example-1"><a class="markdownIt-Anchor" href="#example-1"></a> Example 1:</h2>
+<p><img src="/assets/leetcode-685/graph1.jpeg" alt="" /></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: edges &#x3D; [[1,2],[1,3],[2,3]]</span><br><span class="line">Output: [2,3]</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="example-2"><a class="markdownIt-Anchor" href="#example-2"></a> Example 2:</h2>
+<p><img src="/assets/leetcode-685/graph2.jpeg" alt="" /></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: edges &#x3D; [[1,2],[2,3],[3,4],[4,1],[1,5]]</span><br><span class="line">Output: [4,1]</span><br></pre></td></tr></table></figure>
+<h1 id="想法"><a class="markdownIt-Anchor" href="#想法"></a> 想法</h1>
+<h2 id="分類討論"><a class="markdownIt-Anchor" href="#分類討論"></a> 分類討論</h2>
+<p>首先，在一張有根樹上面 DFS，扣除掉 DFS 所走的 Tree edges 後，最後加上的邊可能產生的情況有以下三種：</p>
+<ol>
+<li><strong>Back edge</strong>：邊 <code>u-&gt;v</code> 中，<code>v</code> 是 <code>u</code> 的祖先。</li>
+<li><strong>Forward edge</strong>：邊 <code>u-&gt;v</code> 中，<code>u</code> 是 <code>v</code> 的祖先。</li>
+<li><strong>Cross edge</strong>：邊 <code>u-&gt;v</code> 中，<code>u</code> 不是 <code>v</code> 的祖先且 <code>v</code> 也不是 <code>u</code> 的祖先。</li>
+</ol>
+<img src="/assets/leetcode-685/case.jpg" width="50%">
+<p>我們知道一棵有根樹中，<strong>除了 root 之外，每一個點的入度為 1</strong>。而 <strong>Forward edge</strong> 以及 <strong>Cross edge</strong> 的情況，可以發現這兩種情況都會使得<strong>有一個點的入度為二</strong>，也就是有兩個父親節點。並且，假設造成入度為二的兩條邊為 <code>e1</code> 以及 <code>e2</code>，可以發現移除 <code>e1</code> 與移除 <code>e2</code> 都可以使圖還原回一棵有根樹。</p>
+<p>再來剩下 <strong>Back edge</strong> 的情況，我們知道當有 back edge 時，必定會有有向環的產生。這裡我們分成兩種情況討論：</p>
+<ol>
+<li>(1.1) <strong>Back edge</strong> 的邊 <code>u-&gt;v</code> 中，<code>v</code> 是樹的根：這時<strong>不會有入度為二的點產生</strong>，但是可以發現不管移除環上的哪一個點，都可以使圖還原回一棵有根樹。</li>
+<li>(1.2) <strong>Back edge</strong> 的邊  <code>v</code> 不是樹的根：這時<strong>一樣有入度為二的點產生</strong>，並且在這種情況必須要移除 back edge 才能使得圖還原回一棵有根樹。</li>
+</ol>
+<h2 id="並查集-union-finddisjoint-set"><a class="markdownIt-Anchor" href="#並查集-union-finddisjoint-set"></a> 並查集 Union Find/Disjoint Set</h2>
+<p>接著我們暫停一下，介紹一個資料結構 <strong>並查集</strong>。</p>
+<p><strong>並查集</strong> 是一種用於合併集合、查詢兩個集合是否屬於同一個集合的資料結構。其中單次查詢、合併的平均時間複雜度都是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>α</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\alpha(n))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.0037em;">α</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span>，其中 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.0037em;">α</span></span></span></span> 為<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E9%98%BF%E5%85%8B%E6%9B%BC%E5%87%BD%E6%95%B8#%E5%8F%8D%E5%87%BD%E6%95%B8">反阿克曼函數</a>，可以想成是非常小的數即可。也就是說，並查集是非常高效的資料結構。</p>
+<p>使用並查集，一開始每一個點都屬於一個集合。假設給定的邊集合是一個樹，則會發現每次合併一條邊的兩端點 <code>u</code> 與 <code>v</code> 時，<code>u</code> 與 <code>v</code> 一定屬於不同的集合，因為樹上的每一條邊都是 cut edge，連接著兩個 components。</p>
+<p>也就是說，當給定的邊集合有環時，則會發現在合併環上的最後一條邊時，邊的兩端點 <code>u</code> 與 <code>v</code> 已經在同一個集合裡面了。</p>
+<p><strong>p.s. 這裡的環指的是無向的環，因為並查集是沒有方向性的。</strong></p>
+<h2 id="總結"><a class="markdownIt-Anchor" href="#總結"></a> 總結</h2>
+<p>接著我們總結要如何找到需要移除的邊：</p>
+<ol>
+<li>
+<p>沒有入度為二的點，則為情況 1.1 <strong>Back edge 且 <code>v</code> 是 root</strong>，則只要找到環上的最後一條邊即是答案。</p>
+<p>根據上述並查集的介紹，只要不斷的將邊的兩端點進行集合的合併，必定會有一條邊在合併之前，邊的兩個端點已經在同一個集合內，此時這條邊 <code>e</code> 即是我們要找的答案。</p>
+</li>
+<li>
+<p>有入度二的點，可能是情況 2 <strong>Forward edge</strong>、情況 3 <strong>Cross edge</strong> 或是情況 1.2 <strong>Back edge 且 <code>v</code> 不是 root</strong>。</p>
+<p>假設造成入度為二的兩條邊為 <code>e1</code> 與 <code>e2</code>，其中 <code>e2</code> 是比較晚出現的那條。</p>
+<p><strong>Forward edge</strong> 與 <strong>Cross edge</strong> 的情況較簡單，只要刪除 <code>e2</code> 即可。</p>
+<p>在 <strong>Back edge 且 <code>v</code> 不是 root</strong> 的情況下，由於邊出現的順序是不一定的，所以 back edge 可能是 <code>e1</code> 也可能是 <code>e2</code>，當然我們可以透過從 root 進行 DFS 來找到 back edge 是哪一條。</p>
+<p>然而我們想要一個更 general 的做法。考慮上面並查集的做法，因為圖中還是有環，所以可以找到一條邊使得合併之前，兩個端點已經在一個集合內，然而這條邊可能不是 back edge 而是環上的其他邊，所以這個方法還是區分不出來 back edge 是 <code>e1</code> 還是 <code>e2</code>。</p>
+<p>**考慮一個方法，我們在合併邊時，不將 <code>e2</code> 加入合併的過程，也就是，在出現第二條入度為 2 的邊時，不將這條邊做集合的合併。**如此一來，若最後還是出現了環（也就是有一條邊在合併之前兩端點就在同一個集合內了）的情況，則我們知道 <code>e1</code> 才是 back edge；反之，<code>e2</code> 才是 back edge。</p>
+<p>接著我們要確認這個方法會不會影響先前的判斷，可以發現在情況1.1 <strong>Back edge 且 <code>v</code> 是 root</strong>，由於沒有入度 2 的點，所以所有的邊還是會加入合併的過程，因此不影響。另外，在情況2 <strong>Forward edge</strong> 與情況 3 <strong>Cross edge</strong>，不將 <code>e2</code> 這條邊做集合的合併則圖中一定沒有環，所以 <code>e2</code> 還是我們要刪除的邊，一樣是正確的。</p>
+</li>
+</ol>
+<h1 id="實作細節"><a class="markdownIt-Anchor" href="#實作細節"></a> 實作細節</h1>
+<p>實作上，<code>pa[x]=y</code> 代表 <code>x</code> 與 <code>y</code> 在同一個集合內，利用遞迴可以不斷向上找，當 <code>pa[x]=0</code> 則代表已經找完了。這裡對並查集就不多介紹了，有興趣的讀者可以上網查詢。</p>
+<p><code>parent[i]</code> 用來記錄指向點 <code>i</code> 的邊的索引值 ，初始化時所有的 <code>parent[i]=0</code>。因此當一條邊 <code>u-&gt;v</code> 要加入時發現 <code>parent[v]</code> 已經不等於 0 時，可以知道這條邊即是第二條造成入度為 2 的邊，記錄為 <code>e2</code>，同時 <code>e1</code>，第一條造成入度為 2 的邊，即是 <code>parent[v]</code> 所記錄的邊。</p>
+<p>當邊不是 <code>e2</code> 時，則將邊的兩端點進行合併，並且注意合併前如果兩端點的集合已經相同，則紀錄 <code>e</code> 為造成環的最後一條邊。</p>
+<p>最後，先判斷有沒有入度為 2 的邊（可以判斷 <code>e1</code> 與 <code>e2</code> 有沒有被賦值過），若沒有的話，則必定是情況1.1，所以直接返回 <code>e</code> 即可；反之，若有入度為 2 的邊，則如果沒有環出現，要刪除的邊是較晚出現的 <code>e2</code>，否則一定是情況1.2 且要刪除的邊為 <code>e1</code>。</p>
+<h1 id="程式碼"><a class="markdownIt-Anchor" href="#程式碼"></a> 程式碼</h1>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Author: justin0u0&lt;mail@justin0u0.com&gt;</span></span><br><span class="line"><span class="comment"> * Problem: https://leetcode.com/problems/redundant-connection-ii/</span></span><br><span class="line"><span class="comment"> * Runtime: 4ms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">findSet</span><span class="params">(<span class="keyword">int</span>* pa, <span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (!pa[x]) ? x : (pa[x] = findSet(pa, pa[x]));</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">findRedundantDirectedConnection</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt;&amp; edges)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = (<span class="keyword">int</span>)edges.size();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> *pa = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>]();</span><br><span class="line">    <span class="keyword">int</span> *parent = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>]();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> e1 = <span class="number">-1</span>, e2; <span class="comment">// e1, e2 are edges that cause a node to have 2 in degree</span></span><br><span class="line">    <span class="keyword">int</span> e = <span class="number">-1</span>; <span class="comment">// e is the index of edge that cause a cycle last</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">      <span class="keyword">auto</span>&amp; edge = edges[i];</span><br><span class="line">      <span class="keyword">if</span> (parent[edge[<span class="number">1</span>]]) &#123; <span class="comment">// Found vertex edge[1] is the vertex that in degree = 2</span></span><br><span class="line">        e1 = parent[edge[<span class="number">1</span>]] - <span class="number">1</span>;</span><br><span class="line">        e2 = i;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        parent[edge[<span class="number">1</span>]] = i + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// We skip adding e2</span></span><br><span class="line">        <span class="keyword">int</span> fx = findSet(pa, edge[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">int</span> fy = findSet(pa, edge[<span class="number">1</span>]);</span><br><span class="line">        <span class="keyword">if</span> (fx != fy) <span class="comment">// no cycle found, merge</span></span><br><span class="line">          pa[fx] = fy;</span><br><span class="line">        <span class="keyword">else</span> <span class="comment">// cycle found, the last edge that cause a cycle is i</span></span><br><span class="line">          e = i;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (e1 == <span class="number">-1</span>)</span><br><span class="line">      <span class="keyword">return</span> edges[e];</span><br><span class="line">    <span class="keyword">if</span> (e == <span class="number">-1</span>)</span><br><span class="line">      <span class="keyword">return</span> edges[e2];</span><br><span class="line">    <span class="keyword">return</span> edges[e1];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.justin0u0.com/LeetCode-Redundant-Connection-II/" title="LeetCode 685 - Redundant Connection II">https://blog.justin0u0.com/LeetCode-Redundant-Connection-II/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/Graph/" rel="tag"># Graph</a>
+              <a href="/tags/Union-Find/" rel="tag"># Union Find</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/LeetCode-Longest-Increasing-Subsequence/" rel="prev" title="LeetCode 300 - Longest Increasing Subsequence">
+      <i class="fa fa-chevron-left"></i> LeetCode 300 - Longest Increasing Subsequence
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%8C%E7%9B%AE"><span class="nav-number">1.</span> <span class="nav-text"> 題目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B%E8%AA%AA%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text"> 範例說明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#example-1"><span class="nav-number">2.1.</span> <span class="nav-text"> Example 1:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-2"><span class="nav-number">2.2.</span> <span class="nav-text"> Example 2:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%83%B3%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text"> 想法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E9%A1%9E%E8%A8%8E%E8%AB%96"><span class="nav-number">3.1.</span> <span class="nav-text"> 分類討論</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A6%E6%9F%A5%E9%9B%86-union-finddisjoint-set"><span class="nav-number">3.2.</span> <span class="nav-text"> 並查集 Union Find&#x2F;Disjoint Set</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">3.3.</span> <span class="nav-text"> 總結</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%A6%E4%BD%9C%E7%B4%B0%E7%AF%80"><span class="nav-number">4.</span> <span class="nav-text"> 實作細節</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">5.</span> <span class="nav-text"> 程式碼</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/uploads/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">justin0u0</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css">
+
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://justin0u0.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog.justin0u0.com/LeetCode-Redundant-Connection-II/";
+    this.page.identifier = "LeetCode-Redundant-Connection-II/";
+    this.page.title = "LeetCode 685 - Redundant Connection II";
+    this.language = 'zh_TW';
+  };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://justin0u0.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

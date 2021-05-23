@@ -94,6 +94,7 @@ $$dp(i)=\min\big(dp(j)+1\big)\quad\forall\ j\gt i,\ if\ isPalindrome[i][j-1]=1$$
  * Author: justin0u0<mail@justin0u0.com>
  * Problem: https://leetcode.com/problems/palindrome-partitioning-ii/
  * Runtime: 74ms
+ * Time Complexity: O(N^2)
  * Description:
  *  First calculate isPalindrome for all substring,
  *  then use dp(i) represent the min-cut for substring s[0:i],
@@ -139,7 +140,8 @@ public:
  * Author: justin0u0<mail@justin0u0.com>
  * Problem: https://leetcode.com/problems/palindrome-partitioning-ii/
  * Runtime: 60ms
- * Description: One-way O(N) solution
+ * Time Complexity: O(N^2)
+ * Description: One-way O(N^2) solution
  */
 
 class Solution {

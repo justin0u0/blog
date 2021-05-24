@@ -80,26 +80,26 @@ for (int i = n - 1; i >= 0; i--) {
 ```cpp
 /**
  * Author: justin0u0<mail@justin0u0.com>
- * Problem: https://leetcode.com/problems/burst-balloons/
- * Runtime: 372ms
+ * Problem: https://leetcode.com/problems/guess-number-higher-or-lower-ii/
+ * Runtime: 40ms
  * Time Complexity: O(N^3)
+ * Description: Bottom-up DP
  */
 
 class Solution {
 public:
-  int maxCoins(vector<int>& nums) {
-    nums.insert(nums.begin(), 1);
-    nums.emplace_back(1);
-    int n = nums.size();
-    
-    int **dp = new int*[n];
-    for (int i = n - 1; i >= 0; i--) {
-      dp[i] = new int[n + 1];
-      dp[i][i + 1] = 0;
+  int getMoneyAmount(int n) {
+    int** dp = new int*[n];
+    for (int i = 0; i < n; i++) {
+      dp[i] = new int[n]();
+    }
 
-      for (int j = i + 2; j < n; j++) {
-        for (int k = i + 1; k < j; k++)
-          dp[i][j] = max(dp[i][j], dp[i][k] + dp[k][j] + nums[i] * nums[k] * nums[j]);
+    for (int i = n - 1; i >= 0; i--) {
+      for (int j = i + 1; j < n; j++) {
+        dp[i][j] = min((i + 1) + dp[i + 1][j], dp[i][j - 1] + (j + 1));
+        for (int k = i + 1; k < j; k++) {
+          dp[i][j] = min(dp[i][j], max(dp[i][k - 1], dp[k + 1][j]) + (k + 1));
+        }
       }
     }
     return dp[0][n - 1];

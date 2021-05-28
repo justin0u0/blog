@@ -1168,7 +1168,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #8e5065;
+  background: #86e026;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2545,4 +2545,8 @@ ul.breadcrumb li + li:last-child {
 }
 .links-of-blogroll-item {
   padding: 0;
+}
+.katex .mathdefault {
+  font-family: KaTeX_Math;
+  font-style: italic;
 }

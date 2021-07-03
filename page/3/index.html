@@ -123,6 +123,11 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
 
   </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
         <li class="menu-item menu-item-tags">
 
     <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
@@ -188,6 +193,100 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/LeetCode-Scramble-String/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/LeetCode-Scramble-String/" class="post-title-link" itemprop="url">LeetCode 87 - Scramble String</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-28 09:55:33" itemprop="dateCreated datePublished" datetime="2021-01-28T09:55:33+08:00">2021-01-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/LeetCode-Scramble-String/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="LeetCode-Scramble-String/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="題目"><a class="markdownIt-Anchor" href="#題目"></a> 題目</h1>
+<p>題目連結：<a target="_blank" rel="noopener" href="https://leetcode.com/problems/scramble-string">https://leetcode.com/problems/scramble-string</a></p>
+<p>給定一個字串 <code>s1</code>，將 <code>s1</code> 分成 <code>x</code> 和 <code>y</code> 兩段子字串，你可以決定是否將交換兩段子字串的順序，也就是 <code>s1 = x + y</code>，或是 <code>s1 = y + x</code>。接著再對 <code>x</code>, <code>y</code> 分別進行一樣的操作，直到字串都變成長度 1 為止。</p>
+<p>現在給你另一個字串 <code>s2</code>，問是否 <code>s1</code> 可以透過上述的操作變成 <code>s2</code>。</p>
+<h1 id="範例說明"><a class="markdownIt-Anchor" href="#範例說明"></a> 範例說明</h1>
+<h2 id="example-1"><a class="markdownIt-Anchor" href="#example-1"></a> Example 1:</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Input: s1 &#x3D; &quot;great&quot;, s2 &#x3D; &quot;rgeat&quot;</span><br><span class="line">Output: true</span><br><span class="line"></span><br><span class="line">Explanation: One possible scenario applied on s1 is:</span><br><span class="line">&quot;great&quot; --&gt; &quot;gr&#x2F;eat&quot; &#x2F;&#x2F; divide at random index.</span><br><span class="line">&quot;gr&#x2F;eat&quot; --&gt; &quot;gr&#x2F;eat&quot; &#x2F;&#x2F; random decision is not to swap the two substrings and keep them in order.</span><br><span class="line">&quot;gr&#x2F;eat&quot; --&gt; &quot;g&#x2F;r &#x2F; e&#x2F;at&quot; &#x2F;&#x2F; apply the same algorithm recursively on both substrings. divide at ranom index each of them.</span><br><span class="line">&quot;g&#x2F;r &#x2F; e&#x2F;at&quot; --&gt; &quot;r&#x2F;g &#x2F; e&#x2F;at&quot; &#x2F;&#x2F; random decision was to swap the first substring and to keep the second substring in the same order.</span><br><span class="line">&quot;r&#x2F;g &#x2F; e&#x2F;at&quot; --&gt; &quot;r&#x2F;g &#x2F; e&#x2F; a&#x2F;t&quot; &#x2F;&#x2F; again apply the algorithm recursively, divide &quot;at&quot; to &quot;a&#x2F;t&quot;.</span><br><span class="line">&quot;r&#x2F;g &#x2F; e&#x2F; a&#x2F;t&quot; --&gt; &quot;r&#x2F;g &#x2F; e&#x2F; a&#x2F;t&quot; &#x2F;&#x2F; random decision is to keep both substrings in the same order.</span><br><span class="line">The algorithm stops now and the result string is &quot;rgeat&quot; which is s2.</span><br><span class="line">As there is one possible scenario that led s1 to be scrambled to s2, we return true.</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/LeetCode-Scramble-String/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -1040,105 +1139,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
-    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/LeetCode-Text-Justification/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar.jpg">
-      <meta itemprop="name" content="justin0u0">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Justin0u0's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/LeetCode-Text-Justification/" class="post-title-link" itemprop="url">LeetCode 68 - Text Justification</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-07-17 09:48:39" itemprop="dateCreated datePublished" datetime="2020-07-17T09:48:39+08:00">2020-07-17</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus: </span>
-    
-    <a title="disqus" href="/LeetCode-Text-Justification/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="LeetCode-Text-Justification/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="題目"><a class="markdownIt-Anchor" href="#題目"></a> 題目</h1>
-<p>題目連結：<a target="_blank" rel="noopener" href="https://leetcode.com/problems/text-justification/">https://leetcode.com/problems/text-justification/</a></p>
-<p>給很多個字串和一個寬度 <code>maxWidth</code>，將字串逐一放入並讓每一行都是 <code>maxWidth</code> 寬。</p>
-<p>若是最後一行、或是一行內只有一個字串，則靠左排列。其餘則置中排列，平均的分配空白到字串之間。</p>
-<p>置中排列時若空白的數量不能平均的被分配，則左邊的空格會比右邊的空格多一個。</p>
-<h1 id="範例說明"><a class="markdownIt-Anchor" href="#範例說明"></a> 範例說明</h1>
-<h2 id="example-1"><a class="markdownIt-Anchor" href="#example-1"></a> Example 1:</h2>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">words &#x3D; [&quot;This&quot;, &quot;is&quot;, &quot;an&quot;, &quot;example&quot;, &quot;of&quot;, &quot;text&quot;, &quot;justification.&quot;]</span><br><span class="line">maxWidth &#x3D; 16</span><br><span class="line">Output:</span><br><span class="line">[</span><br><span class="line">   &quot;This    is    an&quot;,</span><br><span class="line">   &quot;example  of text&quot;,</span><br><span class="line">   &quot;justification.  &quot;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-<h2 id="example-2"><a class="markdownIt-Anchor" href="#example-2"></a> Example 2:</h2>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">words &#x3D; [&quot;What&quot;,&quot;must&quot;,&quot;be&quot;,&quot;acknowledgment&quot;,&quot;shall&quot;,&quot;be&quot;]</span><br><span class="line">maxWidth &#x3D; 16</span><br><span class="line">Output:</span><br><span class="line">[</span><br><span class="line">  &quot;What   must   be&quot;,</span><br><span class="line">  &quot;acknowledgment  &quot;,</span><br><span class="line">  &quot;shall be        &quot;</span><br><span class="line">]</span><br><span class="line">Explanation: Note that the last line is &quot;shall be    &quot; instead of &quot;shall     be&quot;,</span><br><span class="line">             because the last line must be left-justified instead of fully-justified.</span><br><span class="line">             Note that the second line is also left-justified becase it contains only one word.</span><br></pre></td></tr></table></figure>
-<h2 id="example-3"><a class="markdownIt-Anchor" href="#example-3"></a> Example 3:</h2>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Input:</span><br><span class="line">words &#x3D; [&quot;Science&quot;,&quot;is&quot;,&quot;what&quot;,&quot;we&quot;,&quot;understand&quot;,&quot;well&quot;,&quot;enough&quot;,&quot;to&quot;,&quot;explain&quot;,</span><br><span class="line">         &quot;to&quot;,&quot;a&quot;,&quot;computer.&quot;,&quot;Art&quot;,&quot;is&quot;,&quot;everything&quot;,&quot;else&quot;,&quot;we&quot;,&quot;do&quot;]</span><br><span class="line">maxWidth &#x3D; 20</span><br><span class="line">Output:</span><br><span class="line">[</span><br><span class="line">  &quot;Science  is  what we&quot;,</span><br><span class="line">  &quot;understand      well&quot;,</span><br><span class="line">  &quot;enough to explain to&quot;,</span><br><span class="line">  &quot;a  computer.  Art is&quot;,</span><br><span class="line">  &quot;everything  else  we&quot;,</span><br><span class="line">  &quot;do                  &quot;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/LeetCode-Text-Justification/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1210,7 +1210,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-count">47</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1223,7 +1223,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

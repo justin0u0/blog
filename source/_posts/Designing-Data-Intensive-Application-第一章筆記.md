@@ -8,9 +8,9 @@ categories: Notes
 mathjax: true
 ---
 
-# Introduction
+<img src="/assets/Designing-Data-Intensive-Application-第一章筆記/book-cover.png" width="50%">
 
-![](/assets/Designing-Data-Intensive-Application-第一章筆記/book-cover.png)
+# Introduction
 
 現在的軟體基本上都不是 CPU Bound，而是 Data-Intensive 的，也就是大多數的瓶頸都在資料的量而不是計算的量。因此大多數的應用程式會依靠多種工具來滿足不同情境下的資料使用。
 
@@ -146,3 +146,5 @@ $p_k$ 代表第k百分位數。
 - Reliability：系統要可以容錯。
 - Scalability：系統負載增加時也能保持性能。
 - Maintainability：降低工程師與維運團隊工作的複雜度。
+
+> 最後，如果你喜歡這篇文章，或是文章對你有幫助的話，可以幫我按個喜歡、或是留言！你的支持就是我寫作的最大動力。有任何想問的問題也可以在底下留言喔～

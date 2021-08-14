@@ -1,6 +1,9 @@
 ---
 title: Designing Data-Intensive Application 第二章筆記
 date: 2021-08-01 16:02:44
+description: |
+  本章節主要在介紹目前主流的三個 Data Model，Relational Model、Document Model 以及 Graph Model 的優缺點、演進史以及使用時機。
+  因為要精通一種 data model 是十分困難的，在使用之前先綜觀的了解每一種 model 的優缺點以及使用時機是非常重要的。
 tags:
 	- Notes
 	- DDIA

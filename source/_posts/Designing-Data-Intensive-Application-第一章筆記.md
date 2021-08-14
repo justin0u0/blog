@@ -1,6 +1,9 @@
 ---
 title: Designing Data-Intensive Application 第一章筆記
 date: 2021-07-24 21:55:03
+description: |
+	現在的軟體基本上都不是 CPU Bound，而是 Data-Intensive 的，因此大多數的應用程式會依靠多種工具來滿足不同情境下的資料使用。
+	本章節重點先放在三項設計系統時的要點：可靠性（Reliability）、可擴展性（Scalability）以及可維護性（Maintainability）。
 tags:
 	- Notes
 	- DDIA

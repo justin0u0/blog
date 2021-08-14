@@ -1,6 +1,10 @@
 ---
 title: Designing Data-Intensive Application 第三章筆記
 date: 2021-08-10 13:39:16
+description: |
+	本章節首先介紹資料庫的 storage engine 是如何儲存資料，使得查詢可以變得更快速。並介紹兩種常被資料庫使用的資料結構 LSM-Tree 以及 B-Tree。
+	再來淺談一般用於網路服務的資料庫與資料分析用的資料庫的設計理念有什麼不同。
+	最後介紹較不常見的 column-oriented database 的優缺點、設計以及使用情境。
 tags:
 	- Notes
 	- DDIA

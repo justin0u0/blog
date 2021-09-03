@@ -24,7 +24,7 @@ Explanation: There is a cycle in the linked list, where the tail connects to the
 
 <!-- More -->
 
-![](/assets/leetcode-141/circularlinkedlist.png)
+![](/assets/LeetCode-Linked-List-Cycle/circularlinkedlist.png)
 
 ## Example 2:
 
@@ -34,7 +34,7 @@ Output: true
 Explanation: There is a cycle in the linked list, where the tail connects to the 0th node.
 ```
 
-![](/assets/leetcode-141/circularlinkedlist_test2.png)
+![](/assets/LeetCode-Linked-List-Cycle/circularlinkedlist_test2.png)
 
 ## Example 3:
 
@@ -44,7 +44,7 @@ Output: false
 Explanation: There is no cycle in the linked list.
 ```
 
-![](/assets/leetcode-141/circularlinkedlist_test3.png)
+![](/assets/LeetCode-Linked-List-Cycle/circularlinkedlist_test3.png)
 
 # 想法
 

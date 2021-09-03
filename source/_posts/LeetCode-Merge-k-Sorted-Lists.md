@@ -32,7 +32,7 @@ Output: 1->1->2->3->4->4->5->6
 ## 方法一：時間複雜度 O(KN)、空間複雜度 O(KN)
 合併兩個長度分別為 `N`, `M`，排序好的串列，我們可以用雙指針遍歷兩個串列，每次都將比較小的值加入一個**新的序列**中，時間複雜度為 `O(N + M)`，空間複雜度為 `O(N + M)`。見下圖：
 
-<img width="50%" src="/assets/merge-k-sorted-lists-double-pointer.gif">
+<img width="50%" src="/assets/LeetCode-Merge-k-Sorted-Lists/merge-k-sorted-lists-double-pointer.gif">
 
 假設所有串列之總長為 `N`。
 
@@ -44,7 +44,7 @@ Output: 1->1->2->3->4->4->5->6
 
 先考慮合併序列的方法，若改為先將串列兩兩配對合併，下一輪再將合併過後的串列兩兩配對合併...，直到剩下一個串列為止。如下圖：
 
-<img width="70%" src="/assets/merge-k-sorted-lists-merge.png">
+<img width="70%" src="/assets/LeetCode-Merge-k-Sorted-Lists/merge-k-sorted-lists-merge.png">
 
 每一輪合併，串列的數量減半，總共合併了 `logK + 1` 輪。再加上每一輪都會遍歷所有的串列每一個數字，總長度為 `N`。總時間複雜度降為 `O(NLogK)`。
 

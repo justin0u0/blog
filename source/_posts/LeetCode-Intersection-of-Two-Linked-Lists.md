@@ -21,7 +21,7 @@ Input: intersectVal = 8, listA = [4,1,8,4,5], listB = [5,6,1,8,4,5], skipA = 2, 
 Output: Reference of the node with value = 8
 Input Explanation: The intersected node's value is 8 (note that this must not be 0 if the two lists intersect). From the head of A, it reads as [4,1,8,4,5]. From the head of B, it reads as [5,6,1,8,4,5]. There are 2 nodes before the intersected node in A; There are 3 nodes before the intersected node in B.
 ``` 
-![](/assets/leetcode-160/160_example_1_1.png)
+![](/assets/LeetCode-Intersection-of-Two-Linked-Lists/160_example_1_1.png)
 
 <!-- More -->
 
@@ -32,7 +32,7 @@ Input: intersectVal = 2, listA = [1,9,1,2,4], listB = [3,2,4], skipA = 3, skipB 
 Output: Reference of the node with value = 2
 Input Explanation: The intersected node's value is 2 (note that this must not be 0 if the two lists intersect). From the head of A, it reads as [1,9,1,2,4]. From the head of B, it reads as [3,2,4]. There are 3 nodes before the intersected node in A; There are 1 node before the intersected node in B.
 ``` 
-![](/assets/leetcode-160/160_example_2.png)
+![](/assets/LeetCode-Intersection-of-Two-Linked-Lists/160_example_2.png)
 
 ## Example 3:
 
@@ -42,7 +42,7 @@ Output: null
 Input Explanation: From the head of A, it reads as [2,6,4]. From the head of B, it reads as [1,5]. Since the two lists do not intersect, intersectVal must be 0, while skipA and skipB can be arbitrary values.
 Explanation: The two lists do not intersect, so return null.
 ```
-![](/assets/leetcode-160/160_example_3.png)
+![](/assets/LeetCode-Intersection-of-Two-Linked-Lists/160_example_3.png)
 
 # 想法
 
@@ -58,7 +58,7 @@ Explanation: The two lists do not intersect, so return null.
 
 使用第一條 Linked list 串到第二條 Linked list 之後；將第二條 Linked list 串到第一條 Linked list 之後。則兩條 Linked list 會變成等長，根據**想法一**，因為交點後的長度皆相同，所以只要使用兩個指標從兩個 Linked list 的開頭開始，同時一次一步的前進，若有交點則一定會同時走到交點（下圖黑框）：若沒有交點的話則同時走到 `null`。
 
-![](/assets/leetcode-160/00.png)
+![](/assets/LeetCode-Intersection-of-Two-Linked-Lists/00.png)
 
 # 實作細節
 

@@ -21,7 +21,7 @@ Input: [0,1,0,2,1,0,1,3,2,1,2,1]
 Output: 6
 ```
 
-![](/assets/trapping-rain-water-sample.png)
+![](/assets/LeetCode-Trapping-Rain-Water/trapping-rain-water-sample.png)
 
 上圖顯示輸入為 `[0,1,0,2,1,0,1,3,2,1,2,1]` 後 6 格水（藍色）所在的位置。
 

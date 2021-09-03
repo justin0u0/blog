@@ -20,7 +20,7 @@ date: 2021-04-26 13:29:50
 
 ## Example 1:
 
-![](/assets/leetcode-685/graph1.jpeg)
+![](/assets/LeetCode-Redundant-Connection-II/graph1.jpeg)
 
 ```
 Input: edges = [[1,2],[1,3],[2,3]]
@@ -31,7 +31,7 @@ Output: [2,3]
 
 ## Example 2:
 
-![](/assets/leetcode-685/graph2.jpeg)
+![](/assets/LeetCode-Redundant-Connection-II/graph2.jpeg)
 
 ```
 Input: edges = [[1,2],[2,3],[3,4],[4,1],[1,5]]
@@ -48,7 +48,7 @@ Output: [4,1]
 2. **Forward edge**：邊 `u->v` 中，`u` 是 `v` 的祖先。
 3. **Cross edge**：邊 `u->v` 中，`u` 不是 `v` 的祖先且 `v` 也不是 `u` 的祖先。
 
-<img src="/assets/leetcode-685/case.jpg" width="50%">
+<img src="/assets/LeetCode-Redundant-Connection-II/case.jpg" width="50%">
 
 我們知道一棵有根樹中，**除了 root 之外，每一個點的入度為 1**。而 **Forward edge** 以及 **Cross edge** 的情況，可以發現這兩種情況都會使得**有一個點的入度為二**，也就是有兩個父親節點。並且，假設造成入度為二的兩條邊為 `e1` 以及 `e2`，可以發現移除 `e1` 與移除 `e2` 都可以使圖還原回一棵有根樹。
 

@@ -17,23 +17,23 @@ categories:
 
 在人們剛開始接觸網路時，兩台機器之間的溝通可以被想像成下圖：
 
-![/assets/service-mesh/Untitled.png](/assets/service-mesh/Untitled.png)
+![](/assets/Service-mesh-服務網格之介紹-微服務中的-TCP/Untitled.png)
 
 但漸漸的會發現，機器與機器之間的溝通可能會出現資料遺失、重試等問題，因此需要更複雜的邏輯來處理機器之間的溝通。
 
 <!-- More -->
 
-![/assets/service-mesh/Untitled%201.png](/assets/service-mesh/Untitled%201.png)
+![](/assets/Service-mesh-服務網格之介紹-微服務中的-TCP/Untitled%201.png)
 
 當機器越來越普及，工程師們開始思考如何解決多個連線、資料加密、服務發現等問題，以實現一個 Network System。因此機器開始需要實現一個名為 `Flow Control` 的邏輯，用來確認傳輸的速度不會大於接收的速度、處理網路傳輸的資料遺失、資料加密等等問題。因此，服務中除了實現 Business Logic，還開始需要實現 `Flow Control`。
 
-![/assets/service-mesh/Untitled%202.png](/assets/service-mesh/Untitled%202.png)
+![](/assets/Service-mesh-服務網格之介紹-微服務中的-TCP/Untitled%202.png)
 
 Services need to implement both business logic & flow control.
 
 為了避免每個服務都要自己實踐一個網路傳輸處理的邏輯，TCP/IP 協議出現了。TCP/IP 解決了網路傳輸的問題，將服務中的 Flow Control 抽象出來，成為網路層的一部分。
 
-![/assets/service-mesh/Untitled%203.png](/assets/service-mesh/Untitled%203.png)
+![](/assets/Service-mesh-服務網格之介紹-微服務中的-TCP/Untitled%203.png)
 
 ---
 
@@ -54,11 +54,11 @@ TCP/IP 作為機器之間的溝通當然還是一個好的工具，然而微服�
 
 因此歷史重演，各個服務開始實現自己的服務發現、熔斷機制邏輯。
 
-![/assets/service-mesh/Untitled%204.png](/assets/service-mesh/Untitled%204.png)
+![](/assets/Service-mesh-服務網格之介紹-微服務中的-TCP/Untitled%204.png)
 
 各個服務都要實現自己的服務發現、熔斷機制等邏輯過於麻煩。因此，開始有 Library 的出現來實現這類邏輯。例如：[Twitter's Finagle](https://finagle.github.io/blog/)、[Facebook's Proxygen](https://github.com/facebook/proxygen)。
 
-![/assets/service-mesh/Untitled%205.png](/assets/service-mesh/Untitled%205.png)
+![](/assets/Service-mesh-服務網格之介紹-微服務中的-TCP/Untitled%205.png)
 
 然而，使用 Library 也有一些問題存在：
 
@@ -72,19 +72,19 @@ TCP/IP 作為機器之間的溝通當然還是一個好的工具，然而微服�
 
 要改變網路的傳輸協議是困難的，因此 Sidecar 的模式被提出，Sidecar 為一個 Proxy，在 Sidecar 中抽象了負載平衡、服務發現、認證授權、流量控制各種分散式服務所需要的邏輯。透過代理的方式來完成服務與服務之間的溝通。
 
-![/assets/service-mesh/Untitled%206.png](/assets/service-mesh/Untitled%206.png)
+![](/assets/Service-mesh-服務網格之介紹-微服務中的-TCP/Untitled%206.png)
 
 各種 Sidecar 的實現開始出現，例如：[Linkerd](https://linkerd.io/2016/02/18/linkerd-twitter-style-operability-for-microservices/)、[Envoy](https://eng.lyft.com/announcing-envoy-c-l7-proxy-and-communication-bus-92520b6c8191?gi=41e38b4401fe) 等等。
 
 每個服務旁都有一個 Sidecar 來輔助與其他服務的溝通，全局圖看起來如下。綠色的即為服務，而藍色的部分即為所謂的 **Service Mesh 服務網格**。
 
-![/assets/service-mesh/Untitled%207.png](/assets/service-mesh/Untitled%207.png)
+![](/assets/Service-mesh-服務網格之介紹-微服務中的-TCP/Untitled%207.png)
 
 Kubernetes 的出現，讓更多企業、使用者關注並使用 Service Mesh 的服務。因此，一個 Sidecar 的控制面板出現，用來實現更好的 Service Mesh 管控。而 [Istio](https://istio.io/) 即為最佳代表。
 
-![/assets/service-mesh/Untitled%208.png](/assets/service-mesh/Untitled%208.png)
+![](/assets/Service-mesh-服務網格之介紹-微服務中的-TCP/Untitled%208.png)
 
-![/assets/service-mesh/Untitled%209.png](service-mesh/Untitled%209.png)
+![](service-mesh/Untitled%209.png)
 
 # 結論
 

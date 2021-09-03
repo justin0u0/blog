@@ -22,7 +22,7 @@ Input: [2,1,5,6,2,3]
 Output: 10
 ```
 
-![](/assets/largest-rectangle-in-histogram-example.png)
+![](/assets/LeetCode-Largest-Rectangle-in-Histogram/largest-rectangle-in-histogram-example.png)
 
 <!-- More -->
 

@@ -267,7 +267,7 @@ protoc -I . --go_out=. --micro_out=. ./proto/greeter.proto
 
 首先來認識 Go-Micro 這個框架：
 
-![/assets/go-micro.png](/assets/go-micro.png)
+![](/assets/Go-Micro-手把手從開發到部署（上）/go-micro.png)
 
 - Server：用於接收請求，Server 會向註冊中心(Registry)註冊自己。
 - Client：用於發送請求，Client 會向註冊中心尋找已經註冊的服務。

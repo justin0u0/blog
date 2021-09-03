@@ -34,12 +34,12 @@ categories: Others
 
 **[keybr.com](https://keybr.com)** 是一個線上、免費的打字練習網站。有著乾淨簡潔的頁面、特別的 *current key* 功能和登入功能。
 
-![](/assets/keybr-intro-more.png)
+![](/assets/快速提升你的英打打字速度-keybr-com/keybr-intro-more.png)
 
 **keybr.com** 在一開始會有一個 *current key* 代表這次要練習的主要字母為 `e`，所以可以發現下方的單詞中每一個單字裡面都有字母 `e`。**keybr.com** 就是利用此機制讓你不斷的打出要練習的字母，直到所有字母都熟練為止。
 
 在第一次打完句子後，會看到以下畫面：
-![](/assets/keybr-first-type.png)
+![](/assets/快速提升你的英打打字速度-keybr-com/keybr-first-type.png)
 
 **注意：一開始打字時，可能會發現不用正確的打字姿勢打字好像速度還比較快，但筆者強烈建議一定要強迫自己使用正確的打字姿勢，並讓自己不要盯著鍵盤看。一開始速度可能會下滑許多，但是對最後的成效是最大的。**
 
@@ -50,13 +50,13 @@ categories: Others
 [https://www.keybr.com/profile/m5k3q8s](https://www.keybr.com/profile/m5k3q8s)
 
 可以看到筆者在第一天開始練習（4/6) 到兩週後的 (4/22)，打字速度即從 30 WHM 提升到了 60 WHM。
-![](/assets/keybr-first-day.jpg)
-![](/assets/keybr-a-week.jpg)
+![](/assets/快速提升你的英打打字速度-keybr-com/keybr-first-day.jpg)
+![](/assets/快速提升你的英打打字速度-keybr-com/keybr-a-week.jpg)
 
 一旦開始練習，除了一開始矯正姿勢的陣痛期，很快的打字速度就會直線上升。筆者的打字速度從 30 WHM 到現在穩定能夠 80 WHM，總共也只花了約 5 個小時的時間。
-![](/assets/keybr-graph.png)
+![](/assets/快速提升你的英打打字速度-keybr-com/keybr-graph.png)
 
-![](/assets/keybr-total.png)
+![](/assets/快速提升你的英打打字速度-keybr-com/keybr-total.png)
 
 最後，感謝讀者看完此篇分享。如果使用後覺得很有效用的，歡迎再下方留言跟筆者分享你的心得～
 

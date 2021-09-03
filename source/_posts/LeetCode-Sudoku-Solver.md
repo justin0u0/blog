@@ -15,9 +15,9 @@ date: 2020-07-08 10:25:07
 # 範例說明
 
 **A sudoku puzzle:**
-![](/assets/sudoku-solver-start.png)
+![](/assets/LeetCode-Sudoku-Solver/sudoku-solver-start.png)
 **The sudoku puzzle solution:**
-![](/assets/sudoku-solver-end.png)
+![](/assets/LeetCode-Sudoku-Solver/sudoku-solver-end.png)
 
 <!-- More -->
 

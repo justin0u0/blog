@@ -23,7 +23,7 @@ Input: head = [1,2,3,4,5], left = 2, right = 4
 Output: [1,4,3,2,5]
 ```
 
-![](/assets/leetcode-92/rev2ex.jpg)
+![](/assets/LeetCode-Reverse-Linked-List-II/rev2ex.jpg)
 
 <!-- More -->
 
@@ -58,7 +58,7 @@ Output: [5]
    **<font color="red">在實作 Linked list 的操作的時候，筆者建議可以把圖畫出來，憑空想像是很容易出錯的！</font>**
    
    一樣以 Example 1 為例子：
-   ![](/assets/leetcode-92/00.png)
+   ![](/assets/LeetCode-Reverse-Linked-List-II/00.png)
    1. 首先筆者會先把 `pre`、`cur` 的位置標出來，並且將 `pre->next`、`cur->next` 等指標的位置也標出來。
    2. 再來，執行「**將 `cur` 的下一個數字移除並插入到 `pre` 之後**」這個操作，將要改變的指標畫成曲線。
    3. 最後，將曲線標出如何賦値，例如：
@@ -67,7 +67,7 @@ Output: [5]
       - <font color="red">數字 3 的下一個數字要接到數字 2，數字 3 是 `cur->next`，`cur->next` 的下一個數字也就是 `cur->next->next` 要接到數字 2，也就是 `pre->next`，因此 `cur->next->next = pre->next`。</font>
   
     如果不放心，可以再做一次 Step 1 到 Step 2 的過程，會得到相同的三個步驟。
-    ![](/assets/leetcode-92/01.png)
+    ![](/assets/LeetCode-Reverse-Linked-List-II/01.png)
 
 最後，眼尖的讀者可能已經發現了兩個問題：
 1. 在第一點中，`pre` 的位置是 `head` 向後移動 `left - 2` 次的位置，可是 `left` 的最小值是 `1`，也就是 `left - 2` 是 `-1`，那 `head` 向後移動 `-1` 步是哪裡？

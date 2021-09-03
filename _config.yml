@@ -8,7 +8,7 @@ subtitle: ''
 description: ''
 keywords:
 author: justin0u0
-language: zh-tw
+language: zh-TW
 timezone: ''
 
 # URL
@@ -51,6 +51,8 @@ highlight:
   tab_replace: ''
   wrap: true
   hljs: false
+prismjs:
+  enable: false
 
 # Home page setting
 # path: Root path for your blogs index page. (default = '')

@@ -2,8 +2,9 @@
 title: Designing Data-Intensive Application 第四章筆記
 date: 2021-08-31 23:17:44
 description: |
-	應用程式是不會永恆不變的，隨著新的 features 加入資料的儲存格式可能改變。因此本章節主要探討第一章節中所提到的 maintainability 中的 evolability。
+	應用程式是不會永恆不變的，隨著新的 features 加入資料的儲存格式可能改變。因此本章節主要探討第一章節中所提到的 maintainability 中的 evolvability。
 	本章節會討論在 JSON、XML、Protocol Buffers、Thrift、Arvo 這些資料格式下的相容性問題，以及在 REST、RPC、Message Queue 下如何使用這些資料格式傳輸資料。
+image: /assets/Designing-Data-Intensive-Application-第四章筆記/data_formats.jpeg
 tags:
 	- Notes
 	- DDIA
@@ -11,7 +12,7 @@ categories: Notes
 mathjax: true
 ---
 
-應用程式是不會永恆不變的，隨著新的 features 加入資料的儲存格式可能改變。因此本章節主要探討第一章節中所提到的 maintainability 中的 **evolability**。
+應用程式是不會永恆不變的，隨著新的 features 加入資料的儲存格式可能改變。因此本章節主要探討第一章節中所提到的 maintainability 中的 **evolvability**。
 
 在 relational database 中，通常需要更新 schema；而在 schemaless database 中，新舊版本的資料格式可以同時存在。
 
@@ -34,11 +35,13 @@ Application code 也會因為資料格式的改變而有所變化，但是在大
 
 本章節會討論在 JSON、XML、Protocol Buffers、Thrift、Arvo 這些資料格式下的相容性問題，以及在 REST、RPC、Message Queue 下如何使用這些資料格式傳輸資料。
 
+![](/assets/Designing-Data-Intensive-Application-第四章筆記/data_formats.jpeg)
+
 <!-- More -->
 
 # Formats for Encoding Data
 
-資料在程式中以 objects、structs、lists、hash tables、trees 等格式儲存在 memory 中，這些資料結構經常透過 pointers 來存取資料。但是透過網路傳輸資料時，這些資料必須轉換成 sequences of bytes（例如 JSON）
+資料在程式中以 objects、structs、lists、hash tables、trees 等格式儲存在 memory 中，這些資料結構經常透過 pointers 來存取資料。但是透過網路傳輸資料時，這些資料必須轉換成 sequences of bytes（例如 JSON）。
 
 <strong>這種從 in-memory 結構轉換到 byte sequence 的過程叫做 *encoding*、*serialization* 或是 *marshalling*；反過來則叫 *decoding*、*deserialization* 或是 *unmarshalling*。</strong>
 
@@ -167,7 +170,7 @@ Thrift 使用 CompactProtocol 甚至只需要 34 bytes 就可以儲存相同的�
 
 	這裡作者給的 schema 中，`favorite_number` 是 `int64` 有號整數，根據 [Thrift 提供的 spec](https://github.com/apache/thrift/blob/master/doc/specs/thrift-compact-protocol.md#integer-encoding)，`int32` 與 `int64` 都會做 zig-zag encoding。所以 1337 的部分編碼過後應該是 `11110010 00010100` 才對。
 
-	關於 ZigZag 整數壓縮與 Base 128 Varint 的詳細介紹，可以看筆者的另一篇 blog：[神奇的整數壓縮算法-ZigZag](/神奇的整數壓縮算法-ZigZag)
+	關於 ZigZag 整數壓縮與 Base 128 Varint 的詳細介紹，可以看筆者的另一篇 blog：[神奇的整數壓縮算法-ZigZag](/神奇的整數壓縮算法-ZigZag)。
 	{% endnote %}
 
 ### Protocol buffers
@@ -296,12 +299,12 @@ Web services 主要透過 REST 來設計 API，這種類型的 API 被稱作 RES
 
 ### RPC
 
-早期的 RPC 設計希望透過網路的請求使用起來跟呼叫 local function 很像，但其實這很難做到，因為有以下的差別：
+早期的 RPC 設計希望網路的請求使用起來跟呼叫 local function 很像，但其實這很難做到，因為有以下的差別：
 
 - Local function 是可預期結果的，RPC 可能因為 network issue 有很多無法預期的結果（例如遺失、等待很久才回應...）。
 - RPC 在遇到 error 時可以重試，但是上一次的結果可能是成功的，只是沒有成功回應結果。重試就要避免一些無法重複執行的請求重複執行。
 - Local function 每次執行時間差不多；RPC 每次執行時間可能被 network latency 影響而差別很大。
-- Local function 可以使用 pointers 或是 references；RPC 需要將 parameter 轉換成 sequence of bytes。
+- Local function 可以使用 pointers 或是 references；RPC 需要將參數轉換成 sequence of bytes。
 
 雖然 RPC 有上面提到的這些問題，但是新型的 RPC frameworks 並沒有就此沒落，例如 Google gRPC。因為這些新型的 RPC frameworks 更明確的區分 RPC 並不是一種 local function call，例如 [Finagle](https://twitter.github.io/finagle/) 提供 `futures` 來封裝可能失敗的請求。
 
@@ -313,7 +316,7 @@ RPC 中若使用 Thrift 或是 Protocol Buffers，則可以依照 schema evoluti
 
 REST & RPC 都透過網路傳遞訊息並期望在短時間得到回應。
 
-*Asyncronous message-passing systems*，透過將資料送到一個中介的 *message-broker (message queue, MQ)* 暫時儲存，再轉傳給其他服務。使用 message queue 有以下的優點：
+*Asynchronous message-passing systems*，透過將資料送到一個中介的 *message-broker (message queue, MQ)* 暫時儲存，再轉傳給其他服務。使用 message queue 有以下的優點：
 
 - 如果接收者暫時無法回應，資料可以緩存在 MQ 裡面，提高可用性。
 - 如果資料沒有送到 MQ 可以幫助重送訊息，做到 at-least-once delivery。
@@ -324,7 +327,7 @@ REST & RPC 都透過網路傳遞訊息並期望在短時間得到回應。
 
 # Summary
 
-本章節介紹了各種常見的 encoding formats，提出他們在效能傷的不同，以及對於系統架構與相容性的影響。
+本章節介紹了各種常見的 encoding formats，提出他們在效能上的不同，以及對於系統架構與相容性的影響。
 
 - Programming language-specific formats：通常只限於一種語言中使用，並且通常不能做到相容性。
 - Texture formats：例如 JSON、XML，這些格式通常對型態的定義很模糊，使用時要特別注意。

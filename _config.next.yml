@@ -30,7 +30,6 @@ custom_file_path:
   #mixin: source/_data/mixins.styl
   style: source/_data/styles.styl
 
-
 # ---------------------------------------------------------------
 # Scheme Settings
 # ---------------------------------------------------------------
@@ -84,6 +83,7 @@ creative_commons:
 menu:
   home: / || fa fa-home
   about: /about/ || fa fa-user
+  cv: /assets/cv_en.pdf || fa fa-user
   tags: /tags/ || fa fa-tags
   categories: /categories/ || fa fa-th
   archives: /archives/ || fa fa-archive
@@ -151,6 +151,7 @@ social:
   #YouTube: https://youtube.com/yourname || fab fa-youtube
   #Instagram: https://instagram.com/yourname || fab fa-instagram
   #Skype: skype:yourname?call|chat || fab fa-skype
+  LinkedIn: https://www.linkedin.com/in/justin0u0 || fab fa-linkedin
 
 social_icons:
   enable: true

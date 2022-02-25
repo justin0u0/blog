@@ -9,10 +9,10 @@
     "server": "hexo server"
   },
   "hexo": {
-    "version": "5.3.0"
+    "version": "5.4.1"
   },
   "dependencies": {
-    "@justin0u0/hexo-renderer-markdown-it-plus": "git+ssh://git@github.com/justin0u0/hexo-renderer-markdown-it-plus.git#2.0.3",
+    "@justin0u0/hexo-renderer-markdown-it-plus": "git+ssh://git@github.com/justin0u0/hexo-renderer-markdown-it-plus.git#2.0.4",
     "hexo": "^5.4.1",
     "hexo-deployer-git": "^3.0.0",
     "hexo-generator-archive": "^1.0.0",

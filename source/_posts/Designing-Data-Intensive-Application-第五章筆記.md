@@ -16,7 +16,7 @@ mathjax: true
 2. 當部分節點不可用時系統依然可以保持運作，提高可用性（Availability）。
 3. 分散 read queries，提高 read throughput。
 
-Replication 的難處在於資料是會更新的，因此如何透過網路同步這些資料的更新是最大的難點。本章節主要探討三種常見的 replication model，分別是 single-leader replication、multi-leader replication 以及 leaderless replication。
+Replication 的難處在於資料是會更新的，因此如何透過網路同步這些資料的更新是最大的難點。本章節主要探討三種常見的 replication model，分別是 **single-leader replication**、**multi-leader replication** 以及 **leaderless replication**。
 
 <!-- More -->
 
@@ -28,7 +28,7 @@ Replication 的難處在於資料是會更新的，因此如何透過網路同�
 
 而 client 雖然只能寫入到 leader，但是可以透過 leader 或是 followers 來讀取。
 
-![Leader-based replication.](/assets/Designing-Data-Intensive-Application-第五章筆記/leader_follower.png)
+![Single-leader replication.](/assets/Designing-Data-Intensive-Application-第五章筆記/leader_follower.png)
 
 Leader-follower 模式可以透過讀寫分離來大幅降低資料庫的 loading，並且一般多數的 web application 都是 read-heavy 的，因此在 PostgreSQL、MySQL、MongoDB 等常見的 databases、或是 Kafka、RabbitMQ 等 message queue systems 中，leader-based replication 都是內建的 features。
 
@@ -143,7 +143,7 @@ Replicaiton 提供 fault-tolerance、提升 scalability 以及降低 network lat
 
 有因果關係的兩個更新，讀取時要保留相同的順序。
 
-這個情況在 leader-based replication 並不會發生，只有在資料庫有 partitioned 並且兩個更新被寫入到不同資料庫時才會發生。因此我們需要一些方式來追蹤有因果關係的寫入，方法會在本章節的後面提到。
+這個情況在 single-leader replication 並不會發生，只有在資料庫有 partitioned 並且兩個更新被寫入到不同資料庫時才會發生。因此我們需要一些方式來追蹤有因果關係的寫入，方法會在本章節的後面提到。
 
 ## Solutions for Replication Lag
 
@@ -153,7 +153,7 @@ Replicaiton 提供 fault-tolerance、提升 scalability 以及降低 network lat
 
 # Multi-Leader Replication
 
-Leader-based replication 的主要缺點是所有的 write operations 都要透過 leader。
+Single-leader replication 的主要缺點是所有的 write operations 都要透過 leader。
 
 一個簡單的想法就是使用多個 leaders，每個 leader 並且每個 leaders 都要把收到的 writes forward 給其他節點。
 
@@ -163,9 +163,9 @@ Leader-based replication 的主要缺點是所有的 write operations 都要透�
 
 ![Multi-leader replication.](/assets/Designing-Data-Intensive-Application-第五章筆記/multi_leader.png)
 
-可以考慮每個 datacenter 中只有一個 leader，在一個 data center 內使用 leader-based replication。而 datacenters 之間由 leader 複製 writes 給其他的 leaders。
+可以考慮每個 datacenter 中只有一個 leader，在一個 data center 內使用 single-leader replication。而 datacenters 之間由 leader 複製 writes 給其他的 leaders。
 
-Multi-leader replication 比 leader-based replication 好的地方在於：
+Multi-leader replication 比 single-leader replication 好的地方在於：
 
 - Performance：若 datacenters 是跨國的，則可以選擇最近的 datacenter 進行讀寫大幅降低 network latency。
 - Tolerance of datacenter outages：可以容忍整個 datacenter 的 failover。
@@ -342,7 +342,7 @@ Dynamo 的 paper 中即使用此方法來偵測衝突的發生，Voldermort、Ri
 
 而常見的三種 replication 模式包含：
 
-- Leader-based replication：只有一個 leader 節點並且所有的寫入操作只能透過 leader，由 leader 將資料複製到其他的 follower 節點。配置簡單且不需要考慮 concurrent writes 的問題；但只能提升 read scalability，並且要考慮 leader failure 的問題
+- Single-leader replication：只有一個 leader 節點並且所有的寫入操作只能透過 leader，由 leader 將資料複製到其他的 follower 節點。配置簡單且不需要考慮 concurrent writes 的問題；但只能提升 read scalability，並且要考慮 leader failure 的問題
 - Multi-leader replication：有多個 leader 節點，適合在 datacenter 使用以降低寫入的 latency，有更高的可用性。但是必須處理 concurrent writes 的問題。
 - Leaderless replication：可以在任何 nodes 進行讀寫，有更高的 availability 以及更低的 consistency，適合能容忍 eventual consistency 的應用使用。
 

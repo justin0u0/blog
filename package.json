@@ -9,11 +9,11 @@
     "server": "hexo server"
   },
   "hexo": {
-    "version": "5.4.1"
+    "version": "6.2.0"
   },
   "dependencies": {
     "@justin0u0/hexo-renderer-markdown-it-plus": "git+ssh://git@github.com/justin0u0/hexo-renderer-markdown-it-plus.git#2.0.4",
-    "hexo": "^5.4.1",
+    "hexo": "^6.2.0",
     "hexo-deployer-git": "^3.0.0",
     "hexo-generator-archive": "^1.0.0",
     "hexo-generator-category": "^1.0.0",
@@ -24,6 +24,6 @@
     "hexo-renderer-ejs": "^2.0.0",
     "hexo-renderer-stylus": "^2.0.1",
     "hexo-server": "^3.0.0",
-    "hexo-theme-next": "^8.11.0"
+    "hexo-theme-next": "^8.11.1"
   }
 }

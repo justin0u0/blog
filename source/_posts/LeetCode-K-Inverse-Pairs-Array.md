@@ -138,7 +138,11 @@ public:
       }
     }
 
-    return (*cur)[k];
+    int answer = (*cur)[k];
+    delete pre;
+    delete cur;
+
+    return answer;
   }
 };
 ```

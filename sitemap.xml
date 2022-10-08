@@ -638,13 +638,6 @@
   </url>
   
   <url>
-    <loc>https://blog.justin0u0.com/tags/%E5%9B%9E%E6%9C%94%E6%B3%95%EF%BC%88Backtracking%EF%BC%89/</loc>
-    <lastmod>2022-10-08</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.justin0u0.com/tags/%E6%BB%91%E5%8B%95%E7%AA%97%E5%8F%A3%EF%BC%88Sliding-Window%EF%BC%89/</loc>
     <lastmod>2022-10-08</lastmod>
     <changefreq>weekly</changefreq>
@@ -653,6 +646,13 @@
   
   <url>
     <loc>https://blog.justin0u0.com/tags/%E4%BA%8C%E5%85%83%E6%90%9C%E5%B0%8B%E6%A8%B9%EF%BC%88Binary-Search-Tree%EF%BC%89/</loc>
+    <lastmod>2022-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.justin0u0.com/tags/%E5%9B%9E%E6%9C%94%E6%B3%95%EF%BC%88Backtracking%EF%BC%89/</loc>
     <lastmod>2022-10-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

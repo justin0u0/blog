@@ -2,7 +2,7 @@
 title: Raycast 超詳細介紹！快速提升生產力的超好用工具！
 date: 2023-01-22 17:04:40
 image: "/assets/Raycast-超詳細介紹！快速提升生產力的超好用工具！/raycast.jpg"
-description:
+description: "Raycast 超詳細介紹！快速提升生產力的超好用工具！介紹 Raycast 的功能，以及推薦 15 個最好用、最能夠提升生產力的指令，只要能夠熟悉這些指令的使用，一定能夠大幅提升你的工作效率！"
 tags:
 - Productivity
 - MacOS
@@ -96,7 +96,7 @@ Raycast 有比 Spotlight 更強大的計算機功能，可以直接在輸入框�
 
 筆者最常用的就是 **<code style="color: red">Maximize</code>**，可以把視窗最大化，再也不用按著 <code style="color: red">⌥</code> 去點視窗的上面小小的綠色按鈕了！**<code style="color: red">Left Half</code>** 和 **<code style="color: red">Right Half</code>** 分別會把視窗放置在左半部或是右半部，這樣就可以在同時處理多個視窗的時候，快速的調整好分割的視窗大小啦！
 
-![Raycast Maximize](/assets/Raycast-超詳細介紹！快速提升生產力的超好用工具！/maximize.gif)
+![Raycast Maximize Window](/assets/Raycast-超詳細介紹！快速提升生產力的超好用工具！/maximize.gif)
 
 {% note success %}
 👉 你可以把不會使用到的功能在 Raycast 的設定中關閉，打開 Raycast 輸入 **<code style="color: red">Raycast Settings Extensions</code>** 就可以看到設定頁面囉！

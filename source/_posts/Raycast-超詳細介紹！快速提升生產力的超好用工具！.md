@@ -1,7 +1,7 @@
 ---
 title: Raycast 超詳細介紹！快速提升生產力的超好用工具！
 date: 2023-01-22 17:04:40
-image: "/assets/Raycast-超詳細介紹！快速提升生產力的超好用工具！/raycast.jpg"
+image:
 description: "Raycast 超詳細介紹！快速提升生產力的超好用工具！介紹 Raycast 的功能，以及推薦 15 個最好用、最能夠提升生產力的指令，只要能夠熟悉這些指令的使用，一定能夠大幅提升你的工作效率！"
 tags:
 - Productivity

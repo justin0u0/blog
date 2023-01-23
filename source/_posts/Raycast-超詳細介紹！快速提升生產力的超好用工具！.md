@@ -132,7 +132,7 @@ Raycast 有比 Spotlight 更強大的計算機功能，可以直接在輸入框�
 
 Raycast 還有超多 extensions 等著你去探索安裝，像是：
 - 喜歡聽音樂的朋友可以安裝 [Spotify](https://www.raycast.com/mattisssa/spotify-player) 插件，就可以透過 Raycast 看到目前正在播放的歌曲，也可以直接控制播放、暫停、下一首、上一首和搜尋歌曲！
-- 常常需要搜尋天氣預報嗎？現在你可以安裝 [Weather](https://www.raycast.com/tonka3000/weather) 插件，不但可以透過 **<code style="color: red">Weather</code>**指令搜尋地點的天氣，還可以直接在 menu bar 上顯示天氣預報，就可以快速瀏覽天氣囉！
+- 常常需要搜尋天氣預報嗎？現在你可以安裝 [Weather](https://www.raycast.com/tonka3000/weather) 插件，不但可以透過 **<code style="color: red">Weather</code>** 指令搜尋地點的天氣，還可以直接在 menu bar 上顯示天氣預報，就可以快速瀏覽天氣囉！
 - 有在用 Notion 或是 Obsidian 這類的筆記軟體嗎？可以安裝 [Notion](https://www.raycast.com/HenriChabrand/notion) 或是 [Obsidian](https://www.raycast.com/marcjulian/obsidian) 的插件，快速的搜尋和瀏覽你的筆記！
 - 想要快速的開啟瀏覽器書籤嗎？不如試試 [Browser Bookmarks](https://www.raycast.com/raycast/browser-bookmarks) 這個插件。或是如果你是 Arc Browser 的用戶的話，可以改裝 [Arc](https://www.raycast.com/the-browser-company/arc) 的插件，不但可以從 Raycast 開啟書籤，還能在 Raycast 中搜尋瀏覽紀錄和切換分頁喔！
 
@@ -211,6 +211,6 @@ Raycast 還隱藏了一些小彩蛋：
 
 # 結尾
 
-一開始安裝 Raycast 可能常常會忘記要使用它，但是一旦習慣了，你會發現它可以幫你省下很多時間，讓你的工作更有效率。Raycast 還有很多插件等著你去探索，去 Raycast 的[商店](https://www.raycast.com/store) 看看自己有沒有什麼好用的插件吧！如果你推薦有什麼好用的插件或是功能，也歡迎在下面留言分享給我喔～
+一開始安裝 Raycast 可能常常會忘記要使用它，但是一旦習慣了，你會發現它可以幫你省下很多時間，讓你的工作更有效率。Raycast 還有很多插件等著你去探索，去 Raycast 的[商店](https://www.raycast.com/store)看看自己有沒有什麼好用的插件吧！如果你推薦有什麼好用的插件或是功能，也歡迎在下面留言分享給我喔～
 
 > 最後，如果你喜歡這篇文章，或是文章對你有幫助的話，可以幫我按個喜歡、或是留言！你的支持就是我寫作的最大動力。有任何想問的問題也可以在底下留言喔～

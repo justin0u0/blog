@@ -558,13 +558,6 @@
   </url>
   
   <url>
-    <loc>https://blog.justin0u0.com/tags/Interview/</loc>
-    <lastmod>2023-01-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.justin0u0.com/tags/Notes/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -573,6 +566,13 @@
   
   <url>
     <loc>https://blog.justin0u0.com/tags/DDIA/</loc>
+    <lastmod>2023-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.justin0u0.com/tags/Interview/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -670,6 +670,13 @@
   </url>
   
   <url>
+    <loc>https://blog.justin0u0.com/tags/%E4%BA%8C%E5%85%83%E6%90%9C%E5%B0%8B%E6%A8%B9%EF%BC%88Binary-Search-Tree%EF%BC%89/</loc>
+    <lastmod>2023-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://blog.justin0u0.com/tags/Graph/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -678,13 +685,6 @@
   
   <url>
     <loc>https://blog.justin0u0.com/tags/Union-Find/</loc>
-    <lastmod>2023-01-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.justin0u0.com/tags/%E4%BA%8C%E5%85%83%E6%90%9C%E5%B0%8B%E6%A8%B9%EF%BC%88Binary-Search-Tree%EF%BC%89/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -705,14 +705,7 @@
   </url>
   
   <url>
-    <loc>https://blog.justin0u0.com/tags/PostgreSQL/</loc>
-    <lastmod>2023-01-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.justin0u0.com/tags/Productivity/</loc>
+    <loc>https://blog.justin0u0.com/tags/Homebrew/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -720,6 +713,13 @@
   
   <url>
     <loc>https://blog.justin0u0.com/tags/MacOS/</loc>
+    <lastmod>2023-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.justin0u0.com/tags/Productivity/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -740,6 +740,20 @@
   </url>
   
   <url>
+    <loc>https://blog.justin0u0.com/tags/operator-sdk/</loc>
+    <lastmod>2023-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.justin0u0.com/tags/PostgreSQL/</loc>
+    <lastmod>2023-01-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://blog.justin0u0.com/tags/%E6%89%93%E5%AD%97%EF%BC%88Typing%EF%BC%89/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -748,20 +762,6 @@
   
   <url>
     <loc>https://blog.justin0u0.com/tags/%E5%AF%A6%E7%94%A8%E5%B7%A5%E5%85%B7%EF%BC%88Tools%EF%BC%89/</loc>
-    <lastmod>2023-01-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.justin0u0.com/tags/Homebrew/</loc>
-    <lastmod>2023-01-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.justin0u0.com/tags/operator-sdk/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -798,7 +798,7 @@
   </url>
   
   <url>
-    <loc>https://blog.justin0u0.com/categories/PostgreSQL/</loc>
+    <loc>https://blog.justin0u0.com/categories/Golang/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -812,7 +812,7 @@
   </url>
   
   <url>
-    <loc>https://blog.justin0u0.com/categories/Golang/</loc>
+    <loc>https://blog.justin0u0.com/categories/PostgreSQL/</loc>
     <lastmod>2023-01-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

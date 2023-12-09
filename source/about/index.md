@@ -15,4 +15,4 @@ date: 2021-07-03 18:05:24
 
 有任何問題都歡迎與我聯絡： mail@justin0u0.com。
 
-➡ [履歷](/assets/cv_en.pdf)
+➡ [履歷](/assets/CV.pdf)

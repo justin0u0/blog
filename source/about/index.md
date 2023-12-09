@@ -7,7 +7,7 @@ date: 2021-07-03 18:05:24
 
 Hi, my name is Justin!
 
-I'm a master student in Computer Science at National Tsing Hua University in LSALAB studying networking and distributed systems (especially eBPF). I'm also Backend Intern at Dcard currently.
+I'm a master student in Computer Science at National Tsing Hua University in LSALAB studying networking and distributed systems (especially eBPF). I'm also a Backend Intern at Dcard currently.
 
 I like to learn new things and share my knowledge with others, this is why this blog exists and why I've been TA for many courses including Introduction to Compter Science, Operating System, and Distributed System.
 
@@ -15,4 +15,4 @@ Previously I participated in lots of competitive programming contests and got se
 
 This is my CV if you are interested in my background [CV](/assets/CV.pdf).
 
-Please feel free to contact me if you have any questions via mail[at]justin0u0.com.
+Please feel free to contact me if you have any questions via [e-mail](mailto:mail@justin0u0.com).

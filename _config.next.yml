@@ -85,7 +85,7 @@ open_graph:
 menu:
   home: / || fa fa-home
   about: /about/ || fa fa-user
-  cv: /assets/CV.pdf || fa fa-user
+  cv: /assets/CV/CV.pdf || fa fa-user
   tags: /tags/ || fa fa-tags
   categories: /categories/ || fa fa-th
   archives: /archives/ || fa fa-archive

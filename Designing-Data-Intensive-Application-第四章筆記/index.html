@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/icon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/icon16.png">
+  <link rel="mask-icon" href="/images/icon32.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="應用程式是不會永恆不變的，隨著新的 features 加入資料的儲存格式可能改變。因此本章節主要探討第一章節中所提到的 maintainability 中的 evolvability。 本章節會討論在 JSON、XML、Protocol Buffers、Thrift、Arvo 這些資料格式下的相容性問題，以及在 REST、RPC、Message Queue 下如何使用這些資料格式傳輸資料。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Designing Data-Intensive Application 第四章筆記">
+<meta property="og:url" content="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="應用程式是不會永恆不變的，隨著新的 features 加入資料的儲存格式可能改變。因此本章節主要探討第一章節中所提到的 maintainability 中的 evolvability。 本章節會討論在 JSON、XML、Protocol Buffers、Thrift、Arvo 這些資料格式下的相容性問題，以及在 REST、RPC、Message Queue 下如何使用這些資料格式傳輸資料。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/data_formats.jpeg">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/message_pack.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/thrift_binary_protocol.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/thrift_compact_protocol.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/protobuf.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/arvo.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/arvo_reader_writer_schema.png">
+<meta property="article:published_time" content="2021-08-31T15:17:44.000Z">
+<meta property="article:modified_time" content="2021-08-31T15:17:44.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="Notes">
+<meta property="article:tag" content="DDIA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/data_formats.jpeg">
+
+
+<link rel="canonical" href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/","path":"Designing-Data-Intensive-Application-第四章筆記/","title":"Designing Data-Intensive Application 第四章筆記"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Designing Data-Intensive Application 第四章筆記 | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Justin0u0's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-cv"><a href="/assets/CV/CV.pdf" rel="section"><i class="fa fa-user fa-fw"></i>履歷</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#formats-for-encoding-data"><span class="nav-number">1.</span> <span class="nav-text"> Formats for Encoding Data</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#language-specific-formats"><span class="nav-number">1.1.</span> <span class="nav-text"> Language-Specific Formats</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#json-xml-and-binary-variants"><span class="nav-number">1.2.</span> <span class="nav-text"> JSON, XML and Binary Variants</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#binary-encoding"><span class="nav-number">1.2.1.</span> <span class="nav-text"> Binary encoding</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#thrift-and-protocol-buffers"><span class="nav-number">1.3.</span> <span class="nav-text"> Thrift and Protocol Buffers</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#thrift"><span class="nav-number">1.3.1.</span> <span class="nav-text"> Thrift</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#protocol-buffers"><span class="nav-number">1.3.2.</span> <span class="nav-text"> Protocol buffers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#field-tags-and-schema-evolution"><span class="nav-number">1.3.3.</span> <span class="nav-text"> Field tags and schema evolution</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#datatypes-and-schema-evolution"><span class="nav-number">1.3.4.</span> <span class="nav-text"> Datatypes and schema evolution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#arvo"><span class="nav-number">1.4.</span> <span class="nav-text"> Arvo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#the-writers-schema-and-the-readers-schema"><span class="nav-number">1.4.1.</span> <span class="nav-text"> The writer’s schema and the reader’s schema</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#schema-evolution-rules"><span class="nav-number">1.4.2.</span> <span class="nav-text"> Schema evolution rules</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#but-what-is-the-writers-schema"><span class="nav-number">1.4.3.</span> <span class="nav-text"> But what is the writer’s schema</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dynamically-generated-schemas"><span class="nav-number">1.4.4.</span> <span class="nav-text"> Dynamically generated schemas</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#the-merits-of-schemas"><span class="nav-number">1.5.</span> <span class="nav-text"> The Merits of Schemas</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#modes-of-dataflow"><span class="nav-number">2.</span> <span class="nav-text"> Modes of Dataflow</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dataflow-through-databases"><span class="nav-number">2.1.</span> <span class="nav-text"> Dataflow Through Databases</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dataflow-through-services-rest-and-rpc"><span class="nav-number">2.2.</span> <span class="nav-text"> Dataflow Through Services: REST and RPC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rest"><span class="nav-number">2.2.1.</span> <span class="nav-text"> REST</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rpc"><span class="nav-number">2.2.2.</span> <span class="nav-text"> RPC</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#message-passing-dataflow"><span class="nav-number">2.3.</span> <span class="nav-text"> Message-Passing Dataflow</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#summary"><span class="nav-number">3.</span> <span class="nav-text"> Summary</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/assets/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.linkedin.com/in/justin0u0" title="LinkedIn → https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Designing Data-Intensive Application 第四章筆記 | Justin0u0's Blog">
+      <meta itemprop="description" content="應用程式是不會永恆不變的，隨著新的 features 加入資料的儲存格式可能改變。因此本章節主要探討第一章節中所提到的 maintainability 中的 evolvability。
+本章節會討論在 JSON、XML、Protocol Buffers、Thrift、Arvo 這些資料格式下的相容性問題，以及在 REST、RPC、Message Queue 下如何使用這些資料格式傳輸資料。
+">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Designing Data-Intensive Application 第四章筆記
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-08-31 23:17:44" itemprop="dateCreated datePublished" datetime="2021-08-31T23:17:44+08:00">2021-08-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Notes/" itemprop="url" rel="index"><span itemprop="name">Notes</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="Designing-Data-Intensive-Application-第四章筆記/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+            <div class="post-description">應用程式是不會永恆不變的，隨著新的 features 加入資料的儲存格式可能改變。因此本章節主要探討第一章節中所提到的 maintainability 中的 evolvability。
+本章節會討論在 JSON、XML、Protocol Buffers、Thrift、Arvo 這些資料格式下的相容性問題，以及在 REST、RPC、Message Queue 下如何使用這些資料格式傳輸資料。
+</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>應用程式是不會永恆不變的，隨著新的 features 加入資料的儲存格式可能改變。因此本章節主要探討第一章節中所提到的 maintainability 中的 <strong>evolvability</strong>。</p>
+<p>在 relational database 中，通常需要更新 schema；而在 schemaless database 中，新舊版本的資料格式可以同時存在。</p>
+<p>Application code 也會因為資料格式的改變而有所變化，但是在大型應用程式中，做到瞬間的版本更新是不可能的：</p>
+<ul>
+<li>
+<p>Server side applications：通常會執行 <strong>rolling upgrade</strong>，因此新舊版本的程式會通時運作。</p>
+  <div class="note info"><h4 id="rolling-upgrade"><a class="markdownIt-Anchor" href="#rolling-upgrade"></a> Rolling Upgrade</h4>
+<p>透過逐漸部署新版本到 server，確認新版本正常運作後，才逐漸移除舊版本的部署，以達到 zero-downtime 的版本升級。</p>
+</div>
+</li>
+<li>
+<p>Client side applications：是否更新取決於使用者，因此會同時擁有多種版本在運作。</p>
+</li>
+</ul>
+<p>以上兩點就說明了在軟體開發中，相容性的重要性。相容性包含兩個方向：</p>
+<ul>
+<li><strong>Backward compatibility（向下相容）</strong>：新的程式碼可以讀舊的資料。</li>
+<li><strong>Forward compatibility（向上相容）</strong>：舊的程式碼可以讀新的資料。</li>
+</ul>
+<p>本章節會討論在 JSON、XML、Protocol Buffers、Thrift、Arvo 這些資料格式下的相容性問題，以及在 REST、RPC、Message Queue 下如何使用這些資料格式傳輸資料。</p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/data_formats.jpeg" alt="" /></p>
+<span id="more"></span>
+<h1 id="formats-for-encoding-data"><a class="markdownIt-Anchor" href="#formats-for-encoding-data"></a> Formats for Encoding Data</h1>
+<p>資料在程式中以 objects、structs、lists、hash tables、trees 等格式儲存在 memory 中，這些資料結構經常透過 pointers 來存取資料。但是透過網路傳輸資料時，這些資料必須轉換成 sequences of bytes（例如 JSON）。</p>
+<p><strong>這種從 in-memory 結構轉換到 byte sequence 的過程叫做 <em>encoding</em>、<em>serialization</em> 或是 <em>marshalling</em>；反過來則叫 <em>decoding</em>、<em>deserialization</em> 或是 <em>unmarshalling</em>。</strong></p>
+<h2 id="language-specific-formats"><a class="markdownIt-Anchor" href="#language-specific-formats"></a> Language-Specific Formats</h2>
+<p>一些 programming language 有自己的 encoding 方式，例如 Java 中的 <code>java.io.Serialiable</code>。使用這些 encoding 很方便，但是可能有以下問題：</p>
+<ul>
+<li>
+<p>Language-specific encoding 通常只能在一個 langauge 使用，要使用其他 language 讀取是很困難的。</p>
+</li>
+<li>
+<p>這些 encoding 通常不支援資料的上下相容。</p>
+  <div class="note info"><h4 id="golang-gob-library"><a class="markdownIt-Anchor" href="#golang-gob-library"></a> Golang gob library</h4>
+<p>Golang 內建的 encoding <code>gob</code> 可以自動忽略 <code>struct</code> 中新增或是刪除的欄位，可以做到一些上下相容。</p>
+<p>例如 encode 端的結構長這樣：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> &#123; A, B <span class="type">int</span> &#125; <span class="comment">// encode</span></span><br></pre></td></tr></table></figure>
+<p>在 decode 端以下情況都是被允許的：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> &#123; A, B <span class="type">int</span>, C <span class="type">string</span> &#125; <span class="comment">// new field</span></span><br><span class="line"><span class="keyword">struct</span> &#123; A <span class="type">int</span> &#125; <span class="comment">// missing field</span></span><br></pre></td></tr></table></figure>
+</div>
+</li>
+</ul>
+<h2 id="json-xml-and-binary-variants"><a class="markdownIt-Anchor" href="#json-xml-and-binary-variants"></a> JSON, XML and Binary Variants</h2>
+<p>接著介紹一些標準的 encoding 方式，例如 JSON、XML、CSV。他們被設計成 human-readable 的格式，被大多數的語言支援，並且被廣泛的使用，但是也有一些各自的問題存在：</p>
+<ul>
+<li>XML、CSV 無法區分數字以及只包含數字的字串；JSON 無法區分整數以及浮點數。</li>
+<li>XML、JSON 都不支援 <strong>binary encoding</strong>。</li>
+</ul>
+<p>但這些問題依然不影響 JSON、XML 或是 CSV 在資料交換上的使用（尤其是跨機構的），<strong>因為他們被廣泛的支援以及認可，這比起效能或是格式的問題還要重要</strong>。</p>
+<h3 id="binary-encoding"><a class="markdownIt-Anchor" href="#binary-encoding"></a> Binary encoding</h3>
+<p>上面有提到，XML 與 JSON 都不支援 <strong>binary encoding</strong>，但是在跨機構的資料交換上面，被廣泛使用以及支援的格式比起效能或格式問題更重要。反之，在機構內自己使用，就可以多去考慮效能的問題。</p>
+<p>JSON 雖然比 XML 好，但是比起 binary encoding format 還是多使用了很多空間，因此出現了一些 JSON binary encoding 的實作，例如 <a target="_blank" rel="noopener" href="https://msgpack.org/">MessagePack</a>、<a target="_blank" rel="noopener" href="https://docs.mongodb.com/manual/reference/bson-types/">BSON</a>、<a target="_blank" rel="noopener" href="http://bjson.org/">BJSON</a> 等等。</p>
+<p>舉例來說，原本的 JSON 資料如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;userName&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Martin&quot;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;favoriteNumber&quot;</span><span class="punctuation">:</span> <span class="number">1337</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;interests&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;daydreaming&quot;</span><span class="punctuation">,</span> <span class="string">&quot;hacking&quot;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>扣除掉空白字元以及換行後，一共使用 81 個字元。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> s = <span class="string">&#x27;&#123;&quot;userName&quot;:&quot;Martin&quot;,&quot;favoriteNumber&quot;:1337,&quot;interests&quot;:[&quot;daydreaming&quot;,&quot;hacking&quot;]&#125;&#x27;</span>;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(s.<span class="property">length</span>); <span class="comment">// 81</span></span><br></pre></td></tr></table></figure>
+<p>而 MessagePack encode 過後的結果如下：<br />
+<img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/message_pack.png" alt="MessagePack" /></p>
+<p>一共只使用 66 個字元。</p>
+<div class="note "><h4 id="補充關於-messagepack-編碼方式"><a class="markdownIt-Anchor" href="#補充關於-messagepack-編碼方式"></a> 補充關於 MessagePack 編碼方式</h4>
+<p><a target="_blank" rel="noopener" href="https://github.com/msgpack/msgpack/blob/master/spec.md">MessagePack encoding</a></p>
+<ul>
+<li>
+<p>MessagePack 用二進位 <code>1000xxxx</code> 代表 JSON Object，其中 <code>xxxx</code> 代表 object 的 keys 數量，因此可以看到第一個編碼為 83 (<code>10000011</code>)，代表是一個 JSON Object 包含 3 個 keys。<br />
+那如果 keys 數量超過 15 個呢？則會使用 <code>0xde</code>（有小於 2^16 個 keys）或是 <code>0xdf</code>（有小於 2^32 個 keys）當作第一個編碼字元，再接著 keys 的長度。<br />
+<a target="_blank" rel="noopener" href="https://github.com/msgpack/msgpack/blob/master/spec.md#int-format-family">MessagePack encoding - Map format</a></p>
+</li>
+<li>
+<p>MessagePack 對小於 2^7 的無號正整數使用 <code>0xxxxxxx</code> 編碼、對於小於 2^5 的有號整數使用 <code>111xxxxx</code> 做編碼，其中 <code>x</code> 的部分代表數字，這兩種都只使用了一個 byte 做編碼。另外對於小於 8bits、16bits、32bits、64bits 的整數與正整數都用一個不同 first byte 做區別，分別使用 2、3、5、9 個 bytes。<br />
+<a target="_blank" rel="noopener" href="https://github.com/msgpack/msgpack/blob/master/spec.md#int-format-family">MessagePack encoding - Integer format</a></p>
+</li>
+<li>
+<p>MessagePack 對於不同長度的 string 也對不同長度範圍的字串使用不同的 first byte 來編碼。<br />
+<a target="_blank" rel="noopener" href="https://github.com/msgpack/msgpack/blob/master/spec.md#str-format-family">MessagePack encoding - String format</a></p>
+</li>
+</ul>
+</div>
+<h2 id="thrift-and-protocol-buffers"><a class="markdownIt-Anchor" href="#thrift-and-protocol-buffers"></a> Thrift and Protocol Buffers</h2>
+<p>Thrift 和 Protocol Buffers（protobuf）都是開源的 binary encoding libraries，他們都必須透過 schema 先定義好資料的格式才能做 encoding。</p>
+<h3 id="thrift"><a class="markdownIt-Anchor" href="#thrift"></a> Thrift</h3>
+<p>Thrift 的 schema 定義如下：</p>
+<figure class="highlight thrift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">	<span class="number">1</span>: <span class="keyword">required</span> <span class="type">string</span> userName,</span><br><span class="line">	<span class="number">2</span>: <span class="keyword">optional</span> <span class="type">i64</span> favoriteNumber,</span><br><span class="line">	<span class="number">3</span>: <span class="keyword">optional</span> <span class="type">list</span>&lt;<span class="type">string</span>&gt; interests</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而 protobuf 的 schema 定義如下（作者這裡提供的是 proto2 的語法，在 proto3 <code>required</code> 與 <code>optional</code> 已經棄用）：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">message </span><span class="title class_">Person</span> &#123;</span><br><span class="line">	<span class="keyword">required</span> <span class="type">string</span> user_name       = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">optional</span> <span class="type">int64</span>  favorite_number = <span class="number">2</span>;</span><br><span class="line">	<span class="keyword">repeated</span> <span class="type">string</span> interests       = <span class="number">3</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>透過 schema 的定義，Thrift 和 Protobuf 都透過 code generation 工具來生成 schema 在不同語言的實作，包含可以儲存 data 的 in-memory 格式（golang struct、jave class 等）以及 encoding 和 decoding 的函數。</p>
+<p>Thrift 有兩種 encoding 模式，分別是 <em>BinaryProtocol</em> 與 <em>CompactProtocol</em>。</p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/thrift_binary_protocol.png" alt="Thrift - binary protocol" /></p>
+<p>Thrift 在使用 BinaryProtocol 時，只使用了 59 bytes，相較於 MessagePack 的 65 bytes 又少了一些。</p>
+<p><strong>可以發現使用 schema 後，優勢在於不需要像 JSON、XML 的 encoding 一樣儲存 key name（例如 <code>userName</code>），轉而儲存 field tag。也因此不管是 Thrift 還是 Protobuf，都可以看到每個 key 都會有一個 unique 的 field tag。</strong></p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/thrift_compact_protocol.png" alt="Thrift - compact protocol" /></p>
+<p>Thrift 使用 CompactProtocol 甚至只需要 34 bytes 就可以儲存相同的資料。可以發現在 CompactProtocol 做了這些空間優化：</p>
+<ul>
+<li>
+<p>把 field tag 跟 field type encode 在同一個 byte 內。</p>
+</li>
+<li>
+<p>關於整數的部分（包含表示字串長度的整數），使用了 zig-zag 整數壓縮，再透過 Base 128 Varint 的方式傳輸。</p>
+  <div class="note info"><h4 id="zigzag-與-base-128-varint"><a class="markdownIt-Anchor" href="#zigzag-與-base-128-varint"></a> ZigZag 與 Base 128 Varint</h4>
+<p>這裡作者給的 schema 中，<code>favorite_number</code> 是 <code>int64</code> 有號整數，根據 <a target="_blank" rel="noopener" href="https://github.com/apache/thrift/blob/master/doc/specs/thrift-compact-protocol.md#integer-encoding">Thrift 提供的 spec</a>，<code>int32</code> 與 <code>int64</code> 都會做 zig-zag encoding。所以 1337 的部分編碼過後應該是 <code>11110010 00010100</code> 才對。</p>
+<p>關於 ZigZag 整數壓縮與 Base 128 Varint 的詳細介紹，可以看筆者的另一篇 blog：<a href="/%E7%A5%9E%E5%A5%87%E7%9A%84%E6%95%B4%E6%95%B8%E5%A3%93%E7%B8%AE%E7%AE%97%E6%B3%95-ZigZag">神奇的整數壓縮算法-ZigZag</a>。</p>
+</div>
+</li>
+</ul>
+<h3 id="protocol-buffers"><a class="markdownIt-Anchor" href="#protocol-buffers"></a> Protocol buffers</h3>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/protobuf.png" alt="Protobol buffers" /></p>
+<p>基本上 Protocol Buffers 的 encode 方式與 Thrift 中的 CompactProtocol 類似，特別注意兩點：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/encoding#signed_integers">Protobuf 的文件</a>中有提到如果使用的是 <code>int32</code> 或是 <code>int64</code> 類型的話，負數都會使用完整的 10 個 bytes，只有在選擇 <code>sint32</code> 或是 <code>sint64</code> 這兩種 signed types 時才會使用 zig-zag encoding，會有更好的壓縮率。</li>
+<li>不管是 <code>required</code> 或是 <code>optional</code> 都不會對 encode 後的 data 產生影響，<code>required</code> 跟 <code>optional</code> 的作用只有 runtime 時的檢查而已。也因為 <code>required</code> 與 <code>optional</code> 在 schema evolution 時造成不便（下面會介紹到），因此 protocol buffers 3 時 <code>required</code> 與 <code>optional</code> 都被移除。<br />
+<a target="_blank" rel="noopener" href="https://stackoverflow.com/a/31814967">Why required and optional is removed in Protocol Buffers 3?</a></li>
+</ul>
+<h3 id="field-tags-and-schema-evolution"><a class="markdownIt-Anchor" href="#field-tags-and-schema-evolution"></a> Field tags and schema evolution</h3>
+<p>每次的 schema change 都稱作 <em>schema evolution</em>，field name 是可以更改的，但是 field tag 不能更改。</p>
+<ul>
+<li>
+<p>Forward compatibility（舊版本可以相容新版本資料）：</p>
+<ul>
+<li>可以增加新的 field，因為舊版本可以直接 omit 不認識的 field tag。</li>
+<li>可以刪除 optional 的 field，一個 <code>required</code> 的 field 不能被移除。刪除一個 <code>required</code> 的 field 會讓舊版本 code 讀到新版本資料時因為該 field 不存在而報錯。</li>
+</ul>
+</li>
+<li>
+<p>Backward compatibility（新版本可以相容舊版本資料）：</p>
+<ul>
+<li>可以增加新的 field，但是不能增加 <code>required</code> 的 field。增加一個 <code>required</code> 的 field 會讓新版本 code 讀到舊版本資料時因為該 field 不存在而報錯。</li>
+<li>可以刪除一個 field，因為新版本會直接 omit 不認識的 field tag。</li>
+</ul>
+</li>
+</ul>
+<p>刪除一個 field 後，該 field tag 也不能再被使用，因為可能還有舊的資料是使用者個 field tag 的。</p>
+<h3 id="datatypes-and-schema-evolution"><a class="markdownIt-Anchor" href="#datatypes-and-schema-evolution"></a> Datatypes and schema evolution</h3>
+<p>對於同樣的 field，一些資料型態的轉變是 ok 的：</p>
+<ul>
+<li>從 int32 變成 int64 對於新版本程式是沒有問題的，但是舊版本程式若讀到 int64 的資料就會遺失高位的 bits。</li>
+<li>在 protobuf 中使用 <code>repeated</code> 作為 array type，而實際上被 encode 時可以看到只是相同的 field tag 出現多次而已，因此在 protobuf 中把 <code>optional</code> 轉成 <code>repeated</code> 是可以的。新版本可以讀到舊的資料，而舊版本只會讀到 list 中的最後一筆資料。而在 thrift 中有 list 的 type，因此是無法做轉變的。</li>
+</ul>
+<h2 id="arvo"><a class="markdownIt-Anchor" href="#arvo"></a> Arvo</h2>
+<p>Apache Arvo 是另一種與 Thrift 和 Protocol Buffers 不太一樣的 binary encoding 格式。Arvo 也使用 schema，有比較適合人類使用的 Arvo IDL 與比較適合程式使用的 JSON 格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">record Person &#123;</span><br><span class="line">	string userName;</span><br><span class="line">	union &#123; null, long &#125; favoriteNumber = null;</span><br><span class="line">	array&lt;string&gt; interests;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">	<span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;record&quot;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Person&quot;</span><span class="punctuation">,</span></span><br><span class="line">	<span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">		<span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;userName&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">		<span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;favoriteNumber&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;null&quot;</span><span class="punctuation">,</span> <span class="string">&quot;long&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span> <span class="attr">&quot;default&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">		<span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;interests&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;array&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;items&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br><span class="line">	<span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/arvo.png" alt="Arvo" /></p>
+<p>可以注意到 Arvo 沒有 tag number，並且 Arvo 在 encode 時也不會儲存 field name，所以 encode 和 decode 時 schema 需要匹配才能使用。</p>
+<h3 id="the-writers-schema-and-the-readers-schema"><a class="markdownIt-Anchor" href="#the-writers-schema-and-the-readers-schema"></a> The writer’s schema and the reader’s schema</h3>
+<p>Encode 與 decode 可以使用不同 schema，但 decode 時必須擁有當時 encode 用的 schema。而 decode 端的 schema 稱為 <em>reader’s schema</em>，當時 encode 所使用的 schema 稱為 <em>writer’s schema</em>。</p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/arvo_reader_writer_schema.png" alt="Arvo reader's and writer's schema" /></p>
+<p>可以看到透過比對 field name，decode 時可以使用與 encode 不同的 schema。例如 writer’s schema 中有 reader’s schema 中不存在的 field <code>photoURL</code>，則 reader 忽略此欄位；或是 reader’s schema 中有 writer’s schema 中不存在的 field <code>userID</code>，則使用預設值。</p>
+<h3 id="schema-evolution-rules"><a class="markdownIt-Anchor" href="#schema-evolution-rules"></a> Schema evolution rules</h3>
+<p>Arvo 中：</p>
+<ul>
+<li>Forward compatibility：舊版本 reader’s schema 與新版本 writer’s schema。</li>
+<li>Backward compatibility：新版本 reader’s schema 與舊版本 reader’s schema。</li>
+</ul>
+<p>要同時滿足兩種相容性，只能新增或刪除有 default value 的值。</p>
+<h3 id="but-what-is-the-writers-schema"><a class="markdownIt-Anchor" href="#but-what-is-the-writers-schema"></a> But what is the writer’s schema</h3>
+<p>那麼 writer’s schema 會儲存在哪裡呢？根據 Arvo 常被使用的情境，有以下幾種例子：</p>
+<ul>
+<li>File：常被使用在 Hadoop 中，Hadoop 是大型檔案系統。因此 writer’s schema 可以直接被寫在檔案的 header 中。</li>
+<li>Database：在 database 中，每個 rows 可以多儲存一個 version number，再透過 version number 關聯出寫入時的 writer’s schema。</li>
+<li>Network：透過網路傳輸的話，可以透過 RPC 的方式。</li>
+</ul>
+<h3 id="dynamically-generated-schemas"><a class="markdownIt-Anchor" href="#dynamically-generated-schemas"></a> Dynamically generated schemas</h3>
+<p>Arvo 與 Thrift 或是 Protocol Buffers 最大的不同在於 Arvo 適合做 <em>dynamically generated schema</em>，而 Thrift 或是 Protocol Buffers 因為有 tag number 要小心不能重複使用到，因此通常只能手動修改 schema。</p>
+<h2 id="the-merits-of-schemas"><a class="markdownIt-Anchor" href="#the-merits-of-schemas"></a> The Merits of Schemas</h2>
+<p>總結來說有 schemas 帶來以下的好處：</p>
+<ul>
+<li>有更好的壓縮率，因為不需要儲存 field name。</li>
+<li>本身就是有價值的文件，因為 schema 必須跟著 code 一起被版本更新。</li>
+<li>維護一個 schemas 的資料庫，可以讓開發者在部署之前確認所有的相容性。</li>
+<li>對於 statically typed programming languages 來說，code generation 可以幫助編譯期間的 type checking。</li>
+</ul>
+<h1 id="modes-of-dataflow"><a class="markdownIt-Anchor" href="#modes-of-dataflow"></a> Modes of Dataflow</h1>
+<p>接著介紹三種類型的 Dataflow：</p>
+<ul>
+<li>Via databases</li>
+<li>Via services</li>
+<li>Via asynchronous message passing</li>
+</ul>
+<h2 id="dataflow-through-databases"><a class="markdownIt-Anchor" href="#dataflow-through-databases"></a> Dataflow Through Databases</h2>
+<p>資料進出資料庫時也需要做 encode 和 decode，因此也要考慮相容問題。</p>
+<p>假設新版本新增了一個 field，並且寫了一筆資料到資料庫。而舊版本程式讀到這筆資料後，選擇 omit 不認識的 field，再更新回資料庫，那麼這個新的 field 上面的值就會遺失。</p>
+<p>要避免這種情況，可以指定要更新的 fields 而不是一次更新整筆資料（Relational database 中 ORM 的 Save 通常就是更新一整筆資料，可以透過 Update 來更新需要的欄位就好）。</p>
+<h2 id="dataflow-through-services-rest-and-rpc"><a class="markdownIt-Anchor" href="#dataflow-through-services-rest-and-rpc"></a> Dataflow Through Services: REST and RPC</h2>
+<p>當資料傳輸需要透過 network，server 通常會暴露 API 在網路上，client 可以透過 API 向 server 拿取或是送出資料。而 client 可能也是一個 server 的角色，這種 pattern 被稱作 <em>service-oriented architecture (SOA)</em>，或是被稱作 <em>microservices</em>。<em>Microservices</em> 的主要目的之一就是讓每個 services 都可以獨立部署和更新，因此相容性在 API 設計上也是很重要的。</p>
+<h3 id="rest"><a class="markdownIt-Anchor" href="#rest"></a> REST</h3>
+<p>Web services 主要透過 REST 來設計 API，這種類型的 API 被稱作 RESTful API。</p>
+<p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%A1%A8%E7%8E%B0%E5%B1%82%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2">REST</a> 是基於 HTTP 的一種設計方式，使用 URI 來辨識資源，對於資源的操作包含取得、建立、修改和刪除，恰好對應到 HTTP 的 <code>GET</code>、<code>POST</code>、<code>PUT</code> 和 <code>DELETE</code>方法。</p>
+<p>在版本更新時，若無法做到相容，RESTful APIs 通常透過 URI 中的 version number 來提供多版本的 APIs。</p>
+<h3 id="rpc"><a class="markdownIt-Anchor" href="#rpc"></a> RPC</h3>
+<p>早期的 RPC 設計希望網路的請求使用起來跟呼叫 local function 很像，但其實這很難做到，因為有以下的差別：</p>
+<ul>
+<li>Local function 是可預期結果的，RPC 可能因為 network issue 有很多無法預期的結果（例如遺失、等待很久才回應…）。</li>
+<li>RPC 在遇到 error 時可以重試，但是上一次的結果可能是成功的，只是沒有成功回應結果。重試就要避免一些無法重複執行的請求重複執行。</li>
+<li>Local function 每次執行時間差不多；RPC 每次執行時間可能被 network latency 影響而差別很大。</li>
+<li>Local function 可以使用 pointers 或是 references；RPC 需要將參數轉換成 sequence of bytes。</li>
+</ul>
+<p>雖然 RPC 有上面提到的這些問題，但是新型的 RPC frameworks 並沒有就此沒落，例如 Google gRPC。因為這些新型的 RPC frameworks 更明確的區分 RPC 並不是一種 local function call，例如 <a target="_blank" rel="noopener" href="https://twitter.github.io/finagle/">Finagle</a> 提供 <code>futures</code> 來封裝可能失敗的請求。</p>
+<p>gRPC 使用 protocol buffers encoding，比起 REST JSON 有更好的效能。但是缺點在於不易 debug 與實驗，因為 RPC 測試通常需要透過程式或是 code generation 工具。</p>
+<p>RPC 中若使用 Thrift 或是 Protocol Buffers，則可以依照 schema evolution 的規則來做到上下相容。</p>
+<h2 id="message-passing-dataflow"><a class="markdownIt-Anchor" href="#message-passing-dataflow"></a> Message-Passing Dataflow</h2>
+<p>REST &amp; RPC 都透過網路傳遞訊息並期望在短時間得到回應。</p>
+<p><em>Asynchronous message-passing systems</em>，透過將資料送到一個中介的 <em>message-broker (message queue, MQ)</em> 暫時儲存，再轉傳給其他服務。使用 message queue 有以下的優點：</p>
+<ul>
+<li>如果接收者暫時無法回應，資料可以緩存在 MQ 裡面，提高可用性。</li>
+<li>如果資料沒有送到 MQ 可以幫助重送訊息，做到 at-least-once delivery。</li>
+<li>可以讓 senders 不需要知道 receivers 的位置、receivers 也不需要知道 senders 的位置。將兩邊的邏輯分開，senders 只需要專注在送出的訊息，而 receivers 只需要專注在訂閱並處理接收到的訊息。</li>
+<li>可以透過篩選或是訂閱將訊息送給多個 receivers。</li>
+</ul>
+<p>一些企業級、著名的 Message Queue 包括 RabbitMQ、NATS 以及 Apache Kafka。</p>
+<h1 id="summary"><a class="markdownIt-Anchor" href="#summary"></a> Summary</h1>
+<p>本章節介紹了各種常見的 encoding formats，提出他們在效能上的不同，以及對於系統架構與相容性的影響。</p>
+<ul>
+<li>Programming language-specific formats：通常只限於一種語言中使用，並且通常不能做到相容性。</li>
+<li>Texture formats：例如 JSON、XML，這些格式通常對型態的定義很模糊，使用時要特別注意。</li>
+<li>Binary schema-driven formats：例如 Thrift、Protocol Buffers，這些格式能將資料壓縮的更小，並且提供上下相容的能力。另外 schema 本身能夠產生文件，但是壞處是 encoding 後的結果不是 human-readable 的。</li>
+</ul>
+<p>另外介紹了三種 dataflow：</p>
+<ul>
+<li>Databases：寫的 process encode 資料，讀的 process decode 資料。</li>
+<li>RPC and REST APIs：Server 端 encode 資料，client 端 decode 資料。</li>
+<li>Asynchronous message passing：Sender 端 encode 資料，receiver 端 decode 資料。</li>
+</ul>
+<p>最後，不管哪種 dataflow，不管是 server-side 還是 client-side 應用，都會有上下相容的問題，更新應用時多注意相容性問題，應用就可以頻繁的更新與部署了。</p>
+<blockquote>
+<p>最後，如果你喜歡這篇文章，或是文章對你有幫助的話，可以幫我按個喜歡、或是留言！你的支持就是我寫作的最大動力。有任何想問的問題也可以在底下留言喔～</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%AD%86%E8%A8%98/" title="Designing Data-Intensive Application 第四章筆記">https://blog.justin0u0.com/Designing-Data-Intensive-Application-第四章筆記/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Notes/" rel="tag"># Notes</a>
+              <a href="/tags/DDIA/" rel="tag"># DDIA</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%89%E7%AB%A0%E7%AD%86%E8%A8%98/" rel="prev" title="Designing Data-Intensive Application 第三章筆記">
+                  <i class="fa fa-angle-left"></i> Designing Data-Intensive Application 第三章筆記
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/%E7%A5%9E%E5%A5%87%E7%9A%84%E6%95%B4%E6%95%B8%E5%A3%93%E7%B8%AE%E7%AE%97%E6%B3%95-ZigZag/" rel="next" title="神奇的整數壓縮算法——ZigZag">
+                  神奇的整數壓縮算法——ZigZag <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">justin0u0</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/justin0u0" class="github-corner" title="在 GitHub 上關注我" aria-label="在 GitHub 上關注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"justin0u0","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

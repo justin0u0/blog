@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/icon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/icon16.png">
+  <link rel="mask-icon" href="/images/icon32.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="距離收到錄取通知已經有兩個月了，決定來分享一下當初去 Dcard 面試的心得跟過程～ 雖然我本來就有在新創公司工作，但是新創公司樣樣都要自己來，而且沒有一個 Mentor 帶領，產品也比較沒有流量，很難判斷自己做出的系統架構是不是一個好的架構，因此今年決定申請 Dcard 實習，來體驗看看高流量的 backend 開發！  面試流程 Dcard 的面試流程算是滿透明的，基本上分成 3 大關，履歷審">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2021 Dcard Web Backend Intern 面試經驗分享">
+<meta property="og:url" content="https://blog.justin0u0.com/2021-Dcard-Web-Backend-Intern-%E9%9D%A2%E8%A9%A6%E7%B6%93%E9%A9%97%E5%88%86%E4%BA%AB/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="距離收到錄取通知已經有兩個月了，決定來分享一下當初去 Dcard 面試的心得跟過程～ 雖然我本來就有在新創公司工作，但是新創公司樣樣都要自己來，而且沒有一個 Mentor 帶領，產品也比較沒有流量，很難判斷自己做出的系統架構是不是一個好的架構，因此今年決定申請 Dcard 實習，來體驗看看高流量的 backend 開發！  面試流程 Dcard 的面試流程算是滿透明的，基本上分成 3 大關，履歷審">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2021-07-03T09:29:46.000Z">
+<meta property="article:modified_time" content="2021-07-03T09:29:46.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="Dcard">
+<meta property="article:tag" content="Interview">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://blog.justin0u0.com/2021-Dcard-Web-Backend-Intern-%E9%9D%A2%E8%A9%A6%E7%B6%93%E9%A9%97%E5%88%86%E4%BA%AB/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/2021-Dcard-Web-Backend-Intern-%E9%9D%A2%E8%A9%A6%E7%B6%93%E9%A9%97%E5%88%86%E4%BA%AB/","path":"2021-Dcard-Web-Backend-Intern-面試經驗分享/","title":"2021 Dcard Web Backend Intern 面試經驗分享"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>2021 Dcard Web Backend Intern 面試經驗分享 | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Justin0u0's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-cv"><a href="/assets/CV/CV.pdf" rel="section"><i class="fa fa-user fa-fw"></i>履歷</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%A2%E8%A9%A6%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text"> 面試流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%A5%E6%AD%B7%E5%AF%A9%E6%9F%A5"><span class="nav-number">1.1.</span> <span class="nav-text"> 履歷審查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E9%9D%A2%E8%A9%A6"><span class="nav-number">1.2.</span> <span class="nav-text"> 第一次面試</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#talent-operation-team-hr"><span class="nav-number">1.2.1.</span> <span class="nav-text"> Talent Operation Team (HR)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#development-team"><span class="nav-number">1.2.2.</span> <span class="nav-text"> Development Team</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E9%9D%A2%E8%A9%A6"><span class="nav-number">1.3.</span> <span class="nav-text"> 第二次面試</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#talent-operation-manager-hr-manager"><span class="nav-number">1.3.1.</span> <span class="nav-text"> Talent Operation Manager (HR Manager)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ceo-kytu"><span class="nav-number">1.3.2.</span> <span class="nav-text"> CEO - Kytu</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">2.</span> <span class="nav-text"> 總結</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/assets/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.linkedin.com/in/justin0u0" title="LinkedIn → https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/2021-Dcard-Web-Backend-Intern-%E9%9D%A2%E8%A9%A6%E7%B6%93%E9%A9%97%E5%88%86%E4%BA%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="2021 Dcard Web Backend Intern 面試經驗分享 | Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2021 Dcard Web Backend Intern 面試經驗分享
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-07-03 17:29:46" itemprop="dateCreated datePublished" datetime="2021-07-03T17:29:46+08:00">2021-07-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Others/" itemprop="url" rel="index"><span itemprop="name">Others</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021-Dcard-Web-Backend-Intern-%E9%9D%A2%E8%A9%A6%E7%B6%93%E9%A9%97%E5%88%86%E4%BA%AB/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021-Dcard-Web-Backend-Intern-面試經驗分享/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>距離收到錄取通知已經有兩個月了，決定來分享一下當初去 Dcard 面試的心得跟過程～</p>
+<p>雖然我本來就有在新創公司工作，但是新創公司樣樣都要自己來，而且沒有一個 Mentor 帶領，產品也比較沒有流量，很難判斷自己做出的系統架構是不是一個好的架構，因此今年決定申請 Dcard 實習，來體驗看看高流量的 backend 開發！</p>
+<h1 id="面試流程"><a class="markdownIt-Anchor" href="#面試流程"></a> 面試流程</h1>
+<p>Dcard 的面試流程算是滿透明的，基本上分成 3 大關，履歷審查、第一次面試跟第二次面試。</p>
+<p>整個流程走的也算滿快的，大概一個月就會把整個面試流程走完，而且各個階段有沒有通過都會寄信通知，非常棒～</p>
+<span id="more"></span>
+<h2 id="履歷審查"><a class="markdownIt-Anchor" href="#履歷審查"></a> 履歷審查</h2>
+<p>一開始當然是附上履歷！履歷的部分我是寫滿一頁整而已，基本上就是寫上工作經歷、寫過比較重要的 Side Project、黑客松、讀書會等等。</p>
+<p>因為我個人認為 Dcard 還滿看重你的自學能力以及你是不是喜歡與人分享交流，所以放的內容都是比較偏自學、交流性質的活動，一些在學校做過的助教跟網頁開發的打工倒是都沒有放進去。</p>
+<p>如果想要參考履歷要怎麼寫的話，可以到 <a href="/about">關於我</a> 頁面查看。</p>
+<p>申請 Dcard 實習有個比較特別的地方是要交一份作業，是實作一個 Rate Limiter Middleware，也就是如果在一定時間內超過一定數量的 Requests 要回傳 429 Too Many Requests，基本上語言方法不限，我是用 NodeJS + Redis 來實作的。詳細可以參考我的 <a target="_blank" rel="noopener" href="https://github.com/justin0u0/rate-limiter">Github Repo</a>。</p>
+<p>另外申請實習是可以附上應徵信的，裡面可以附上一些履歷沒有提到的內容（履歷主要以技術背景為主），例如我在應徵信裡面提到了我為什麼會想來 Dcard 參加實習以及一些個人特質。想參考的可以看<a target="_blank" rel="noopener" href="https://www.notion.so/justin0u0/Dcard-Web-Backend-Intern-2021-c13e8e7777d9421398f28049596b2b1a">這裡</a>。</p>
+<h2 id="第一次面試"><a class="markdownIt-Anchor" href="#第一次面試"></a> 第一次面試</h2>
+<h3 id="talent-operation-team-hr"><a class="markdownIt-Anchor" href="#talent-operation-team-hr"></a> Talent Operation Team (HR)</h3>
+<p>首先是 HR 面試，總時間是一小時（但我不到一小時就結束了）。一開始是 5 分鐘的自我介紹，想參考的可以看<a target="_blank" rel="noopener" href="https://www.notion.so/justin0u0/73ec63ea80ab42b09fb18cbb68188930">這裡</a>。再來就是回答 HR 的問題，基本上我個人感覺 Dcard 很在乎你對公司的看法、你來參加的動機等等，比如說我有被問到「為什麼會在大三的時候就想要來做 Intern？」或是「為什麼會走 Backend 這條路而不是其他方向」。HR 也會針對你的履歷提出問題，例如我有被問到「為什麼會寫 Blog？」，讓我真的覺得 Dcard 的 HR 很用心也很親切，在聊天的過程中就能體會出來你的履歷有被認真的看過，而且 HR 對於資訊這方面的知識也都略知一二。</p>
+<p>總之 HR 面試關整體來說就很像在聊天一樣，重點就是履歷一定不能造假！最後會問你有沒有任何想問的問題，如果沒有的話就會進到開發面試。</p>
+<h3 id="development-team"><a class="markdownIt-Anchor" href="#development-team"></a> Development Team</h3>
+<p>由 Backend 的成員來面試，總時間也是一小時（但我也是不到一小時），聽說本來是有 Backend Team 的主管會來的，但我去的時間好像剛好主管在開會，所以就是兩名 Backend Engineer 來幫我面試～</p>
+<p>這關主要就是考驗你的技術實力了，不過我覺得問的問題還滿隨性的，除了最後一題之外，其他問題都是圍繞著你的履歷上面有提到的技術，跟一些滿基礎的 Backend 知識來提問的。我有被問到的問題跟我的一些回答包括：</p>
+<ol>
+<li>RDBMS v.s NoSQL 分別是什麼？<br />
+RDBMS 主要利用資料正規化來分割資料庫，建成一張張表後利用 Join 的方式來合併資料。<br />
+NoSQL 給了方便的彈性，有很多類型，例如：Document based、Graph、Key-Value…</li>
+<li>RDBMS v.s NoSQL 要怎麼做出選擇？<br />
+RDMBS 跟 NoSQL 的 use case 不太一樣，RDBMS 比較適合被用在需要確保 ACID 的資料上，以確保資料的一致性；而 NoSQL 通常都是希望可以分散式來提高可以性以及可擴充性。另外還有一個考量的點是 RDBMS 的 Join 會使得他不適合用在微服務上，因為跨 services 的 transactions 需要額外的 effort 來實作。</li>
+<li>ACID 是什麼？<br />
+A 是 Atomic，原子性，一個事務不是全部成功就是全部失敗。<br />
+C 是 Consistency，事務完成後資料正確無誤。<br />
+I 是 Isolation，事務有隔離級別，確保同時發生的事務不會發生錯誤。<br />
+D 是 Durability，事務一旦成功資料就不會遺失。</li>
+<li>Authentication 跟 Authorization 的差別。<br />
+Authentication 驗證身份，例如帳號密碼；Authorization 驗證有沒有權限使用這個功能。</li>
+<li>Authentication 怎麼做？<br />
+可以用 JWT。</li>
+<li>簡單的說明 JWT 的技術。<br />
+JWT 是 JSON Web Token，主要分成三段，用 <code>.</code> 連接起來。第一段是 header，第二段是 payload，前兩段都用 Base64 編碼，最後一段是前兩段的加密文。可以用來防止攜帶的資訊被修改，因為竄改者無法知道第三段的加密結果為何。</li>
+<li>給你兩個很長的 SQL 跟他們的 Explain 結果，請你講解兩段 SQL 做了什麼，以及他們的差別。<br />
+這題基本上是最難的了，因為那時候對 PostgreSQL 還不是很熟，所以其實沒有回答的很好。但主要就是要對 SQL 語法有基礎的知識，特別是常常使用 ORM 而不是直接寫 SQL 的，至少要知道 SQL Join 怎麼使用。</li>
+</ol>
+<p>總之我覺得回答的重點就在於，不要提到自己不熟的技術，因為他們很有可能繼續追問你在回答中講到的技術。而這部分的題目大概也是因人而異，我被問到的題目跟我在準備時看到其他人分享的題目也是完全不相同，所以在履歷裡面也近量別寫自已不熟的技術吧xD，不然大概有大機會會被問倒。</p>
+<p>最後也會詢問有沒有什麼想問的，基本上我有詢問他們用的框架、他們的開發流程等等。</p>
+<h2 id="第二次面試"><a class="markdownIt-Anchor" href="#第二次面試"></a> 第二次面試</h2>
+<h3 id="talent-operation-manager-hr-manager"><a class="markdownIt-Anchor" href="#talent-operation-manager-hr-manager"></a> Talent Operation Manager (HR Manager)</h3>
+<p>這關是 30 分鐘。基本上跟第一次面試的 HR 面試差不多，但內容會偏向更大方向的討論。一樣真的要稱讚一下 Dcard 的 HR，都非常的親切＆準備充足。</p>
+<h3 id="ceo-kytu"><a class="markdownIt-Anchor" href="#ceo-kytu"></a> CEO - Kytu</h3>
+<p>首先，CEO 的名字的念法跟 Kit 是同音的，這個我在去面試前查了好久才查到xD。</p>
+<p>這關是 30 分鐘。基本上在別人的面試分享有看到，就是跟 CEO 的聊天關。基本上一坐下就會問你有沒有什麼想問的問題，所以一定要提前準備一些你想要問的問題，除非你的臨場反應真的很好。</p>
+<p>基本上想要跟 CEO 聊什麼都沒問題，我有詢問關於 Dcard 從一個 10 人團隊到現在 200 人的管理問題，還有詢問一些職涯規劃，討論讀研、是否要出國等問題。</p>
+<p>問題可以盡量準備多一點，因為 CEO 回答的速度還滿快的。</p>
+<h1 id="總結"><a class="markdownIt-Anchor" href="#總結"></a> 總結</h1>
+<p>Dcard 的面試總體感受是滿好的，非常看重你對公司的看法。第一次面試時還會帶你參觀辦公室，帶你到他們的零食區拿食物；第二次面試時 CEO 還請喝星巴克，雖然我根本不敢在當下喝就是了xD</p>
+<p>基本上如果說要準備的話，我強烈建議多去看看一些關於 Dcard 的文章報導，或是 CEO 的演講也可以稍微看看，會對你在面試時的應答還滿有幫助的～</p>
+<p>雖然面試整體過程是走比較輕鬆的路線，但我認為 Dcard 對實習生的審核是非常重視也不隨便的！我認為 Dcard 還滿重視面對問題的邏輯思維和主動學習的能力，所以如果你有在寫 blog 的話，應該是大大加分！</p>
+<blockquote>
+<p>最後，如果這篇文章對你有幫助的話，可以幫我按個喜歡、或是留言！各位的支持就是我寫作的最大動力。有任何想問的問題也可以在底下留言喔～</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/2021-Dcard-Web-Backend-Intern-%E9%9D%A2%E8%A9%A6%E7%B6%93%E9%A9%97%E5%88%86%E4%BA%AB/" title="2021 Dcard Web Backend Intern 面試經驗分享">https://blog.justin0u0.com/2021-Dcard-Web-Backend-Intern-面試經驗分享/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Dcard/" rel="tag"># Dcard</a>
+              <a href="/tags/Interview/" rel="tag"># Interview</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/LeetCode-Best-Time-to-Buy-and-Sell-Stock-with-Cooldown/" rel="prev" title="LeetCode 309 - Best Time to Buy and Sell Stock with Cooldown">
+                  <i class="fa fa-angle-left"></i> LeetCode 309 - Best Time to Buy and Sell Stock with Cooldown
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/" rel="next" title="Designing Data-Intensive Application 第一章筆記">
+                  Designing Data-Intensive Application 第一章筆記 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">justin0u0</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/justin0u0" class="github-corner" title="在 GitHub 上關注我" aria-label="在 GitHub 上關注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"justin0u0","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

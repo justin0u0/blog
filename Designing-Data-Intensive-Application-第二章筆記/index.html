@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/icon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/icon16.png">
+  <link rel="mask-icon" href="/images/icon32.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本章節主要在介紹目前主流的三個 Data Model，Relational Model、Document Model 以及 Graph Model 的優缺點、演進史以及使用時機。 因為要精通一種 data model 是十分困難的，在使用之前先綜觀的了解每一種 model 的優缺點以及使用時機是非常重要的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Designing Data-Intensive Application 第二章筆記">
+<meta property="og:url" content="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="本章節主要在介紹目前主流的三個 Data Model，Relational Model、Document Model 以及 Graph Model 的優缺點、演進史以及使用時機。 因為要精通一種 data model 是十分困難的，在使用之前先綜觀的了解每一種 model 的優缺點以及使用時機是非常重要的。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/linkedin_profile.png">
+<meta property="article:published_time" content="2021-08-01T08:02:44.000Z">
+<meta property="article:modified_time" content="2021-08-01T08:02:44.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="Notes">
+<meta property="article:tag" content="DDIA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/linkedin_profile.png">
+
+
+<link rel="canonical" href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/","path":"Designing-Data-Intensive-Application-第二章筆記/","title":"Designing Data-Intensive Application 第二章筆記"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Designing Data-Intensive Application 第二章筆記 | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Justin0u0's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-cv"><a href="/assets/CV/CV.pdf" rel="section"><i class="fa fa-user fa-fw"></i>履歷</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#relational-model-versus-document-model"><span class="nav-number">1.</span> <span class="nav-text"> Relational Model Versus Document Model</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#the-birth-of-nosql"><span class="nav-number">1.1.</span> <span class="nav-text"> The Birth of NoSQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#the-object-relational-mismatch"><span class="nav-number">1.2.</span> <span class="nav-text"> The Object-Relational Mismatch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#many-to-one-and-many-to-many-relationships"><span class="nav-number">1.3.</span> <span class="nav-text"> Many-to-One and Many-to-Many Relationships</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#are-document-databases-repeatng-history"><span class="nav-number">1.4.</span> <span class="nav-text"> Are Document Databases Repeatng History</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#the-network-model"><span class="nav-number">1.4.1.</span> <span class="nav-text"> The network model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#the-relational-model"><span class="nav-number">1.4.2.</span> <span class="nav-text"> The relational model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#comparison-to-document-databases"><span class="nav-number">1.4.3.</span> <span class="nav-text"> Comparison to document databases</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#relational-versus-document-databases-today"><span class="nav-number">1.5.</span> <span class="nav-text"> Relational Versus Document Databases Today</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#which-data-model-leads-to-simpler-application-code"><span class="nav-number">1.5.1.</span> <span class="nav-text"> Which data model leads to simpler application code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#schema-flexibility-in-the-document-model"><span class="nav-number">1.5.2.</span> <span class="nav-text"> Schema flexibility in the document model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data-locality-for-queries"><span class="nav-number">1.5.3.</span> <span class="nav-text"> Data locality for queries</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#convergence-of-document-and-relational-databases"><span class="nav-number">1.5.4.</span> <span class="nav-text"> Convergence of document and relational databases</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#query-languages-for-data"><span class="nav-number">2.</span> <span class="nav-text"> Query Languages for Data</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#mapreduce-querying"><span class="nav-number">2.1.</span> <span class="nav-text"> MapReduce Querying</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#graph-like-data-models"><span class="nav-number">3.</span> <span class="nav-text"> Graph-Like Data Models</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#property-graphs"><span class="nav-number">3.1.</span> <span class="nav-text"> Property Graphs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#the-cypher-query-language"><span class="nav-number">3.1.1.</span> <span class="nav-text"> The Cypher Query Language</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#graph-queries-in-sql"><span class="nav-number">3.2.</span> <span class="nav-text"> Graph Queries in SQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#triple-stores-and-sparql"><span class="nav-number">3.3.</span> <span class="nav-text"> Triple-Stores and SPARQL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#the-sparql-query-language"><span class="nav-number">3.3.1.</span> <span class="nav-text"> The SPARQL query language</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#graph-databases-compared-to-the-network-model"><span class="nav-number">3.4.</span> <span class="nav-text"> Graph Databases Compared to the Network Model</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">4.</span> <span class="nav-text"> 總結</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/assets/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.linkedin.com/in/justin0u0" title="LinkedIn → https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Designing Data-Intensive Application 第二章筆記 | Justin0u0's Blog">
+      <meta itemprop="description" content="本章節主要在介紹目前主流的三個 Data Model，Relational Model、Document Model 以及 Graph Model 的優缺點、演進史以及使用時機。
+因為要精通一種 data model 是十分困難的，在使用之前先綜觀的了解每一種 model 的優缺點以及使用時機是非常重要的。
+">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Designing Data-Intensive Application 第二章筆記
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-08-01 16:02:44" itemprop="dateCreated datePublished" datetime="2021-08-01T16:02:44+08:00">2021-08-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Notes/" itemprop="url" rel="index"><span itemprop="name">Notes</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="Designing-Data-Intensive-Application-第二章筆記/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+            <div class="post-description">本章節主要在介紹目前主流的三個 Data Model，Relational Model、Document Model 以及 Graph Model 的優缺點、演進史以及使用時機。
+因為要精通一種 data model 是十分困難的，在使用之前先綜觀的了解每一種 model 的優缺點以及使用時機是非常重要的。
+</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本章節主要在介紹目前主流的三個 Data Model，<strong>Relational Model、Document Model 以及 Graph Model</strong> 的優缺點、演進史以及使用時機。</p>
+<p>Data Model 是一層疊一層的：</p>
+<ul>
+<li>在應用層，資料可能是購物車資訊、金流、商品等在現實世界中的資訊。</li>
+<li>在後端，我們必須把資料轉換成易於儲存的資料結構，可能是 XML 或 JSON，又或是關聯式資料庫中的 Tables。</li>
+<li>在資料庫中，XML、JSON 或是 Tables 都必須轉變成 bytes 的形式，使他們能夠被儲存在 memory 或是 disk 上。</li>
+<li>在硬體層，bytes 必須轉換成電流、磁場等等。</li>
+</ul>
+<p>層與層透過定義好的 API 來溝通，可以將背後的複雜實作藏在 API 之後。</p>
+<p>各種不同的 data model 背後都會一些使用情境的假設，因此每一種 data model 都有不同的功能、操作，對於支援的操作，效能也有好與壞之差別。</p>
+<p>也因為要精通一種 data model 是十分困難的（光是 relational data modeling 就有這麼多書籍），因此在使用之前先綜觀的了解每一種 model 的優缺點以及使用時機是非常重要的。</p>
+<span id="more"></span>
+<h1 id="relational-model-versus-document-model"><a class="markdownIt-Anchor" href="#relational-model-versus-document-model"></a> Relational Model Versus Document Model</h1>
+<p>Relational model 在 1970 年時被提出，在 1980 年代開始被廣泛的使用直到現在。當時與其競爭的還有 network model 以及 hierarchical model，但是後來都被 relational model 主宰，而 relational model 之所以能夠成功主要因為兩點：</p>
+<ol>
+<li>其將複雜的 query 實作藏在 database 本身的 query optimizer 中，提供更乾淨的介面使用，讓開發者不需知道資料是如何被儲存在資料庫中的。</li>
+<li>其解決了當時一個重要的問題：多對多的關聯。</li>
+</ol>
+<h2 id="the-birth-of-nosql"><a class="markdownIt-Anchor" href="#the-birth-of-nosql"></a> The Birth of NoSQL</h2>
+<p>NoSQL 在 2010 年初期走紅，當時 NoSQL 指的是非關聯式、開源、分散式的資料庫。後來轉變成 Not Only SQL。</p>
+<p>NoSQL 最主要的推力在：</p>
+<ul>
+<li>有更好的 Scalability。</li>
+<li>支援一些關聯式資料庫不支援的操作。</li>
+<li>可以使用更彈性、更自由的儲存資料結構。</li>
+</ul>
+<h2 id="the-object-relational-mismatch"><a class="markdownIt-Anchor" href="#the-object-relational-mismatch"></a> The Object-Relational Mismatch</h2>
+<p>稍微介紹完了 Relational Model 跟 Document Model 的出現與歷史，接下來講 Relational Model 最主要遇到的問題：<strong>Object-Relational Mismatch</strong>。</p>
+<p>大多數的應用程式開發都是 object-oriented programming，因此在 object 與 table 之間的轉換會遇到困難，幸好現在主流的 database 都有 Object-relational mapping (ORM) 框架的幫助來減少這些轉換的複雜性。但是當原資料就是不太適合放進 table 時，就會遇到困難。</p>
+<p>這裡舉履歷為例子（LinkedIn Profile），一個使用者會有一個 unique ID <code>user_id</code>，會有姓 <code>last_name</code> 與名 <code>first_name</code>，這些欄位都是一個值，可以被當作 <code>users</code> 表的欄位。</p>
+<p>但是一個使用者可能有多個工作、學歷、甚至是聯絡資料，這些一對多的關聯在 relational model 中有幾種處理方式：</p>
+<ul>
+<li>將工作、學歷、聯絡資料放到另一張 table 來儲存，這也是最常見的資料庫正規化方式</li>
+<li>一些關聯式資料庫支援 Array 或是 JSON 儲存格式，例如 PostgreSQL。</li>
+<li>直接將 JSON 或是 XML 格式編碼成 bytes 再儲存進資料庫的一個欄位。</li>
+</ul>
+<img data-src="/assets/Designing-Data-Intensive-Application-第二章筆記/linkedin_profile.png" width="70%" />
+<p>履歷的資料就比較適合放在 JSON 格式下，例如：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;user_id&quot;</span><span class="punctuation">:</span> <span class="number">251</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;first_name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bill&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;last_name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Gates&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;summary&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Co-chair of the Bill &amp; Melinda Gates... Active blogger.&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;region_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;us:91&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;industry_id&quot;</span><span class="punctuation">:</span> <span class="number">131</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;photo_url&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/p/7/000/253/05b/308dd6e.jpg&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;positions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;job_title&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Co-chair&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;organization&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bill &amp; Melinda Gates Foundation&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;job_title&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Co-founder, Chairman&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;organization&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Microsoft&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;education&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;school_name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Harvard University&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;start&quot;</span><span class="punctuation">:</span> <span class="number">1973</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;end&quot;</span><span class="punctuation">:</span> <span class="number">1975</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;school_name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Lakeside School, Seattle&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;start&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;end&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;contact_info&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;blog&quot;</span><span class="punctuation">:</span> <span class="string">&quot;http://thegatesnotes.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;twitter&quot;</span><span class="punctuation">:</span> <span class="string">&quot;http://twitter.com/BillGates&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>由上面的圖與 JSON 可以看出，JSON 格式有更好的 locality，使用 relational model 就必須使用多次的 Join 來關聯多個資料庫，而 JSON 中所有與此使用者相關的資訊都儲存在一起，一個簡單的 query 就能達成。</p>
+<h2 id="many-to-one-and-many-to-many-relationships"><a class="markdownIt-Anchor" href="#many-to-one-and-many-to-many-relationships"></a> Many-to-One and Many-to-Many Relationships</h2>
+<p>講完了 relational model 的缺點，再來講 document model 的缺點。</p>
+<p>首先，可以發現上面的 JSON 中 region 與 industry 都只儲存了一個 ID，而不是直接儲存字串，這樣做有幾個好處：</p>
+<ul>
+<li>一致性，避免相同意思但是拼法不同的問題</li>
+<li>易於更新，當一個名稱變更時，只需要修改一處的名字</li>
+<li>支援多語系，可以透過唯一的 ID 將其翻譯成各個語系的字串</li>
+<li>更好的支援搜尋功能</li>
+</ul>
+<p>使用 ID 的好處在於 ID 對於人是沒有意義的，因此 ID 永遠不會改變。因此透過 ID 將重複的資料都變成唯一的 row，可以避免更新、刪除時需要更新到多個 rows 的問題，這就是資料正規化的核心想法。</p>
+<p>在 relational database 中，多對一的關係很好處理，透過 ID 加上 join 的操作即可。在 document database 中，一對多關聯可以直接的儲存（像 JSON 中的 Array 即是一對多關聯），因此 document model 通常不支援 join 的操作，則可能需要在應用層手動的模擬 join 的操作。</p>
+<blockquote>
+<p>在 document model 中，不一定要像 relational model 一樣透過 ID 做多對一的關聯，可以透過 denormalization，直接讓資料重複的出現，例如直接將 JSON 中 <code>region_id</code> 直接用 <code>region</code> 的 object 取代。好處是不需要再有 join 的操作，壞處當然就是喪失上面提到只儲存 ID 的幾個好處。這個方法比較適合用在很少被更改的資料，因為 denormalization 會使得 update, delete 的操作變得更複雜與更沒效率。</p>
+<p>在 <a target="_blank" rel="noopener" href="https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-2">MongoDB 的 6 Rules of Thumb for MongoDB Schema</a> 就有提到這個方法的使用時機與考量，建議讀者可以閱讀～</p>
+</blockquote>
+<p>另外，就算資料原本很符合 document model 的格式，在未來也有機會因為需求的變更變得更加複雜而產生多對一、多對多的關聯。例如：</p>
+<ol>
+<li>新增學校的 logo、聯絡電話、地址等等，這時不再只能儲存一個 <code>school_name</code> 字串，就可能需要有一個 <code>schools</code> 的表來儲存資訊，如此一來 <code>users</code> 與 <code>schools</code> 就變成多對一的關係了。</li>
+<li>新增一個推薦功能可以讓使用者爲另一名使用者寫推薦信，則產生了多對多的關係。</li>
+</ol>
+<h2 id="are-document-databases-repeatng-history"><a class="markdownIt-Anchor" href="#are-document-databases-repeatng-history"></a> Are Document Databases Repeatng History</h2>
+<p>講完了 relational model 與 document model 各自的不擅長之處，這裡稍微講古一下 network model 與 hierarchical model。</p>
+<p>在 1970 年最熱門的資料庫 IBM’s Information Management System (IMS) 採用的是 hierarchical model，與現在 document model 中 JSON 的格式非常相似。與現在使用 document model 一樣，hierarchical model 可以很好的處理一對多關聯，但是不適合處理多對一或是多對多關聯。</p>
+<p>因此兩個最突出的解決方案出現了，分別是 <strong>network model</strong> 以及 <strong>relational model</strong>。</p>
+<h3 id="the-network-model"><a class="markdownIt-Anchor" href="#the-network-model"></a> The network model</h3>
+<p>Network model 是由一個會議 Conference on Data Systems Languages (CODASYL) 制定的，因此也叫做 CODASYL model。</p>
+<p>Network model 與 hierarchical model 很像，最大的不同在於每個 record 可以有不只一個 parent。</p>
+<p>在 network model 中的 query 必須透過指針從 root 移動到想要的 record，開發者必須自己維護可能走到重複的點、決定路徑等問題。</p>
+<h3 id="the-relational-model"><a class="markdownIt-Anchor" href="#the-relational-model"></a> The relational model</h3>
+<p>Relational model 將資料放在表中的列上，最成功的部分在於 relational model 把 query 的複雜實作都抽象化在 DBMS 的 query optimizer 中，使得開發者可以簡單的選擇想要的資料，透過 query optimizer 自行決定要怎麼存取資料、要使用哪個 index。</p>
+<h3 id="comparison-to-document-databases"><a class="markdownIt-Anchor" href="#comparison-to-document-databases"></a> Comparison to document databases</h3>
+<p>最後回到最初的問題，那麼現在的 document model 是否是重蹈覆轍呢？</p>
+<p>現在的 document model 可以透過類似 relational model 中 <em>foreign key</em> 的方式，來關聯多對一或是多對多的模型，稱作 <em>document reference</em>。不像是之前 network model 所採用的方式。</p>
+<p>最終要如何選擇，到底是 relational model 還是 document model 更符合使用情境，還是看各位開發者的決定了！</p>
+<h2 id="relational-versus-document-databases-today"><a class="markdownIt-Anchor" href="#relational-versus-document-databases-today"></a> Relational Versus Document Databases Today</h2>
+<p>最後總結一些今日 relational 與 document databases 在 data model 上的比較。</p>
+<h3 id="which-data-model-leads-to-simpler-application-code"><a class="markdownIt-Anchor" href="#which-data-model-leads-to-simpler-application-code"></a> Which data model leads to simpler application code</h3>
+<p>跟在前面提到的一樣，如果資料是 document-like，並沒有多對一、多對多的關聯，則較適合 document model。</p>
+<p>若有很大量的多對多關聯存在，甚至 relational model 也並不是最適合的選項，後面會介紹到 graph model 就是專門解決這個問題而產生的。</p>
+<h3 id="schema-flexibility-in-the-document-model"><a class="markdownIt-Anchor" href="#schema-flexibility-in-the-document-model"></a> Schema flexibility in the document model</h3>
+<p>通常 document databases 會被叫做 <em>schemaless</em>，但更準確來說應該稱作 <em>schema-on-read</em>，也就是資料的格式是隱藏、不需預先定義的，在讀出時才決定他的格式。</p>
+<p>當儲存的資料結構需要改變時，例如將原本的 <code>name</code> 欄位拆成 <code>first_name</code> 以及 <code>last_name</code>，document model 可以很簡單的透過應用層的程式碼在讀出與寫入時對資料做出改變即可，因爲 document databases 通常容許一個 collections 內的資料長相不同。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (user &amp;&amp; user.<span class="property">name</span> &amp;&amp; !user.<span class="property">first_name</span>) &#123;</span><br><span class="line">  first_name = user.<span class="property">name</span>.<span class="title function_">split</span>(<span class="string">&quot; &quot;</span>)[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而 relational database 通常必須透過 <em>migration</em> 來達成：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> users <span class="keyword">ADD</span> <span class="keyword">COLUMN</span> first_name text;</span><br><span class="line"><span class="keyword">UPDATE</span> users <span class="keyword">SET</span> first_name <span class="operator">=</span> split_part(name, <span class="string">&#x27; &#x27;</span>, <span class="number">1</span>); <span class="comment">-- PostgreSQL</span></span><br><span class="line"><span class="keyword">UPDATE</span> users <span class="keyword">SET</span> first_name <span class="operator">=</span> substring_index(name, <span class="string">&#x27; &#x27;</span>, <span class="number">1</span>); <span class="comment">-- MySQL</span></span><br></pre></td></tr></table></figure>
+<p><code>ALTER TABLE</code> 對於大型系統而言是非常可怕的，通常會造成 database 的 downtime。PostgreSQL 在 v11 之前，<code>ALTER TABLE ADD COLUMN</code> 會拿整張 table 的 <code>ACCESS EXCLUSIVE</code> lock，造成所有的 transaction 不能 access 這張 table。</p>
+<p>因此若資料結構是經常改動、或是資料的結構變化很大，則有 schema 反而會成為一種困難，document model 可能會更加適合。</p>
+<h3 id="data-locality-for-queries"><a class="markdownIt-Anchor" href="#data-locality-for-queries"></a> Data locality for queries</h3>
+<p>Document model 通常將整個 document 儲存成一段 encoded 的 JSON 字串（或是 MongoDB’s BSON），因此存取會整個 document 一起取出，也就是 document model 的 <em>storage locality</em>。</p>
+<p>若資料經常是整個被存取的，則 document model 可以避免掉 relational model 因為需要多次 join 而可能造成多次 disk access 的問題。但反之若每次只需要一小部分的資料，document 還是會被整個 load 到 memory 造成浪費。並且 document 更新時通常也是整個 document 一起寫入，因此就算只修改一小部分的資料也會重寫整個 document。</p>
+<h3 id="convergence-of-document-and-relational-databases"><a class="markdownIt-Anchor" href="#convergence-of-document-and-relational-databases"></a> Convergence of document and relational databases</h3>
+<p>PostgreSQL 從 v9.3 開始、MySQL 從 v5.7 開始支援 JSON 格式的欄位。</p>
+<p>MongoDB 的 driver 會自動的 join document reference。</p>
+<p>因此 relational 與 document databases 現在是越來越相近的，讓使用者在應用層能夠更方便的挑選適合的 data model。</p>
+<h1 id="query-languages-for-data"><a class="markdownIt-Anchor" href="#query-languages-for-data"></a> Query Languages for Data</h1>
+<p>這個段落開始介紹 declarative language 與 imperative programming 的差異。</p>
+<p>Declarative language 即只描述目標的性質，不須描述要如何達到此目標。而 imperative programming 則是很像一般的 programming language，要達到目標的話一定要將流程寫出。</p>
+<p>簡單來說：<strong>declarative 是定義 what to do、而 imperative 是定義 how to do</strong>。</p>
+<p>舉例來說 SQL 就是一種 declarative language、CSS 也是一種 declarative language。</p>
+<p>而資料庫更適合 declarative language，因為可以把實作的複雜都隱藏起來，讓 DBMS 決定如何優化，並且更適合做平行化的處理。</p>
+<h2 id="mapreduce-querying"><a class="markdownIt-Anchor" href="#mapreduce-querying"></a> MapReduce Querying</h2>
+<p>MapReduce 是 google 提出的處理大量資料的一種 programming，同時用到了 declarative 與 imperative 的方式。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">db.<span class="property">observations</span>.<span class="title function_">mapReduce</span>(</span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">map</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> year = <span class="variable language_">this</span>.<span class="property">observationTimestamp</span>.<span class="title function_">getFullYear</span>();</span><br><span class="line">    <span class="keyword">var</span> month = <span class="variable language_">this</span>.<span class="property">observationTimestamp</span>.<span class="title function_">getMonth</span>() + <span class="number">1</span>;</span><br><span class="line">    <span class="title function_">emit</span>(year + <span class="string">&quot;-&quot;</span> + month, <span class="variable language_">this</span>.<span class="property">numAnimals</span>);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">reduce</span>(<span class="params">key, values</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">Array</span>.<span class="title function_">sum</span>(values);</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">query</span>: &#123; <span class="attr">family</span>: <span class="string">&quot;Sharks&quot;</span> &#125;,</span><br><span class="line">    <span class="attr">out</span>: <span class="string">&quot;monthlySharkReport&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>因為 MapReduce 需要使用者自己小心的撰寫 Javascript 程式碼，雖然可以做到很複雜的操作，但對於簡單的操作來說，還是 declarative language 更適合作為資料庫的查詢語言。</p>
+<p>因此 MongoDB 在 v2.2 之後支援了 <em>aggregation pipeline</em> 的 declarative query language。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">db.<span class="property">observations</span>.<span class="title function_">aggregate</span>([</span><br><span class="line">  &#123; <span class="attr">$match</span>: &#123; <span class="attr">family</span>: <span class="string">&quot;Sharks&quot;</span> &#125; &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="attr">$group</span>: &#123;</span><br><span class="line">      <span class="attr">_id</span>: &#123;</span><br><span class="line">        <span class="attr">year</span>:  &#123; <span class="attr">$year</span>:  <span class="string">&quot;$observationTimestamp&quot;</span> &#125;,</span><br><span class="line">        <span class="attr">month</span>: &#123; <span class="attr">$month</span>: <span class="string">&quot;$observationTimestamp&quot;</span> &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">totalAnimals</span>: &#123; <span class="attr">$sum</span>: <span class="string">&quot;$numAnimals&quot;</span> &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">]);</span><br></pre></td></tr></table></figure>
+<h1 id="graph-like-data-models"><a class="markdownIt-Anchor" href="#graph-like-data-models"></a> Graph-Like Data Models</h1>
+<p>當資料庫有很多的多對多關聯，就很適合使用 graph-like data model。</p>
+<p>Graph 中包含點與邊，在現實中的例子包含：</p>
+<ul>
+<li>Social graphs: 點代表人，邊代表朋友或是追蹤關係。</li>
+<li>The web graph: 點代表網頁，邊代表連到別的網頁的 link。</li>
+</ul>
+<p>在一張 graph 中每個點與邊也可以代表不同意義，例如 Facebook 維護了一張 graph，其中 vertex 可能是人、地點、事件或是留言，而邊可能代表人參加的事件、事件發生的地點或是人留下的留言。</p>
+<p>Graph-like data models 主要分為兩種，<em>property graph</em> model 以及 <em>triple-store</em> model。</p>
+<h2 id="property-graphs"><a class="markdownIt-Anchor" href="#property-graphs"></a> Property Graphs</h2>
+<p>每個點都有：</p>
+<ul>
+<li>一個 unique ID</li>
+<li>一些出邊</li>
+<li>一些入邊</li>
+<li>一些 properties（key-value pairs）</li>
+</ul>
+<p>每個邊都有：</p>
+<ul>
+<li>一個 unique ID</li>
+<li>邊的起點跟終點</li>
+<li>一個 label</li>
+<li>一些 properties（key-value pairs）</li>
+</ul>
+<h3 id="the-cypher-query-language"><a class="markdownIt-Anchor" href="#the-cypher-query-language"></a> The Cypher Query Language</h3>
+<p><em>Cypher</em> 是一種 declarative language，是 Neo4j 圖資料庫的查詢語言。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span></span><br><span class="line">  (NAmerica:Location &#123;name:<span class="string">&#x27;North America&#x27;</span>, type:<span class="string">&#x27;continent&#x27;</span>&#125;),</span><br><span class="line">  (USA:Location      &#123;name:<span class="string">&#x27;United States&#x27;</span>, type:<span class="string">&#x27;country&#x27;</span>  &#125;),</span><br><span class="line">  (Idaho:Location    &#123;name:<span class="string">&#x27;Idaho&#x27;</span>,         type:<span class="string">&#x27;state&#x27;</span>    &#125;),</span><br><span class="line">  (Lucy:Person       &#123;name:<span class="string">&#x27;Lucy&#x27;</span> &#125;),</span><br><span class="line">  (Idaho) <span class="operator">-</span>[:<span class="keyword">WITHIN</span>]<span class="operator">-</span><span class="operator">&gt;</span>  (USA)  <span class="operator">-</span>[:<span class="keyword">WITHIN</span>]<span class="operator">-</span><span class="operator">&gt;</span> (NAmerica),</span><br><span class="line">  (Lucy)  <span class="operator">-</span>[:BORN_IN]<span class="operator">-</span><span class="operator">&gt;</span> (Idaho)</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">MATCH</span></span><br><span class="line">  (person) <span class="operator">-</span>[:BORN_IN]<span class="operator">-</span><span class="operator">&gt;</span>  () <span class="operator">-</span>[:<span class="keyword">WITHIN</span><span class="operator">*</span><span class="number">0.</span>.]<span class="operator">-</span><span class="operator">&gt;</span> (us:Location &#123;name:<span class="string">&#x27;United States&#x27;</span>&#125;),</span><br><span class="line">  (person) <span class="operator">-</span>[:LIVES_IN]<span class="operator">-</span><span class="operator">&gt;</span> () <span class="operator">-</span>[:<span class="keyword">WITHIN</span><span class="operator">*</span><span class="number">0.</span>.]<span class="operator">-</span><span class="operator">&gt;</span> (eu:Location &#123;name:<span class="string">&#x27;Europe&#x27;</span>&#125;)</span><br><span class="line">  <span class="keyword">RETURN</span> person.name</span><br></pre></td></tr></table></figure>
+<p><code>()</code> 代表點、<code>[]</code> 代表邊、<code>:</code> 代表邊或是點的 label、<code>&#123;&#125;</code> 內的代表 properties、<code>-&gt;</code> 代表邊的方向，<code>()</code> 或是 <code>[]</code> 中最前面的變數則是命名。</p>
+<h2 id="graph-queries-in-sql"><a class="markdownIt-Anchor" href="#graph-queries-in-sql"></a> Graph Queries in SQL</h2>
+<p>作者提出如果把 graph data 放在 relational structure 內，那麼可以使用 SQL 來做查詢嗎？</p>
+<p>可以觀察到上面的 query 有一個特別的符號 <code>*0..</code>，這代表的 label 是 <code>WITHIN</code> 的邊可以出現 0 到任意多次，但是在 SQL 中，並沒有辦法指定 0 ~ 任意多次的 join，要做到的話必須透過 SQL 中的 <code>RECURSIVE</code> 語法，更加複雜。</p>
+<h2 id="triple-stores-and-sparql"><a class="markdownIt-Anchor" href="#triple-stores-and-sparql"></a> Triple-Stores and SPARQL</h2>
+<p>Triple-Stores 透過三元組 <code>(subject, predicate, object)</code> 來儲存資料。例如 <code>(Jim, likes, bananas)</code>。</p>
+<p>三元組也可以用來描述 subject 的 properties，例如 <code>(Jim, age, 33)</code>。</p>
+<p>對應到圖的話，則 <code>subject</code> 是點、<code>predicate</code> 是邊、<code>object</code> 可以是點或是值。</p>
+<h3 id="the-sparql-query-language"><a class="markdownIt-Anchor" href="#the-sparql-query-language"></a> The SPARQL query language</h3>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ?personName <span class="keyword">WHERE</span> &#123;</span><br><span class="line">  ?person :name ?personName.</span><br><span class="line">  ?person :bornIn  <span class="operator">/</span> :<span class="keyword">within</span><span class="operator">*</span> <span class="operator">/</span> :name &quot;United States&quot;.</span><br><span class="line">  ?person :livesIn <span class="operator">/</span> :<span class="keyword">within</span><span class="operator">*</span> <span class="operator">/</span> :name &quot;Europe&quot;.</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="graph-databases-compared-to-the-network-model"><a class="markdownIt-Anchor" href="#graph-databases-compared-to-the-network-model"></a> Graph Databases Compared to the Network Model</h2>
+<p>Network (CODASYL) model 與現今的 graph databases 看起來十分相似，但是 graph databases 能成功大致有幾個原因：</p>
+<ul>
+<li>CODASYL 沒有可以直接 access record 的方式，但是 Graph Model 中每個 vertex 跟 edge 都有 uid 可以直接 access。</li>
+<li>CODASYL 並沒有 declarative query language（ex: Cypher），因此不好做查詢。</li>
+</ul>
+<h1 id="總結"><a class="markdownIt-Anchor" href="#總結"></a> 總結</h1>
+<p>因為每一種 data model 都很複雜，因此本章先以綜觀的角度看各種 data model 的性質與優缺點，期望開發者能夠在使用這些 data model 時爲各種情境的應用挑選正確的資料模型。</p>
+<blockquote>
+<p>最後，如果你喜歡這篇文章，或是文章對你有幫助的話，可以幫我按個喜歡、或是留言！你的支持就是我寫作的最大動力。有任何想問的問題也可以在底下留言喔～</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/" title="Designing Data-Intensive Application 第二章筆記">https://blog.justin0u0.com/Designing-Data-Intensive-Application-第二章筆記/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Notes/" rel="tag"># Notes</a>
+              <a href="/tags/DDIA/" rel="tag"># DDIA</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/" rel="prev" title="Designing Data-Intensive Application 第一章筆記">
+                  <i class="fa fa-angle-left"></i> Designing Data-Intensive Application 第一章筆記
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%89%E7%AB%A0%E7%AD%86%E8%A8%98/" rel="next" title="Designing Data-Intensive Application 第三章筆記">
+                  Designing Data-Intensive Application 第三章筆記 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">justin0u0</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/justin0u0" class="github-corner" title="在 GitHub 上關注我" aria-label="在 GitHub 上關注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"justin0u0","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

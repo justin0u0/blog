@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/icon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/icon16.png">
+  <link rel="mask-icon" href="/images/icon32.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Service Mesh 此篇文章為參考 Phil Calçado 所寫之 Pattern: Service Mesh，結合一些自己的想法所寫下。圖片皆來自其文章。  原始通訊時代 在人們剛開始接觸網路時，兩台機器之間的溝通可以被想像成下圖：  但漸漸的會發現，機器與機器之間的溝通可能會出現資料遺失、重試等問題，因此需要更複雜的邏輯來處理機器之間的溝通。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Service mesh 服務網格之介紹--微服務中的 TCP">
+<meta property="og:url" content="https://blog.justin0u0.com/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="Service Mesh 此篇文章為參考 Phil Calçado 所寫之 Pattern: Service Mesh，結合一些自己的想法所寫下。圖片皆來自其文章。  原始通訊時代 在人們剛開始接觸網路時，兩台機器之間的溝通可以被想像成下圖：  但漸漸的會發現，機器與機器之間的溝通可能會出現資料遺失、重試等問題，因此需要更複雜的邏輯來處理機器之間的溝通。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%201.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%202.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%203.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%204.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%205.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%206.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%207.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%208.png">
+<meta property="og:image" content="https://blog.justin0u0.com/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/service-mesh/Untitled%209.png">
+<meta property="article:published_time" content="2020-08-26T21:55:42.000Z">
+<meta property="article:modified_time" content="2020-08-26T21:55:42.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="Istio">
+<meta property="article:tag" content="Service mesh">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled.png">
+
+
+<link rel="canonical" href="https://blog.justin0u0.com/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/","path":"Service-mesh-服務網格之介紹-微服務中的-TCP/","title":"Service mesh 服務網格之介紹--微服務中的 TCP"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Service mesh 服務網格之介紹--微服務中的 TCP | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Justin0u0's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-cv"><a href="/assets/CV/CV.pdf" rel="section"><i class="fa fa-user fa-fw"></i>履歷</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#service-mesh"><span class="nav-number">1.</span> <span class="nav-text"> Service Mesh</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%A7%8B%E9%80%9A%E8%A8%8A%E6%99%82%E4%BB%A3"><span class="nav-number">1.1.</span> <span class="nav-text"> 原始通訊時代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AE%E6%9C%8D%E5%8B%99%E6%99%82%E4%BB%A3"><span class="nav-number">1.2.</span> <span class="nav-text"> 微服務時代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#service-mesh-2"><span class="nav-number">1.3.</span> <span class="nav-text"> Service Mesh</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="nav-number">2.</span> <span class="nav-text"> 結論</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text"> 參考資料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/assets/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.linkedin.com/in/justin0u0" title="LinkedIn → https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Service mesh 服務網格之介紹--微服務中的 TCP | Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Service mesh 服務網格之介紹--微服務中的 TCP
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2020-08-27 05:55:42" itemprop="dateCreated datePublished" datetime="2020-08-27T05:55:42+08:00">2020-08-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Kubernetes/" itemprop="url" rel="index"><span itemprop="name">Kubernetes</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="Service-mesh-服務網格之介紹-微服務中的-TCP/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="service-mesh"><a class="markdownIt-Anchor" href="#service-mesh"></a> Service Mesh</h1>
+<p>此篇文章為參考 Phil Calçado 所寫之 Pattern: Service Mesh，結合一些自己的想法所寫下。圖片皆來自其文章。</p>
+<h2 id="原始通訊時代"><a class="markdownIt-Anchor" href="#原始通訊時代"></a> 原始通訊時代</h2>
+<p>在人們剛開始接觸網路時，兩台機器之間的溝通可以被想像成下圖：</p>
+<p><img data-src="/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled.png" alt="" /></p>
+<p>但漸漸的會發現，機器與機器之間的溝通可能會出現資料遺失、重試等問題，因此需要更複雜的邏輯來處理機器之間的溝通。</p>
+<span id="more"></span>
+<p><img data-src="/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%201.png" alt="" /></p>
+<p>當機器越來越普及，工程師們開始思考如何解決多個連線、資料加密、服務發現等問題，以實現一個 Network System。因此機器開始需要實現一個名為 <code>Flow Control</code> 的邏輯，用來確認傳輸的速度不會大於接收的速度、處理網路傳輸的資料遺失、資料加密等等問題。因此，服務中除了實現 Business Logic，還開始需要實現 <code>Flow Control</code>。</p>
+<p><img data-src="/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%202.png" alt="" /></p>
+<p>Services need to implement both business logic &amp; flow control.</p>
+<p>為了避免每個服務都要自己實踐一個網路傳輸處理的邏輯，TCP/IP 協議出現了。TCP/IP 解決了網路傳輸的問題，將服務中的 Flow Control 抽象出來，成為網路層的一部分。</p>
+<p><img data-src="/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%203.png" alt="" /></p>
+<hr />
+<h2 id="微服務時代"><a class="markdownIt-Anchor" href="#微服務時代"></a> 微服務時代</h2>
+<p>TCP/IP 作為機器之間的溝通當然還是一個好的工具，然而微服務中的服務發現、熔斷機制等，在 TCP/IP 中都並沒有被實現。</p>
+<p><strong>服務發現</strong>：<br />
+在單體式服務中，服務運行在同一個 Process 下，服務發現可以輕易的做到。<br />
+要存取其他的服務也能透過 DNS、Load Balancer、Port Number 來取得。<br />
+分散式架構中，服務分散在不同的機器上，因此需要有一個方法來找到要存取的服務。<br />
+<a target="_blank" rel="noopener" href="https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/">https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/</a></p>
+<p><strong>熔斷機制</strong>：<br />
+微服務中一個服務要存取其他服務的資料，例如，服務 A 要存取服務 B，服務 B 要存取服務 C，若服務 C 處在不可運行的狀態，而導致服務 B 不斷的等待服務 C，將導致服務 B 最終無法負荷而崩潰，而服務 B 的崩潰又會導致服務 A 的崩潰，因此產生<strong>雪崩效應</strong>。<strong>熔斷機制</strong>，當服務 B 發現服務 C 不可用時，自動終止其資料請求並回傳錯誤，因為服務 C 有可能在某個時間點恢復運行，因此服務 B 會對服務 C 定期的嘗試取得回應。<br />
+<a target="_blank" rel="noopener" href="https://microservices.io/patterns/reliability/circuit-breaker.html">https://microservices.io/patterns/reliability/circuit-breaker.html</a></p>
+<p>因此歷史重演，各個服務開始實現自己的服務發現、熔斷機制邏輯。</p>
+<p><img data-src="/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%204.png" alt="" /></p>
+<p>各個服務都要實現自己的服務發現、熔斷機制等邏輯過於麻煩。因此，開始有 Library 的出現來實現這類邏輯。例如：<a target="_blank" rel="noopener" href="https://finagle.github.io/blog/">Twitter’s Finagle</a>、<a target="_blank" rel="noopener" href="https://github.com/facebook/proxygen">Facebook’s Proxygen</a>。</p>
+<p><img data-src="/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%205.png" alt="" /></p>
+<p>然而，使用 Library 也有一些問題存在：</p>
+<ol>
+<li>函式庫實現了細節，在實際應用中變更難以追蹤、解決框架出現的問題。</li>
+<li>函式庫限制了語言，然而微服務最重要的特性之一就是「與語言無關」。</li>
+<li>函式庫的升級、測試、部署都會需要工程師花時間來研究。</li>
+</ol>
+<hr />
+<h2 id="service-mesh-2"><a class="markdownIt-Anchor" href="#service-mesh-2"></a> Service Mesh</h2>
+<p>要改變網路的傳輸協議是困難的，因此 Sidecar 的模式被提出，Sidecar 為一個 Proxy，在 Sidecar 中抽象了負載平衡、服務發現、認證授權、流量控制各種分散式服務所需要的邏輯。透過代理的方式來完成服務與服務之間的溝通。</p>
+<p><img data-src="/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%206.png" alt="" /></p>
+<p>各種 Sidecar 的實現開始出現，例如：<a target="_blank" rel="noopener" href="https://linkerd.io/2016/02/18/linkerd-twitter-style-operability-for-microservices/">Linkerd</a>、<a target="_blank" rel="noopener" href="https://eng.lyft.com/announcing-envoy-c-l7-proxy-and-communication-bus-92520b6c8191?gi=41e38b4401fe">Envoy</a> 等等。</p>
+<p>每個服務旁都有一個 Sidecar 來輔助與其他服務的溝通，全局圖看起來如下。綠色的即為服務，而藍色的部分即為所謂的 <strong>Service Mesh 服務網格</strong>。</p>
+<p><img data-src="/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%207.png" alt="" /></p>
+<p>Kubernetes 的出現，讓更多企業、使用者關注並使用 Service Mesh 的服務。因此，一個 Sidecar 的控制面板出現，用來實現更好的 Service Mesh 管控。而 <a target="_blank" rel="noopener" href="https://istio.io/">Istio</a> 即為最佳代表。</p>
+<p><img data-src="/assets/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/Untitled%208.png" alt="" /></p>
+<p><img data-src="service-mesh/Untitled%209.png" alt="" /></p>
+<h1 id="結論"><a class="markdownIt-Anchor" href="#結論"></a> 結論</h1>
+<hr />
+<p>Service mesh 此詞的發明人 William Morgan 對 <strong>Service Mesh</strong> 的定義如下：<br />
+<strong>A service mesh is a dedicated infrastructure layer for handling service-to-service communication. It’s responsible for the reliable delivery of requests through the complex topology of services that comprise a modern, cloud native application. In practice, the service mesh is typically implemented as an array of lightweight network proxies that are deployed alongside application code, without the application needing to be aware.</strong></p>
+<p>可以看到以下三個重點：</p>
+<ol>
+<li><strong>Infrastructure layer, through the complex topology of services</strong><br />
+基礎設施層＋拓樸中穿梭。可以知道 Service Mesh 的定義即為<strong>微服務中的 TCP</strong>！</li>
+<li><strong>Network proxies</strong><br />
+網路代理即為 Service Mesh 的實現方式。</li>
+<li><strong>Without the application needing to be aware</strong><br />
+Service Mesh 中要解決最重要的問題，就是讓開發人員不用再去思考一切關於服務溝通的問題！</li>
+</ol>
+<h1 id="參考資料"><a class="markdownIt-Anchor" href="#參考資料"></a> 參考資料</h1>
+<p><a target="_blank" rel="noopener" href="https://philcalcado.com/2017/08/03/pattern_service_mesh.html">Pattern: Service Mesh</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/" title="Service mesh 服務網格之介紹--微服務中的 TCP">https://blog.justin0u0.com/Service-mesh-服務網格之介紹-微服務中的-TCP/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+              <a href="/tags/Istio/" rel="tag"># Istio</a>
+              <a href="/tags/Service-mesh/" rel="tag"># Service mesh</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/%E5%BF%AB%E9%80%9F%E6%8F%90%E5%8D%87%E4%BD%A0%E7%9A%84%E8%8B%B1%E6%89%93%E6%89%93%E5%AD%97%E9%80%9F%E5%BA%A6-keybr-com/" rel="prev" title="快速提升你的英打打字速度 - keybr.com">
+                  <i class="fa fa-angle-left"></i> 快速提升你的英打打字速度 - keybr.com
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/" rel="next" title="Go-Micro 手把手從開發到部署（上）">
+                  Go-Micro 手把手從開發到部署（上） <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">justin0u0</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/justin0u0" class="github-corner" title="在 GitHub 上關注我" aria-label="在 GitHub 上關注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"justin0u0","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/icon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/icon16.png">
+  <link rel="mask-icon" href="/images/icon32.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;sudoku-solver&#x2F; 給一個數獨，保證存在唯一一組解，求出數獨。  範例說明 A sudoku puzzle:  The sudoku puzzle solution:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 37 - Sudoku Solver">
+<meta property="og:url" content="https://blog.justin0u0.com/LeetCode-Sudoku-Solver/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;sudoku-solver&#x2F; 給一個數獨，保證存在唯一一組解，求出數獨。  範例說明 A sudoku puzzle:  The sudoku puzzle solution:">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/LeetCode-Sudoku-Solver/sudoku-solver-start.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/LeetCode-Sudoku-Solver/sudoku-solver-end.png">
+<meta property="article:published_time" content="2020-07-08T02:25:07.000Z">
+<meta property="article:modified_time" content="2020-07-08T02:25:07.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="回朔法（Backtracking）">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/LeetCode-Sudoku-Solver/sudoku-solver-start.png">
+
+
+<link rel="canonical" href="https://blog.justin0u0.com/LeetCode-Sudoku-Solver/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/LeetCode-Sudoku-Solver/","path":"LeetCode-Sudoku-Solver/","title":"LeetCode 37 - Sudoku Solver"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LeetCode 37 - Sudoku Solver | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Justin0u0's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-cv"><a href="/assets/CV/CV.pdf" rel="section"><i class="fa fa-user fa-fw"></i>履歷</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%8C%E7%9B%AE"><span class="nav-number">1.</span> <span class="nav-text"> 題目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B%E8%AA%AA%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text"> 範例說明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%83%B3%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text"> 想法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%A6%E4%BD%9C%E7%B4%B0%E7%AF%80"><span class="nav-number">4.</span> <span class="nav-text"> 實作細節</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">5.</span> <span class="nav-text"> 程式碼</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E9%A1%8D%E5%A4%96%E7%B4%80%E9%8C%84-row-col-block"><span class="nav-number">5.1.</span> <span class="nav-text"> 不額外紀錄 row, col, block</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%8D%E5%A4%96%E7%B4%80%E9%8C%84-row-col-block-%E4%B8%89%E5%80%8B%E5%B8%83%E6%9E%97%E5%80%BC%E9%99%A3%E5%88%97"><span class="nav-number">5.2.</span> <span class="nav-text"> 額外紀錄 row, col, block 三個布林值陣列</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/assets/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.linkedin.com/in/justin0u0" title="LinkedIn → https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/LeetCode-Sudoku-Solver/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LeetCode 37 - Sudoku Solver | Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode 37 - Sudoku Solver
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2020-07-08 10:25:07" itemprop="dateCreated datePublished" datetime="2020-07-08T10:25:07+08:00">2020-07-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/LeetCode-Sudoku-Solver/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="LeetCode-Sudoku-Solver/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="題目"><a class="markdownIt-Anchor" href="#題目"></a> 題目</h1>
+<p>題目連結：<a target="_blank" rel="noopener" href="https://leetcode.com/problems/sudoku-solver/">https://leetcode.com/problems/sudoku-solver/</a></p>
+<p>給一個數獨，保證存在唯一一組解，求出數獨。</p>
+<h1 id="範例說明"><a class="markdownIt-Anchor" href="#範例說明"></a> 範例說明</h1>
+<p><strong>A sudoku puzzle:</strong><br />
+<img data-src="/assets/LeetCode-Sudoku-Solver/sudoku-solver-start.png" alt="" /><br />
+<strong>The sudoku puzzle solution:</strong><br />
+<img data-src="/assets/LeetCode-Sudoku-Solver/sudoku-solver-end.png" alt="" /></p>
+<span id="more"></span>
+<h1 id="想法"><a class="markdownIt-Anchor" href="#想法"></a> 想法</h1>
+<p>解數獨最簡單的方法為回朔法。所謂回朔法其實就是利用遞迴暴力嘗試，對於每一個數獨的空格，都暴力嘗試填入 <code>1 ~ 9</code>。若發現填不下去了，則返回到上一步嘗試填入下一種數字。</p>
+<p>當然，若要解的數獨比九乘九大小更大，可以將數獨轉換為<strong>精準覆蓋問題</strong>，再利用<strong>舞蹈鏈</strong>求解。（待補）</p>
+<h1 id="實作細節"><a class="markdownIt-Anchor" href="#實作細節"></a> 實作細節</h1>
+<p>實作上，遞迴函數 <code>solver</code> 攜帶 <code>x</code>, <code>y</code> 代表當前位置。如果當前位置為數字則跳過，否則嘗試填入 <code>1 ~ 9</code>。</p>
+<p>填入數字 <code>i</code> 時檢查此位置是否能夠填入，所以只要檢查：</p>
+<ol>
+<li>第 <code>x</code> 列（row）是否有 <code>i</code>。</li>
+<li>第 <code>y</code> 行（column）是否有 <code>i</code>。</li>
+<li><code>(x, y)</code> 所在的方格（block）內是否有填入 <code>i</code>。<br />
+若我們將方格編號，由左到右、由上到下為 <code>0 ~ 9</code> 號，則 <code>(x, y)</code> 所在的方格編號為 <code>x / 3 * 3 + y / 3</code>。</li>
+</ol>
+<p>檢查數字可以使用迴圈檢查，或是額外紀錄布林值陣列 <code>row[i][j]</code>, <code>col[i][j]</code>, <code>block[i][j]</code> 分別代表第 <code>i</code> 個列、行、方格有沒有數字 <code>j</code>。<br />
+當然，要額外紀錄陣列就必須在初始化時先遍歷整個數獨，但是在檢查時可以 <code>O(1)</code> 知道數字能否填入。<br />
+不額外紀錄陣列雖然程式碼較簡潔，但速度稍慢一些。</p>
+<p>在 <code>(x, y)</code> 填入數字 <code>i</code> 後，向下一格遞迴。<strong>不要忘記在遞迴返回後恢復原本的盤面</strong>（在呼叫函數後的下一行）。<br />
+若有額外紀錄 <code>row</code>, <code>col</code>, <code>block</code> 陣列，填入數字時要將 <code>row[x][i]</code>, <code>col[y][i]</code>, <code>block[x / 3 * 3 + y / 3][i]</code> 改為 <code>true</code>，遞迴返回後，這些值也要恢復成 <code>false</code>。</p>
+<p>最後，遞迴的終止條件為 <code>x = 9</code>，代表所有格子已經填完。</p>
+<p>另外要注意 <code>board</code> 內存的為 <code>char</code>，轉為對應數字時應該要剪去字元的 ASCII 編碼。</p>
+<h1 id="程式碼"><a class="markdownIt-Anchor" href="#程式碼"></a> 程式碼</h1>
+<h2 id="不額外紀錄-row-col-block"><a class="markdownIt-Anchor" href="#不額外紀錄-row-col-block"></a> 不額外紀錄 row, col, block</h2>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Author: justin0u0&lt;mail@justin0u0&gt;</span></span><br><span class="line"><span class="comment"> * Problem: https://leetcode.com/problems/sudoku-solver/</span></span><br><span class="line"><span class="comment"> * Runtime: 28ms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">solver</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y, vector&lt;vector&lt;<span class="type">char</span>&gt;&gt;&amp; board)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 遞迴邊界，找到解</span></span><br><span class="line">    <span class="keyword">if</span> (x == <span class="number">9</span>) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> nextX = y == <span class="number">8</span> ? x + <span class="number">1</span> : x;</span><br><span class="line">    <span class="type">int</span> nextY = y == <span class="number">8</span> ? <span class="number">0</span> : y + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (board[x][y] == <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">      <span class="comment">// 嘗試填入 1 ~ 9</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">9</span>; i++) &#123;</span><br><span class="line">        <span class="type">bool</span> valid = <span class="literal">true</span>;</span><br><span class="line">        <span class="type">char</span> cell = i + <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">        <span class="comment">// 檢查是否可以在 (x, y) 填入數字 i</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">9</span>; j++) &#123;</span><br><span class="line">          <span class="type">int</span> blockX = (x / <span class="number">3</span>) * <span class="number">3</span> + (j / <span class="number">3</span>);</span><br><span class="line">          <span class="type">int</span> blockY = (y / <span class="number">3</span>) * <span class="number">3</span> + (j % <span class="number">3</span>);</span><br><span class="line">          <span class="keyword">if</span> (board[x][j] == cell || board[j][y] == cell || board[blockX][blockY] == cell) &#123;</span><br><span class="line">            valid = <span class="literal">false</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!valid) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="comment">// 可以填入</span></span><br><span class="line">        board[x][y] = cell;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">solver</span>(nextX, nextY, board)) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="comment">// 恢復盤面</span></span><br><span class="line">        board[x][y] = <span class="string">&#x27;.&#x27;</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 原本就有數字，跳過 (x, y)</span></span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">solver</span>(nextX, nextY, board);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">solveSudoku</span><span class="params">(vector&lt;vector&lt;<span class="type">char</span>&gt;&gt;&amp; board)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">solver</span>(<span class="number">0</span>, <span class="number">0</span>, board);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="額外紀錄-row-col-block-三個布林值陣列"><a class="markdownIt-Anchor" href="#額外紀錄-row-col-block-三個布林值陣列"></a> 額外紀錄 row, col, block 三個布林值陣列</h2>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Author: justin0u0&lt;mail@justin0u0&gt;</span></span><br><span class="line"><span class="comment"> * Problem: https://leetcode.com/problems/sudoku-solver/</span></span><br><span class="line"><span class="comment"> * Runtime: 8ms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="comment">// 額外紀錄布林陣列 col, row, block</span></span><br><span class="line">  <span class="type">bool</span> row[<span class="number">9</span>][<span class="number">9</span>], col[<span class="number">9</span>][<span class="number">9</span>], block[<span class="number">9</span>][<span class="number">9</span>];</span><br><span class="line">  <span class="comment">// 將額外紀錄的布林陣列值反轉</span></span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">toggleState</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y, <span class="type">int</span> i)</span> </span>&#123;</span><br><span class="line">    row[x][i] ^= <span class="literal">true</span>;</span><br><span class="line">    col[y][i] ^= <span class="literal">true</span>;</span><br><span class="line">    block[x / <span class="number">3</span> * <span class="number">3</span> + y / <span class="number">3</span>][i] ^= <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">solver</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y, vector&lt;vector&lt;<span class="type">char</span>&gt;&gt;&amp; board)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 遞迴邊界，找到解</span></span><br><span class="line">    <span class="keyword">if</span> (x == <span class="number">9</span>) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> nextX = y == <span class="number">8</span> ? x + <span class="number">1</span> : x;</span><br><span class="line">    <span class="type">int</span> nextY = y == <span class="number">8</span> ? <span class="number">0</span> : y + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (board[x][y] == <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">      <span class="comment">// 嘗試填入 1 ~ 9</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!row[x][i] &amp;&amp; !col[y][i] &amp;&amp; !block[x / <span class="number">3</span> * <span class="number">3</span> + y / <span class="number">3</span>][i]) &#123;</span><br><span class="line">          <span class="comment">// 可以在 (x, y) 填入數字 i</span></span><br><span class="line">          board[x][y] = i + <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line">          <span class="comment">// 將 row, col, block 設成 1</span></span><br><span class="line">          <span class="built_in">toggleState</span>(x, y, i);</span><br><span class="line">          <span class="keyword">if</span> (<span class="built_in">solver</span>(nextX, nextY, board)) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">          <span class="comment">// 將 row, col, block 設成 0</span></span><br><span class="line">          <span class="built_in">toggleState</span>(x, y, i);</span><br><span class="line">          <span class="comment">// 恢復盤面</span></span><br><span class="line">          board[x][y] = <span class="string">&#x27;.&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 原本就有數字，跳過 (x, y)</span></span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">solver</span>(nextX, nextY, board);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">solveSudoku</span><span class="params">(vector&lt;vector&lt;<span class="type">char</span>&gt;&gt;&amp; board)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 初始化 row, col, block</span></span><br><span class="line">    <span class="built_in">memset</span>(row, <span class="literal">false</span>, <span class="keyword">sizeof</span> row);</span><br><span class="line">    <span class="built_in">memset</span>(col, <span class="literal">false</span>, <span class="keyword">sizeof</span> col);</span><br><span class="line">    <span class="built_in">memset</span>(block, <span class="literal">false</span>, <span class="keyword">sizeof</span> block);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">9</span>; j++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (board[i][j] != <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">          <span class="type">int</span> cell = board[i][j] - <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line">          row[i][cell] = <span class="literal">true</span>;</span><br><span class="line">          col[j][cell] = <span class="literal">true</span>;</span><br><span class="line">          block[i / <span class="number">3</span> * <span class="number">3</span> + j / <span class="number">3</span>][cell] = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">solver</span>(<span class="number">0</span>, <span class="number">0</span>, board);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/LeetCode-Sudoku-Solver/" title="LeetCode 37 - Sudoku Solver">https://blog.justin0u0.com/LeetCode-Sudoku-Solver/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/%E5%9B%9E%E6%9C%94%E6%B3%95%EF%BC%88Backtracking%EF%BC%89/" rel="tag"># 回朔法（Backtracking）</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/LeetCode-Longest-Valid-Parentheses/" rel="prev" title="LeetCode 32 - Longest Valid Parentheses">
+                  <i class="fa fa-angle-left"></i> LeetCode 32 - Longest Valid Parentheses
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/LeetCode-First-Missing-Positive/" rel="next" title="LeetCode 41 - First Missing Positive">
+                  LeetCode 41 - First Missing Positive <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">justin0u0</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/justin0u0" class="github-corner" title="在 GitHub 上關注我" aria-label="在 GitHub 上關注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"justin0u0","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

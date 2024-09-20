@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/icon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/icon16.png">
+  <link rel="mask-icon" href="/images/icon32.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="現在的軟體基本上都不是 CPU Bound，而是 Data-Intensive 的，因此大多數的應用程式會依靠多種工具來滿足不同情境下的資料使用。 本章節重點先放在三項設計系統時的要點：可靠性（Reliability）、可擴展性（Scalability）以及可維護性（Maintainability）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Designing Data-Intensive Application 第一章筆記">
+<meta property="og:url" content="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="現在的軟體基本上都不是 CPU Bound，而是 Data-Intensive 的，因此大多數的應用程式會依靠多種工具來滿足不同情境下的資料使用。 本章節重點先放在三項設計系統時的要點：可靠性（Reliability）、可擴展性（Scalability）以及可維護性（Maintainability）。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/book-cover.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/system.png">
+<meta property="article:published_time" content="2021-07-24T13:55:03.000Z">
+<meta property="article:modified_time" content="2021-07-24T13:55:03.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="Notes">
+<meta property="article:tag" content="DDIA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/book-cover.png">
+
+
+<link rel="canonical" href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/","path":"Designing-Data-Intensive-Application-第一章筆記/","title":"Designing Data-Intensive Application 第一章筆記"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Designing Data-Intensive Application 第一章筆記 | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Justin0u0's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-cv"><a href="/assets/CV/CV.pdf" rel="section"><i class="fa fa-user fa-fw"></i>履歷</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#introduction"><span class="nav-number">1.</span> <span class="nav-text"> Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#reliability"><span class="nav-number">2.</span> <span class="nav-text"> Reliability</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hardware-faults"><span class="nav-number">2.1.</span> <span class="nav-text"> Hardware Faults</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#software-errors"><span class="nav-number">2.2.</span> <span class="nav-text"> Software Errors</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#human-errors"><span class="nav-number">2.3.</span> <span class="nav-text"> Human Errors</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#scalability"><span class="nav-number">3.</span> <span class="nav-text"> Scalability</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#describing-load"><span class="nav-number">3.1.</span> <span class="nav-text"> Describing Load</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#describing-performance"><span class="nav-number">3.2.</span> <span class="nav-text"> Describing Performance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#approaches-for-coping-with-load"><span class="nav-number">3.3.</span> <span class="nav-text"> Approaches for Coping with Load</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#maintainability"><span class="nav-number">4.</span> <span class="nav-text"> Maintainability</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#operability-making-life-easy-for-operations"><span class="nav-number">4.1.</span> <span class="nav-text"> Operability: Making Life Easy for Operations</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#simplicity-managing-complexity"><span class="nav-number">4.2.</span> <span class="nav-text"> Simplicity: Managing Complexity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#evolvability-making-change-easy"><span class="nav-number">4.3.</span> <span class="nav-text"> Evolvability: Making Change Easy</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#summary"><span class="nav-number">5.</span> <span class="nav-text"> Summary</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/assets/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.linkedin.com/in/justin0u0" title="LinkedIn → https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Designing Data-Intensive Application 第一章筆記 | Justin0u0's Blog">
+      <meta itemprop="description" content="現在的軟體基本上都不是 CPU Bound，而是 Data-Intensive 的，因此大多數的應用程式會依靠多種工具來滿足不同情境下的資料使用。
+本章節重點先放在三項設計系統時的要點：可靠性（Reliability）、可擴展性（Scalability）以及可維護性（Maintainability）。
+">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Designing Data-Intensive Application 第一章筆記
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-07-24 21:55:03" itemprop="dateCreated datePublished" datetime="2021-07-24T21:55:03+08:00">2021-07-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Notes/" itemprop="url" rel="index"><span itemprop="name">Notes</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="Designing-Data-Intensive-Application-第一章筆記/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+            <div class="post-description">現在的軟體基本上都不是 CPU Bound，而是 Data-Intensive 的，因此大多數的應用程式會依靠多種工具來滿足不同情境下的資料使用。
+本章節重點先放在三項設計系統時的要點：可靠性（Reliability）、可擴展性（Scalability）以及可維護性（Maintainability）。
+</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><img data-src="/assets/Designing-Data-Intensive-Application-第一章筆記/book-cover.png" width="50%">
+<h1 id="introduction"><a class="markdownIt-Anchor" href="#introduction"></a> Introduction</h1>
+<p>現在的軟體基本上都不是 CPU Bound，而是 Data-Intensive 的，也就是大多數的瓶頸都在資料的量而不是計算的量。因此大多數的應用程式會依靠多種工具來滿足不同情境下的資料使用。</p>
+<p>例如一個後端可能會用到 MySQL、PostgreSQL 來儲存資料，用 Redis 來做快取，用 ElasticSearch 來做搜尋引擎，用 RabbitMQ、NATS 來做異步的消息傳輸。有各種工具可以滿足不同需求的資料使用方式，因此我們需要知道在設計不同需求的系統時，要如何挑選、使用這些技術與工具。下圖即是一種可能的系統架構：</p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/system.png" alt="" /></p>
+<p>本章節重點先放在三項設計系統時的要點：可靠性（Reliability）、可擴展性（Scalability）以及可維護性（Maintainability）。</p>
+<span id="more"></span>
+<h1 id="reliability"><a class="markdownIt-Anchor" href="#reliability"></a> Reliability</h1>
+<p>一個系統是可靠的，如果能夠功能正常的運作、容錯（Fault Tolerance）、有好的效率（Performance）以及可以避免被攻擊。</p>
+<p>這裡特別提到 fault 指的是系統背離原本預期的行為，而 failure 指的是整個系統因為錯誤而停止服務。因為任何的系統都不可能是完全不會有錯誤發生的，因此我們應該設計一個 fault tolerance 的系統來避免 failure 的發生。</p>
+<p>另外，作者提到可以透過故意的產生錯誤來檢查系統是否能夠應付這些錯誤，例如 Netflix 的 <a target="_blank" rel="noopener" href="https://github.com/Netflix/chaosmonkey">Chaos Monkey</a> 會隨機的關掉 VM 的容器，強迫工程師建立更能容錯的系統。這就是所謂的 Chaos Engineering。</p>
+<h2 id="hardware-faults"><a class="markdownIt-Anchor" href="#hardware-faults"></a> Hardware Faults</h2>
+<p>硬碟的 Mean Time to Failure(MTTF) 在 10 ~ 50 年之間，因此一個有 10000 個硬碟的叢集平均每天都會有一顆硬碟故障。</p>
+<p>避免硬碟故障導致的問題，可以使用 RAID 磁碟陣列。另外各種硬體都有可能發生錯誤，因此都需要有備援機制。</p>
+<blockquote>
+<p>不過筆者認為現在大多數公司都會直接採用雲端平台提供的各種服務與資源，因此這部分的問題應該可以大量避免了。不過 GCP/AWS 每年也都會有幾次的 System Outage，因此若是服務很重要的話，可能甚至要考慮跨雲的部署或是救援。</p>
+</blockquote>
+<h2 id="software-errors"><a class="markdownIt-Anchor" href="#software-errors"></a> Software Errors</h2>
+<p>軟體系統錯誤可能會導致其他系統也受到影響。雖然沒有 100% 能夠避免軟體錯誤的方法，但有很多小事情可以幫助改善，例如撰寫測試，從單元測試、整合測試到端對端測試；做監控以確定系統正常運作。</p>
+<h2 id="human-errors"><a class="markdownIt-Anchor" href="#human-errors"></a> Human Errors</h2>
+<p>人類是不可靠的，據調查系統大多數都是因為人為操作失誤而導致停止運作，而因為硬體錯誤而導致的錯誤只有 10–25%。</p>
+<p>要盡量避免人為操作錯誤，有幾項方式：</p>
+<ul>
+<li>定義良好的抽象層、APIs、管理者介面。</li>
+<li>提供一個跟非 production，但與 production 幾乎功能一致的環境。通常就是所謂的 staging server。</li>
+<li>撰寫完整的測試。</li>
+<li>有快速的方法可以恢復錯誤，例如 rollback changes。</li>
+<li>做 monitor 以及 metrics，monitor 可以幫助提早的發現錯誤，當錯誤發生時透過 metrics 來排查。</li>
+</ul>
+<h1 id="scalability"><a class="markdownIt-Anchor" href="#scalability"></a> Scalability</h1>
+<p>在思考如何應付大量的流量之前，應該先定義系統的流量。</p>
+<h2 id="describing-load"><a class="markdownIt-Anchor" href="#describing-load"></a> Describing Load</h2>
+<p>舉 Twitter 為例，若只有兩項功能：</p>
+<ol>
+<li>Post tweet：使用者可以發布 tweet，所有追蹤訂閱者都會收到通知。4.6k requests/sec at average, 12k requests/sec at peak。</li>
+<li>Home timeline：使用者可以檢視所有的追蹤者發布的 tweets。 300k requests/sec。</li>
+</ol>
+<p>有兩種不同方式可以做到 View home timeline 的功能：</p>
+<ol>
+<li>
+<p>使用 SQL Join</p>
+ <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> tweets.<span class="operator">*</span>, users.<span class="operator">*</span> <span class="keyword">FROM</span> tweets</span><br><span class="line"><span class="keyword">JOIN</span> users <span class="keyword">ON</span> tweets.sender_id <span class="operator">=</span> users.id</span><br><span class="line"><span class="keyword">JOIN</span> follows <span class="keyword">ON</span> follows.followee_id <span class="operator">=</span> users.id</span><br><span class="line"><span class="keyword">WHERE</span> follows.follower_id <span class="operator">=</span> <span class="built_in">current_user</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>對每一個使用者維護一個 Cache Queue，當 tweet 發出時，將訊息送到每個訂閱者的 Queue。</p>
+</li>
+</ol>
+<p>一開始 Twitter 採用的是方法 1，但是當使用者多起來時，每次的 view home timeline 都要做 SQL Join，造成過多的流量。</p>
+<p>因為使用者的平均追蹤者是 75 人，等於每次的推文平均需要 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>75</mn><mo>×</mo><mn>4.6</mn><mi>k</mi><mo>=</mo><mn>345</mn><mi>k</mi></mrow><annotation encoding="application/x-tex">75\times 4.6k=345k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">75</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">4.6</span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">345</span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span></span></span></span> 次的 cache writes，因為 post tweet 的流量是比 view home timeline 低許多的，因此 Twitter 改採用了方法 2，來降低 view home timeline 造成的 bottleneck。</p>
+<p>但是有些使用者有超過3千萬個追蹤者，因此每次他發布推文時需要3千萬次的 cache writes，可能會造成系統的負擔，因此最後 Twitter 採取了 Hybrid 的做法，對於過多追蹤者的用戶，他們的發推就不採用第二種做法。</p>
+<p>由這個例子就可以很輕易的知道，根據每個系統、每項功能的不同流量高低，都會有對應不一樣的設計方式。</p>
+<h2 id="describing-performance"><a class="markdownIt-Anchor" href="#describing-performance"></a> Describing Performance</h2>
+<p>可以用以下兩點來分析系統效能：</p>
+<ul>
+<li>當流量增加時，系統的效能會受到多少影響？</li>
+<li>當流量增加時，需要增加多少資源（CPU, Memory, Network bandwith）才能使的系統效能不變。</li>
+</ul>
+<p>通常評估的方式是 Response Time，從 client 發起請求到收到請求所經過的時間。</p>
+<p>通常不會看平均，因為平均無法代表使用者真正收到的延遲時間。通常會採用百分位數（Percentile），也就是將 response time 由低到高排序後某個百分點對應的數值。</p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">p_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 代表第k百分位數。</p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mn>50</mn></msub></mrow><annotation encoding="application/x-tex">p_{50}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">50</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 可以知道使用者通常等待的時間。</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mn>95</mn></msub><mo separator="true">,</mo><msub><mi>p</mi><mn>99</mn></msub><mo separator="true">,</mo><msub><mi>p</mi><mn>999</mn></msub></mrow><annotation encoding="application/x-tex">p_{95}, p_{99}, p_{999}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">95</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">99</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">999</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 也可以稱作 tail latency，是比較重要的觀察點，可以用來觀察大多數的使用者的等待時間。</li>
+</ul>
+<blockquote>
+<p>但也不是越多 9 就越好，因為每多一個 9 都會使得維運成本大幅增加。</p>
+</blockquote>
+<p>在測試時，要從 client 端計算 response time，並且 requests 要同時送出，才能達到真正的效果。</p>
+<h2 id="approaches-for-coping-with-load"><a class="markdownIt-Anchor" href="#approaches-for-coping-with-load"></a> Approaches for Coping with Load</h2>
+<p>在流量增加速度很快的服務下，必然可能會需要重構系統架構。</p>
+<p>不過在不動系統架構的前提下，通常有兩種方式可以 scale up：</p>
+<ol>
+<li>Vertical scaling：增加 CPU、增加 Memory，使用更好的機器。</li>
+<li>Horizontal scaling：將流量分散到多台 server 上。</li>
+</ol>
+<p>通常要 vertical scaling 是比較容易的，但是太高規格的機器是非常昂貴的，因此有一定流量的系統通常會無可避免的要做 horizontal scaling。將 stateless 的服務（Ex: front-end server）做 horizontal scaling 是很容易的，但是 stateful 的服務要變成 distributed system 就會衍生出很多問題，因此通常會採用 vertical scaling 直到價格無法應付。</p>
+<p>當然因應現在資訊爆炸，資料量越來越大的情形，現在也已經有很多 distributed system 的工具與解決方案了。這些都會在後面的書中後面的章節提到。</p>
+<h1 id="maintainability"><a class="markdownIt-Anchor" href="#maintainability"></a> Maintainability</h1>
+<p>沒有工程師會想要接手 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Legacy_system">legacy system</a>，因此，保持系統的可維護性也是很重要的。</p>
+<h2 id="operability-making-life-easy-for-operations"><a class="markdownIt-Anchor" href="#operability-making-life-easy-for-operations"></a> Operability: Making Life Easy for Operations</h2>
+<p>一個好的維運團隊應該要做到：</p>
+<ul>
+<li>監控系統的健康並且如果系統陣亡能快速的復原</li>
+<li>做錯誤的追蹤以及效能的追蹤，例如 request 在哪裡是 bottleneck</li>
+<li>系統安全性的修補</li>
+<li>建立部署、配置、管理方面的實踐方式與工具</li>
+</ul>
+<p>當然還有更多，這裡只提一些筆者認為比較重要的。</p>
+<h2 id="simplicity-managing-complexity"><a class="markdownIt-Anchor" href="#simplicity-managing-complexity"></a> Simplicity: Managing Complexity</h2>
+<p>可以利用抽象來簡化程式的複雜度。</p>
+<h2 id="evolvability-making-change-easy"><a class="markdownIt-Anchor" href="#evolvability-making-change-easy"></a> Evolvability: Making Change Easy</h2>
+<p>系統是不會永遠不變的。Aglie 敏捷開發方法即是採用一種擁抱改變的態度，其中還提出了例如 TDD（Test-Driven Design）與 Refactoring 的方法。</p>
+<h1 id="summary"><a class="markdownIt-Anchor" href="#summary"></a> Summary</h1>
+<p>設計系統時三個重要的觀點，可靠性（Reliability）、可擴展性（Scalability）以及可維護性（Maintainability）。</p>
+<ul>
+<li>Reliability：系統要可以容錯。</li>
+<li>Scalability：系統負載增加時也能保持性能。</li>
+<li>Maintainability：降低工程師與維運團隊工作的複雜度。</li>
+</ul>
+<blockquote>
+<p>最後，如果你喜歡這篇文章，或是文章對你有幫助的話，可以幫我按個喜歡、或是留言！你的支持就是我寫作的最大動力。有任何想問的問題也可以在底下留言喔～</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/" title="Designing Data-Intensive Application 第一章筆記">https://blog.justin0u0.com/Designing-Data-Intensive-Application-第一章筆記/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Notes/" rel="tag"># Notes</a>
+              <a href="/tags/DDIA/" rel="tag"># DDIA</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021-Dcard-Web-Backend-Intern-%E9%9D%A2%E8%A9%A6%E7%B6%93%E9%A9%97%E5%88%86%E4%BA%AB/" rel="prev" title="2021 Dcard Web Backend Intern 面試經驗分享">
+                  <i class="fa fa-angle-left"></i> 2021 Dcard Web Backend Intern 面試經驗分享
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/" rel="next" title="Designing Data-Intensive Application 第二章筆記">
+                  Designing Data-Intensive Application 第二章筆記 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">justin0u0</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/justin0u0" class="github-corner" title="在 GitHub 上關注我" aria-label="在 GitHub 上關注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"justin0u0","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

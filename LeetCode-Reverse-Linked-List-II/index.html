@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/icon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/icon16.png">
+  <link rel="mask-icon" href="/images/icon32.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;reverse-linked-list-ii&#x2F; 給一個 Linked list 以及兩個數字 left、right，將索引值在 left~right 的部分翻轉。 索引值從 1 開始。  範例說明  Example 1: 12Input: head &#x3D; [1,2,3,4,5], left &#x3D; 2, right &#x3D; 4Ou">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 92 - Reverse Linked List II">
+<meta property="og:url" content="https://blog.justin0u0.com/LeetCode-Reverse-Linked-List-II/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="題目 題目連結：https:&#x2F;&#x2F;leetcode.com&#x2F;problems&#x2F;reverse-linked-list-ii&#x2F; 給一個 Linked list 以及兩個數字 left、right，將索引值在 left~right 的部分翻轉。 索引值從 1 開始。  範例說明  Example 1: 12Input: head &#x3D; [1,2,3,4,5], left &#x3D; 2, right &#x3D; 4Ou">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/LeetCode-Reverse-Linked-List-II/rev2ex.jpg">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/LeetCode-Reverse-Linked-List-II/00.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/LeetCode-Reverse-Linked-List-II/01.png">
+<meta property="article:published_time" content="2021-03-01T17:55:08.000Z">
+<meta property="article:modified_time" content="2021-03-01T17:55:08.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="鏈結串列（Linked List）">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/LeetCode-Reverse-Linked-List-II/rev2ex.jpg">
+
+
+<link rel="canonical" href="https://blog.justin0u0.com/LeetCode-Reverse-Linked-List-II/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/LeetCode-Reverse-Linked-List-II/","path":"LeetCode-Reverse-Linked-List-II/","title":"LeetCode 92 - Reverse Linked List II"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LeetCode 92 - Reverse Linked List II | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Justin0u0's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-cv"><a href="/assets/CV/CV.pdf" rel="section"><i class="fa fa-user fa-fw"></i>履歷</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%8C%E7%9B%AE"><span class="nav-number">1.</span> <span class="nav-text"> 題目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B%E8%AA%AA%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text"> 範例說明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#example-1"><span class="nav-number">2.1.</span> <span class="nav-text"> Example 1:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#example-2"><span class="nav-number">2.2.</span> <span class="nav-text"> Example 2:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%83%B3%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text"> 想法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%A6%E4%BD%9C%E7%B4%B0%E7%AF%80"><span class="nav-number">4.</span> <span class="nav-text"> 實作細節</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="nav-number">5.</span> <span class="nav-text"> 程式碼</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/assets/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.linkedin.com/in/justin0u0" title="LinkedIn → https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/LeetCode-Reverse-Linked-List-II/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LeetCode 92 - Reverse Linked List II | Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode 92 - Reverse Linked List II
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2021-03-02 01:55:08" itemprop="dateCreated datePublished" datetime="2021-03-02T01:55:08+08:00">2021-03-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/LeetCode-Reverse-Linked-List-II/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="LeetCode-Reverse-Linked-List-II/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="題目"><a class="markdownIt-Anchor" href="#題目"></a> 題目</h1>
+<p>題目連結：<a target="_blank" rel="noopener" href="https://leetcode.com/problems/reverse-linked-list-ii/">https://leetcode.com/problems/reverse-linked-list-ii/</a></p>
+<p>給一個 Linked list 以及兩個數字 <code>left</code>、<code>right</code>，將索引值在 <code>left~right</code> 的部分翻轉。</p>
+<p>索引值從 1 開始。</p>
+<h1 id="範例說明"><a class="markdownIt-Anchor" href="#範例說明"></a> 範例說明</h1>
+<h2 id="example-1"><a class="markdownIt-Anchor" href="#example-1"></a> Example 1:</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: head = [1,2,3,4,5], left = 2, right = 4</span><br><span class="line">Output: [1,4,3,2,5]</span><br></pre></td></tr></table></figure>
+<p><img data-src="/assets/LeetCode-Reverse-Linked-List-II/rev2ex.jpg" alt="" /></p>
+<span id="more"></span>
+<h2 id="example-2"><a class="markdownIt-Anchor" href="#example-2"></a> Example 2:</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Input: head = [5], left = 1, right = 1</span><br><span class="line">Output: [5]</span><br></pre></td></tr></table></figure>
+<h1 id="想法"><a class="markdownIt-Anchor" href="#想法"></a> 想法</h1>
+<p>假設索引 <code>left</code> 上的數字為 <code>cur</code>，且索引 <code>left - 1</code> 上的數字為 <code>pre</code>。</p>
+<p>若想要遍歷一次，並且使用 <code>O(1)</code> space 完成翻轉，可以想成是做 <code>right - left</code> 次的「<strong>將 <code>cur</code> 的下一個數字移除並插入到 <code>pre</code> 之後</strong>」。</p>
+<p>例如 Example 1：</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Linked list</th>
+<th><code>cur</code> index</th>
+<th><code>pre</code> index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><code>1-&gt;2-&gt;3-&gt;4-&gt;5</code></td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>1-&gt;3-&gt;2-&gt;4-&gt;5</code></td>
+<td>3</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>1-&gt;4-&gt;3-&gt;2-&gt;5</code></td>
+<td>4</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>注意 <code>cur</code> 會一直指著同一個數字，在 Example 1 中也就是數字 <code>2</code>；<code>pre</code> 也會一直指著同一個數字，在 Example 1 中也就是數字 1。</p>
+<h1 id="實作細節"><a class="markdownIt-Anchor" href="#實作細節"></a> 實作細節</h1>
+<p>首先，可以將上述想法分為兩個步驟實作：</p>
+<ol>
+<li>
+<p>找到 <code>pre</code> 以及 <code>cur</code> 的位置<br />
+從上表可以看出，<code>cur</code> 的在 <code>head</code> 向後移動 <code>left - 1</code> 次的位置；<code>pre</code> 在 <code>cur</code> 的前一個，也就是 <code>head</code> 向後移動 <code>left - 2</code> 次的位置。</p>
+</li>
+<li>
+<p>執行 <code>right - left</code> 次「<strong>將 <code>cur</code> 的下一個數字移除並插入到 <code>pre</code> 之後</strong>」<br />
+<strong><font color="red">在實作 Linked list 的操作的時候，筆者建議可以把圖畫出來，憑空想像是很容易出錯的！</font></strong></p>
+<p>一樣以 Example 1 為例子：<br />
+<img data-src="/assets/LeetCode-Reverse-Linked-List-II/00.png" alt="" /></p>
+<ol>
+<li>首先筆者會先把 <code>pre</code>、<code>cur</code> 的位置標出來，並且將 <code>pre-&gt;next</code>、<code>cur-&gt;next</code> 等指標的位置也標出來。</li>
+<li>再來，執行「<strong>將 <code>cur</code> 的下一個數字移除並插入到 <code>pre</code> 之後</strong>」這個操作，將要改變的指標畫成曲線。</li>
+<li>最後，將曲線標出如何賦値，例如：
+<ul>
+<li><font color="green">數字 1 的下一個數字應該應該要接數字 3，數字 1 是 <code>pre</code>，<code>pre</code> 的下一個數字也就是 <code>pre-&gt;next</code> 要接到數字 3，也就是 <code>cur-&gt;next</code>，因此 <code>pre-&gt;next = cur-&gt;next</code>。</font></li>
+<li><font color="blue">數字 2 的下一個數字要接到數字 4，數字 2 是 <code>cur</code>，<code>cur</code> 的下一個數字也就是 <code>cur-&gt;next</code> 要接到數字 4，也就是 <code>cur-&gt;next-&gt;next</code>，因此 <code>cur-&gt;next = cur-&gt;next-&gt;next</code>。</font></li>
+<li><font color="red">數字 3 的下一個數字要接到數字 2，數字 3 是 <code>cur-&gt;next</code>，<code>cur-&gt;next</code> 的下一個數字也就是 <code>cur-&gt;next-&gt;next</code> 要接到數字 2，也就是 <code>pre-&gt;next</code>，因此 <code>cur-&gt;next-&gt;next = pre-&gt;next</code>。</font></li>
+</ul>
+</li>
+</ol>
+<p>如果不放心，可以再做一次 Step 1 到 Step 2 的過程，會得到相同的三個步驟。<br />
+<img data-src="/assets/LeetCode-Reverse-Linked-List-II/01.png" alt="" /></p>
+</li>
+</ol>
+<p>最後，眼尖的讀者可能已經發現了兩個問題：</p>
+<ol>
+<li>
+<p>在第一點中，<code>pre</code> 的位置是 <code>head</code> 向後移動 <code>left - 2</code> 次的位置，可是 <code>left</code> 的最小值是 <code>1</code>，也就是 <code>left - 2</code> 是 <code>-1</code>，那 <code>head</code> 向後移動 <code>-1</code> 步是哪裡？<br />
+為了解決這個問題，可以在整個 Linked list 的前面多加一個點（Dummy Node），也就是在 <code>head</code> 的前面再放一個新的點，Dummy Node 雖然實際上不存在，但是可以幫助你的實作更佳簡潔。<br />
+有了 Dummy node 的幫助，那麼 <code>pre</code> 的位置即改為 dummy node 往後移動 <code>left - 1</code> 不的位置，就一定存在了！當然 <code>cur</code> 也要改為 dummy node 往後移動 <code>left</code> 步的位置。</p>
+</li>
+<li>
+<p>在第二點中，三個修改 <code>1. pre-&gt;next = cur-&gt;next</code>、<code>2. cur-&gt;next = cur-&gt;next-&gt;next</code> 以及 <code>3. cur-&gt;next-&gt;next = pre-&gt;next</code> 是有順序性的。<br />
+例如： <code>1.</code> 應該要在 <code>3.</code> 之後，因為 <code>3.</code> 會需要原本 <code>pre-&gt;next</code> 的值，可是在 <code>1.</code> 的時候會修改到 <code>pre-&gt;next</code> 的值。<br />
+遇到這種情況，比較簡單的辦法就是<strong>先把需要的值都備份一遍，最後更改時從等號左側值比較右邊的開始修改，等號右側都使用備份的指標</strong>。因為等號右側所用到的值都是備份的，右側一定不會出錯，而等號左側的值從最右邊開始照順序更改，因此也不會有依附關係，如此一來就不會出錯了～</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ListNode* tempCurNext = cur-&gt;next;</span><br><span class="line">ListNode* tempCurNextNext = cur-&gt;next-&gt;next;</span><br><span class="line">ListNode* tempPreNext = pre-&gt;next;</span><br><span class="line">cur-&gt;next-&gt;next = tempPreNext;</span><br><span class="line">cur-&gt;next = tempCurNextNext;</span><br><span class="line">pre-&gt;next = tempCurNext;</span><br></pre></td></tr></table></figure>
+<p>當然，也可以稍微思考一下順序，再用盡量少的變數來幫助即可（可以把先後關係畫成一張圖再決定先後順序，如果有環出現的話就至少需要一個暫存變數）。</p>
+</li>
+</ol>
+<h1 id="程式碼"><a class="markdownIt-Anchor" href="#程式碼"></a> 程式碼</h1>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Author: justin0u0&lt;mail@justin0u0.com&gt;</span></span><br><span class="line"><span class="comment"> * Problem: https://leetcode.com/problems/reverse-linked-list-ii/submissions/</span></span><br><span class="line"><span class="comment"> * Runtime: 0ms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for singly-linked list.</span></span><br><span class="line"><span class="comment"> * struct ListNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     ListNode *next;</span></span><br><span class="line"><span class="comment"> *     ListNode() : val(0), next(nullptr) &#123;&#125;</span></span><br><span class="line"><span class="comment"> *     ListNode(int x) : val(x), next(nullptr) &#123;&#125;</span></span><br><span class="line"><span class="comment"> *     ListNode(int x, ListNode *next) : val(x), next(next) &#123;&#125;</span></span><br><span class="line"><span class="comment"> * &#125;;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function">ListNode* <span class="title">reverseBetween</span><span class="params">(ListNode* head, <span class="type">int</span> left, <span class="type">int</span> right)</span> </span>&#123;</span><br><span class="line">    ListNode* preHead = <span class="keyword">new</span> <span class="built_in">ListNode</span>(<span class="number">0</span>, head); <span class="comment">// Dummy node</span></span><br><span class="line">    ListNode* pre = preHead;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; left - <span class="number">1</span>; i++) &#123;</span><br><span class="line">      pre = pre-&gt;next;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ListNode* cur = pre-&gt;next;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = left; i &lt; right; i++) &#123;</span><br><span class="line">      ListNode* temp = cur-&gt;next-&gt;next;</span><br><span class="line">      cur-&gt;next-&gt;next = pre-&gt;next;</span><br><span class="line">      pre-&gt;next = cur-&gt;next;</span><br><span class="line">      cur-&gt;next = temp;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> preHead-&gt;next;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/LeetCode-Reverse-Linked-List-II/" title="LeetCode 92 - Reverse Linked List II">https://blog.justin0u0.com/LeetCode-Reverse-Linked-List-II/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/%E9%8F%88%E7%B5%90%E4%B8%B2%E5%88%97%EF%BC%88Linked-List%EF%BC%89/" rel="tag"># 鏈結串列（Linked List）</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/LeetCode-Intersection-of-Two-Linked-Lists/" rel="prev" title="LeetCode 160 - Intersection of Two Linked Lists">
+                  <i class="fa fa-angle-left"></i> LeetCode 160 - Intersection of Two Linked Lists
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/LeetCode-Remove-K-Digits/" rel="next" title="LeetCode 402 - Remove K Digits">
+                  LeetCode 402 - Remove K Digits <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">justin0u0</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/justin0u0" class="github-corner" title="在 GitHub 上關注我" aria-label="在 GitHub 上關注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"justin0u0","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

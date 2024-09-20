@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/icon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/icon16.png">
+  <link rel="mask-icon" href="/images/icon32.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="零、前言 本篇文章將使用 Go-Micro 這個 Golang Microservice Framework 來建置一個最基礎的微服務。並部署一個簡單的 HTTP API Server 來作為驗證。 這裡有一個筆者當初一直被混淆的部分：   Go-Micro https:&#x2F;&#x2F;github.com&#x2F;micro&#x2F;go-micro 是 Go microservices development fram">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go-Micro 手把手從開發到部署（上）">
+<meta property="og:url" content="https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="零、前言 本篇文章將使用 Go-Micro 這個 Golang Microservice Framework 來建置一個最基礎的微服務。並部署一個簡單的 HTTP API Server 來作為驗證。 這裡有一個筆者當初一直被混淆的部分：   Go-Micro https:&#x2F;&#x2F;github.com&#x2F;micro&#x2F;go-micro 是 Go microservices development fram">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/go-micro.png">
+<meta property="article:published_time" content="2020-10-06T14:36:52.000Z">
+<meta property="article:modified_time" content="2020-10-06T14:36:52.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="Go-Micro">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/go-micro.png">
+
+
+<link rel="canonical" href="https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/","path":"Go-Micro-手把手從開發到部署（上）/","title":"Go-Micro 手把手從開發到部署（上）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go-Micro 手把手從開發到部署（上） | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Justin0u0's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-cv"><a href="/assets/CV/CV.pdf" rel="section"><i class="fa fa-user fa-fw"></i>履歷</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9B%B6-%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text"> 零、前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80-%E7%92%B0%E5%A2%83%E5%BB%BA%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text"> 一、環境建置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%92%B0%E5%A2%83%E4%BB%8B%E7%B4%B9"><span class="nav-number">2.1.</span> <span class="nav-text"> 環境介紹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D"><span class="nav-number">2.2.</span> <span class="nav-text"> 安裝</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#go"><span class="nav-number">2.2.1.</span> <span class="nav-text"> Go</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker"><span class="nav-number">2.2.2.</span> <span class="nav-text"> Docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-compose"><span class="nav-number">2.2.3.</span> <span class="nav-text"> Docker-compose</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#protobuf"><span class="nav-number">2.2.4.</span> <span class="nav-text"> Protobuf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kubernetesminikube"><span class="nav-number">2.2.5.</span> <span class="nav-text"> Kubernetes&#x2F;Minikube</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C-%E5%BE%AE%E6%9C%8D%E5%8B%99%E7%9A%84%E6%A7%8B%E5%BB%BA-proto-%E6%96%87%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text"> 二、微服務的構建－Proto 文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%96%8B%E5%95%9F%E6%96%B0%E7%9A%84-project"><span class="nav-number">3.1.</span> <span class="nav-text"> 開啟新的 Project</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90-proto-%E6%96%87%E4%BB%B6"><span class="nav-number">3.2.</span> <span class="nav-text"> 生成 Proto 文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90-go-go-micro-%E6%96%87%E4%BB%B6"><span class="nav-number">3.3.</span> <span class="nav-text"> 生成 Go, Go-Micro 文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89-%E5%BE%AE%E6%9C%8D%E5%8B%99%E7%9A%84%E6%A7%8B%E5%BB%BA-go-micro-server"><span class="nav-number">4.</span> <span class="nav-text"> 三、微服務的構建－Go-Micro Server</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#go-micro-%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%B4%B9"><span class="nav-number">4.1.</span> <span class="nav-text"> Go-Micro 的基本介紹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%92%B0%E5%AF%AB-go-micro-%E6%9C%8D%E5%8B%99"><span class="nav-number">4.2.</span> <span class="nav-text"> 撰寫 Go-Micro 服務</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%8B%E8%A1%8C%E6%9C%8D%E5%8B%99"><span class="nav-number">4.3.</span> <span class="nav-text"> 運行服務</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B-%E5%BE%AE%E6%9C%8D%E5%8B%99%E7%9A%84%E6%A7%8B%E5%BB%BA-go-micro-client"><span class="nav-number">5.</span> <span class="nav-text"> 四、微服務的構建－Go-Micro Client</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%96%8B%E5%95%9F%E6%96%B0%E7%9A%84%E8%B3%87%E6%96%99%E5%A4%BE"><span class="nav-number">5.1.</span> <span class="nav-text"> 開啟新的資料夾</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%96%8B%E5%A7%8B%E6%92%B0%E5%AF%AB-api"><span class="nav-number">5.2.</span> <span class="nav-text"> 開始撰寫 API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%8B%E8%A1%8C%E6%9C%8D%E5%8B%99-2"><span class="nav-number">5.3.</span> <span class="nav-text"> 運行服務</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/assets/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.linkedin.com/in/justin0u0" title="LinkedIn → https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Go-Micro 手把手從開發到部署（上） | Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go-Micro 手把手從開發到部署（上）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2020-10-06 22:36:52" itemprop="dateCreated datePublished" datetime="2020-10-06T22:36:52+08:00">2020-10-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Go-Micro/" itemprop="url" rel="index"><span itemprop="name">Go-Micro</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="Go-Micro-手把手從開發到部署（上）/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="零-前言"><a class="markdownIt-Anchor" href="#零-前言"></a> 零、前言</h1>
+<p>本篇文章將使用 Go-Micro 這個 Golang Microservice Framework 來建置一個最基礎的微服務。並部署一個簡單的 HTTP API Server 來作為驗證。</p>
+<p>這裡有一個筆者當初一直被混淆的部分：</p>
+<ul>
+<li>
+<p>Go-Micro</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/micro/go-micro">https://github.com/micro/go-micro</a></p>
+<p>是 Go microservices development framework，用來開發微服務，提供 Authentication, Service Discovery, Message Encoding… 微服務所需的功能。而且基本上所有的組件都是可以抽換的。非常方便。</p>
+</li>
+<li>
+<p>Micro</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/micro/micro">https://github.com/micro/micro</a></p>
+<p>是一個 CLI。不是必要的套件，但是可以快速的生成模板、運行服務、查看服務，micro 是基於 go-micro 開發的，但此篇文章中不會使用到。</p>
+</li>
+</ul>
+<p>另外，筆者之開發環境為 MacOS 10.15.7。</p>
+<p>本篇文章的所有程式碼都放在 Github 上：<a target="_blank" rel="noopener" href="https://github.com/justin0u0/go-micro-demo">https://github.com/justin0u0/go-micro-demo</a></p>
+<p>下一篇文章：<a href="/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89">Go-Micro-手把手從開發到部署（下）</a></p>
+<span id="more"></span>
+<hr />
+<h1 id="一-環境建置"><a class="markdownIt-Anchor" href="#一-環境建置"></a> 一、環境建置</h1>
+<h2 id="環境介紹"><a class="markdownIt-Anchor" href="#環境介紹"></a> 環境介紹</h2>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">### Language</span></span><br><span class="line"><span class="bullet">-</span> golang v1.14</span><br><span class="line"><span class="bullet">  -</span> Gin v.1.6.3</span><br><span class="line"><span class="bullet">  -</span> Go-micro v2.9.1</span><br><span class="line"></span><br><span class="line"><span class="section">### Container Orchestration</span></span><br><span class="line"><span class="bullet">-</span> docker v19.03.13</span><br><span class="line"><span class="bullet">-</span> docker-compose v1.27.4</span><br><span class="line"><span class="bullet">-</span> kubernetes v1.18.3</span><br><span class="line"><span class="bullet">-</span> minikube v1.12.3</span><br><span class="line"></span><br><span class="line"><span class="section">### Communication Protocal</span></span><br><span class="line"><span class="bullet">-</span> Protobuf v3.13.0</span><br><span class="line"></span><br><span class="line"><span class="section">### Registry</span></span><br><span class="line"><span class="bullet">-</span> etcd </span><br></pre></td></tr></table></figure>
+<h2 id="安裝"><a class="markdownIt-Anchor" href="#安裝"></a> 安裝</h2>
+<h3 id="go"><a class="markdownIt-Anchor" href="#go"></a> Go</h3>
+<p><a target="_blank" rel="noopener" href="https://golang.org/doc/install">Download and install</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># macOS</span></span><br><span class="line">brew install go</span><br><span class="line"></span><br><span class="line">go version</span><br><span class="line"><span class="comment"># go version go1.14.6 darwin/amd64</span></span><br></pre></td></tr></table></figure>
+<h3 id="docker"><a class="markdownIt-Anchor" href="#docker"></a> Docker</h3>
+<p>用來打包完成的微服務。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.docker.com/docker-for-mac/install/">Install Docker Desktop on Mac</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">docker version</span><br><span class="line"></span><br><span class="line">Client: Docker Engine - Community</span><br><span class="line"> Cloud integration  0.1.18</span><br><span class="line"> Version:           19.03.13</span><br><span class="line"> API version:       1.40</span><br><span class="line"> Go version:        go1.13.15</span><br><span class="line"> Git commit:        4484c46d9d</span><br><span class="line"> Built:             Wed Sep 16 16:58:31 2020</span><br><span class="line"> OS/Arch:           darwin/amd64</span><br><span class="line"> Experimental:      <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">Server: Docker Engine - Community</span><br><span class="line"> Engine:</span><br><span class="line">  Version:          19.03.13</span><br><span class="line">  API version:      1.40 (minimum version 1.12)</span><br><span class="line">  Go version:       go1.13.15</span><br><span class="line">  Git commit:       4484c46d9d</span><br><span class="line">  Built:            Wed Sep 16 17:07:04 2020</span><br><span class="line">  OS/Arch:          linux/amd64</span><br><span class="line">  Experimental:     <span class="literal">false</span></span><br><span class="line"> containerd:</span><br><span class="line">  Version:          v1.3.7</span><br><span class="line">  GitCommit:        8fba4e9a7d01810a393d5d25a3621dc101981175</span><br><span class="line"> runc:</span><br><span class="line">  Version:          1.0.0-rc10</span><br><span class="line">  GitCommit:        dc9208a3303feef5b3839f4323d9beb36df0a9dd</span><br><span class="line"> docker-init:</span><br><span class="line">  Version:          0.18.0</span><br><span class="line">  GitCommit:        fec3683</span><br></pre></td></tr></table></figure>
+<h3 id="docker-compose"><a class="markdownIt-Anchor" href="#docker-compose"></a> Docker-compose</h3>
+<p>在 MacOS 上只要安裝完 Docker Desktop for Mac，就會自帶 <code>docker-compose</code> 指令。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.docker.com/compose/install/">Install Docker Compose</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker-compose version</span><br><span class="line"></span><br><span class="line">docker-compose version 1.27.4, build 40524192</span><br><span class="line">docker-py version: 4.3.1</span><br><span class="line">CPython version: 3.7.7</span><br><span class="line">OpenSSL version: OpenSSL 1.1.1g  21 Apr 2020</span><br></pre></td></tr></table></figure>
+<h3 id="protobuf"><a class="markdownIt-Anchor" href="#protobuf"></a> Protobuf</h3>
+<p>Go-Micro 支持 http, tcp, grpc 通訊協議；支持 json, protobuf, bytes 等編碼方式。</p>
+<p>其預設的通訊協議為 http，編碼方式為 protobuf。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/protocolbuffers/protobuf/releases">Releases · protocolbuffers/protobuf</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># macOS</span></span><br><span class="line">brew install protobuf</span><br><span class="line"></span><br><span class="line">protoc --version</span><br><span class="line"><span class="comment"># libprotoc 3.13.0</span></span><br></pre></td></tr></table></figure>
+<h3 id="kubernetesminikube"><a class="markdownIt-Anchor" href="#kubernetesminikube"></a> Kubernetes/Minikube</h3>
+<p>在本地上起一個 Kubernetes 的環境其中一個方式就是安裝 Minikube。</p>
+<p><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/tasks/tools/install-minikube/">Install Minikube</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># macOS</span></span><br><span class="line">brew install minikube</span><br></pre></td></tr></table></figure>
+<hr />
+<h1 id="二-微服務的構建-proto-文件"><a class="markdownIt-Anchor" href="#二-微服務的構建-proto-文件"></a> 二、微服務的構建－Proto 文件</h1>
+<p>我們首先想要完成一個最簡單的 Greeter 服務。</p>
+<p>Greeter 服務需要給其一個 Name，之後 Greeter 會回應 <code>Hello, &#123;Name&#125;</code>。</p>
+<p>在 Go-Micro 中，你需要先定義好 Request, Response 的 Interface，所以我們首先要編寫 Proto 文件。</p>
+<h2 id="開啟新的-project"><a class="markdownIt-Anchor" href="#開啟新的-project"></a> 開啟新的 Project</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> go-micro-demo &amp;&amp; <span class="built_in">cd</span> go-micro-demo</span><br><span class="line"><span class="built_in">mkdir</span> greeter-service &amp;&amp; <span class="built_in">cd</span> greeter-service</span><br><span class="line"><span class="built_in">export</span> GO111MODULE=<span class="string">&quot;on&quot;</span></span><br><span class="line">go mod init greeter-service</span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> proto &amp;&amp; vim proto/greeter.proto</span><br></pre></td></tr></table></figure>
+<h2 id="生成-proto-文件"><a class="markdownIt-Anchor" href="#生成-proto-文件"></a> 生成 Proto 文件</h2>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// greeter-service/proto/greeter.proto</span></span><br><span class="line"></span><br><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> greeter;</span><br><span class="line">option go_package = <span class="string">&quot;proto;greeter&quot;</span>;</span><br><span class="line"></span><br><span class="line">service Greeter &#123;</span><br><span class="line">  <span class="comment">// 定義 API Interface，Greet 為此 API 的 Name，</span></span><br><span class="line">  <span class="comment">// 代表 給 Greet API Request 當參數，並返回 Response</span></span><br><span class="line">  rpc Greet(Request) returns (Response) &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Request 需要攜帶 type 為 string 的參數 name</span></span><br><span class="line">message Request &#123;</span><br><span class="line">  <span class="type">string</span> name = <span class="number">1</span>; <span class="comment">// 數字不重複即可</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Response 會返回 type 為 string 的參數 greeting</span></span><br><span class="line">message Response &#123;</span><br><span class="line">  <span class="type">string</span> greeting = <span class="number">2</span>; <span class="comment">// 數字不重複即可</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完成後，檔案目錄應該如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">└── greeter-service</span><br><span class="line">    ├── go.mod</span><br><span class="line">    └── proto</span><br><span class="line">        └── greeter.proto</span><br></pre></td></tr></table></figure>
+<h2 id="生成-go-go-micro-文件"><a class="markdownIt-Anchor" href="#生成-go-go-micro-文件"></a> 生成 Go, Go-Micro 文件</h2>
+<p>完成 Proto 檔案之後，我們需要 protobuf 幫我們生成需要的 go 文件以及 go-micro 文件。所以我們需要安裝 <code>protoc-gen-go</code> 以及 <code>protoc-gen-micro</code>。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> get -u github.com/golang/protobuf/protoc-gen-<span class="keyword">go</span></span><br><span class="line"><span class="keyword">go</span> get github.com/micro/micro/v2/cmd/protoc-gen-micro@master</span><br></pre></td></tr></table></figure>
+<p>Golang 會把指令下載在 <code>$GOPATH/bin</code> 之下，因此我們需要將 <code>$GOPATH/bin</code> 設定在 <code>$PATH</code> 之下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PATH</span>:<span class="subst">$(go env GOPATH)</span>/bin&quot;</span></span><br></pre></td></tr></table></figure>
+<p>完成後，我們即可以利用 Protobuf 幫我們生成需要的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># go_out file 會生成在 go_out/proto</span></span><br><span class="line"><span class="comment"># micro_out file 會生成在 micro_out/proto</span></span><br><span class="line">protoc -I . --go_out=. --micro_out=. ./proto/greeter.proto</span><br></pre></td></tr></table></figure>
+<p>完成後，可以看到 <code>protoc</code> 幫我們生成的兩個 Go File。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── go.mod</span><br><span class="line">└── proto</span><br><span class="line">    ├── greeter.pb.go</span><br><span class="line">    ├── greeter.pb.micro.go</span><br><span class="line">    └── greeter.proto</span><br></pre></td></tr></table></figure>
+<p>進到 <code>greeter.pb.micro.go</code> 檔案，可以看到兩段註解：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Client API for Greeter service</span></span><br><span class="line"><span class="comment">// Server API for Greeter service</span></span><br></pre></td></tr></table></figure>
+<p>我們需要實作的 Interface 即是定義在這邊。</p>
+<hr />
+<h1 id="三-微服務的構建-go-micro-server"><a class="markdownIt-Anchor" href="#三-微服務的構建-go-micro-server"></a> 三、微服務的構建－Go-Micro Server</h1>
+<h2 id="go-micro-的基本介紹"><a class="markdownIt-Anchor" href="#go-micro-的基本介紹"></a> Go-Micro 的基本介紹</h2>
+<p>有了上一段文章生成的 Go, Go-Micro 文件，我們可以開始編寫 Go-Micro Service。</p>
+<p>首先來認識 Go-Micro 這個框架：</p>
+<p><img data-src="/assets/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/go-micro.png" alt="" /></p>
+<ul>
+<li>Server：用於接收請求，Server 會向註冊中心(Registry)註冊自己。</li>
+<li>Client：用於發送請求，Client 會向註冊中心尋找已經註冊的服務。</li>
+<li>Registry：註冊中心。用於服務發現。Go-Micro 現在預設的註冊中心為 mdns，但是你可以很方便的改變你的註冊中心。可以使用的註冊中心有 Consul, Etcd, Kubernetes, ZooKeeper…。本文所用的註冊中心即為 Etcd。</li>
+<li>Codec：負責處理傳輸的編碼解碼。預設為 Protobuf，但也支援 JSON, BSON 等等。</li>
+<li>Transport：負責處理服務與服務之間的同步/響應傳輸。預設為 HTTP，支援 RabbitMQ, WebSockets, NATS…</li>
+<li>Broker：負責處理服務的消息發送、訂閱。</li>
+<li>Selector：負責在註冊中心中挑選一個適合的服務進行調用。</li>
+</ul>
+<h2 id="撰寫-go-micro-服務"><a class="markdownIt-Anchor" href="#撰寫-go-micro-服務"></a> 撰寫 Go-Micro 服務</h2>
+<p>繼續上一篇的步驟，我們開始撰寫 Go-Micro 的第一個微服務。</p>
+<p>創建一個 <code>main.go</code>，如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">└── greeter-service</span><br><span class="line">    ├── go.mod</span><br><span class="line">    ├── go.sum</span><br><span class="line">    ├── main.go <span class="comment"># 入口文件</span></span><br><span class="line">    └── proto</span><br><span class="line">        ├── greeter.pb.go</span><br><span class="line">        ├── greeter.pb.micro.go</span><br><span class="line">        └── greeter.proto</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">  <span class="string">&quot;github.com/micro/go-micro/v2&quot;</span></span><br><span class="line">  <span class="string">&quot;context&quot;</span></span><br><span class="line">  <span class="string">&quot;greeter-service/proto&quot;</span> <span class="comment">// replace greeter-service if you didn&#x27;t name greeter-service when go mod init</span></span><br><span class="line">  <span class="string">&quot;log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// GreeterService ...</span></span><br><span class="line"><span class="keyword">type</span> GreeterService <span class="keyword">struct</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Greet ... Implement interface left in proto/greeter.pb.micro.go server part</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(g *GreeterService)</span></span> Greet(ctx context.Context, req *greeter.Request, res *greeter.Response) <span class="type">error</span> &#123;</span><br><span class="line">  log.Println(<span class="string">&quot;Greeter service handle Greet&quot;</span>, req.Name)</span><br><span class="line">  res.Greeting = <span class="string">&quot;Hello, &quot;</span> + req.Name</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  service := micro.NewService(</span><br><span class="line">    micro.Name(<span class="string">&quot;micro.service.greeter&quot;</span>), <span class="comment">// The service name to register in the registry</span></span><br><span class="line">  )</span><br><span class="line"></span><br><span class="line">  service.Init()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// The &#x27;RegisterGreeterHandler&#x27; is implement in the proto/greeter.pb.micro.go file</span></span><br><span class="line">  greeter.RegisterGreeterHandler(service.Server(), &amp;GreeterService&#123;&#125;)</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">if</span> err := service.Run(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Print(err.Error())</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="運行服務"><a class="markdownIt-Anchor" href="#運行服務"></a> 運行服務</h2>
+<p>完成後，我們試著運行 Greeter Service：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> greeter-service</span><br><span class="line">go run .</span><br></pre></td></tr></table></figure>
+<p>結果發生錯誤：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># github.com/coreos/etcd/clientv3/balancer/resolver/endpoint</span></span><br><span class="line">/Users/justin/go/pkg/mod/github.com/coreos/etcd@v3.3.18+incompatible/clientv3/balancer/resolver/endpoint/endpoint.go:114:78: undefined: resolver.BuildOption</span><br><span class="line">/Users/justin/go/pkg/mod/github.com/coreos/etcd@v3.3.18+incompatible/clientv3/balancer/resolver/endpoint/endpoint.go:182:31: undefined: resolver.ResolveNowOption</span><br><span class="line"><span class="comment"># github.com/coreos/etcd/clientv3/balancer/picker</span></span><br><span class="line">/Users/justin/go/pkg/mod/github.com/coreos/etcd@v3.3.18+incompatible/clientv3/balancer/picker/err.go:37:44: undefined: balancer.PickOptions</span><br><span class="line">/Users/justin/go/pkg/mod/github.com/coreos/etcd@v3.3.18+incompatible/clientv3/balancer/picker/roundrobin_balanced.go:55:54: undefined: balancer.PickOptions</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://github.com/etcd-io/etcd/issues/11563#issuecomment-580196860">似乎是 grpc 版本問題</a>，我們在 <code>go.mod</code> 加上下面這行：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">replace google.golang.org/grpc =&gt; google.golang.org/grpc v1<span class="number">.26</span><span class="number">.0</span></span><br></pre></td></tr></table></figure>
+<p>再執行一次：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">go run .</span><br><span class="line"></span><br><span class="line">2020-10-06 15:52:23  file=v2@v2.9.1-0.20200723075038-fbdf1f2c1c4c/service.go:211 level=info Starting [service] micro.service.greeter</span><br><span class="line">2020-10-06 15:52:23  file=grpc/grpc.go:887 level=info Server [grpc] Listening on [::]:57713</span><br><span class="line">2020-10-06 15:52:23  file=grpc/grpc.go:718 level=info Registry [mdns] Registering node: micro.service.greeter-8990d2fe-d477-4e61-a5b3-152d846cb488</span><br></pre></td></tr></table></figure>
+<p>可以看到這時候 Server 已經運行在 57713 這個 Port（而你的不一定會在 57713），也可以看到此 Server 被 register 到預設的 registry mdns 之中。但是由於是 RPC Server，所以還沒有辦法使用類似 Postman 的方式進行簡單的測試。</p>
+<p>下一段文中，我們會寫一個 Client 來對此 Server 進行測試。</p>
+<hr />
+<h1 id="四-微服務的構建-go-micro-client"><a class="markdownIt-Anchor" href="#四-微服務的構建-go-micro-client"></a> 四、微服務的構建－Go-Micro Client</h1>
+<p>上一段文章中，我們利用了 Protobuf 所產生出來的 Go, Go-Micro 文件成功起起了一個 RPC Server。</p>
+<p>本篇文章中，我們會利用 Gin 框架，完成我們的 API Server，也就是微服務的內部溝通使用 RPC，而對外使用 HTTP。</p>
+<h2 id="開啟新的資料夾"><a class="markdownIt-Anchor" href="#開啟新的資料夾"></a> 開啟新的資料夾</h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/gin-gonic/gin">https://github.com/gin-gonic/gin</a></p>
+<p>我們想要當 HTTP 對 <code>/greeter</code> 發起 GET Request，並攜帶 <code>name</code> 為參數時，返回一個 JSON 格式的 Response。</p>
+<p>首先，最後部署的時候 Server 與 Client 會分別在兩個 Container/Pod 裡面，因此我們先開一個新的資料夾，並將 <code>greeter-service</code> 中的 <code>proto</code> 資料夾複製到 Client 中。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> greeter-api &amp;&amp; <span class="built_in">cd</span> greeter-api</span><br><span class="line"><span class="built_in">export</span> GO111MODULE=<span class="string">&quot;on&quot;</span></span><br><span class="line">go mod init greeter-api</span><br><span class="line"><span class="built_in">cp</span> -r ../greeter-service/proto .</span><br></pre></td></tr></table></figure>
+<p>完成後目錄結構應該為下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── greeter-api</span><br><span class="line">│   ├── go.mod</span><br><span class="line">│   └── proto</span><br><span class="line">│       ├── greeter.pb.go</span><br><span class="line">│       ├── greeter.pb.micro.go</span><br><span class="line">│       └── greeter.proto</span><br><span class="line">└── greeter-service</span><br><span class="line">    ├── go.mod</span><br><span class="line">    ├── go.sum</span><br><span class="line">    ├── main.go</span><br><span class="line">    └── proto</span><br><span class="line">        ├── greeter.pb.go</span><br><span class="line">        ├── greeter.pb.micro.go</span><br><span class="line">        └── greeter.proto</span><br></pre></td></tr></table></figure>
+<h2 id="開始撰寫-api"><a class="markdownIt-Anchor" href="#開始撰寫-api"></a> 開始撰寫 API</h2>
+<p>首先，實作一個 RPC Client：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> client &amp;&amp; <span class="built_in">cd</span> client</span><br><span class="line">vim greet.go</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// greeter-api/client/greet.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> client</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">  <span class="string">&quot;context&quot;</span></span><br><span class="line">  <span class="string">&quot;github.com/micro/go-micro/v2&quot;</span></span><br><span class="line">  <span class="string">&quot;github.com/gin-gonic/gin&quot;</span></span><br><span class="line">  <span class="string">&quot;greeter-api/proto&quot;</span></span><br><span class="line">  <span class="string">&quot;log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> client greeter.GreeterService</span><br><span class="line"></span><br><span class="line"><span class="comment">// Init ... In the main function, you should call Init() first,</span></span><br><span class="line"><span class="comment">// so the &#x27;client&#x27; defined above can be initialized.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Init</span><span class="params">()</span></span> &#123;</span><br><span class="line">  service := micro.NewService(</span><br><span class="line">    micro.Name(<span class="string">&quot;micro.client.greeter&quot;</span>),</span><br><span class="line">  )</span><br><span class="line"></span><br><span class="line">  service.Init()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// NewGreeterService is defined at proto/greeter.pb.micro.go file,</span></span><br><span class="line">  <span class="comment">// &quot;micro.service.greeter&quot; should match the name you defined in the server part.</span></span><br><span class="line">  client = greeter.NewGreeterService(<span class="string">&quot;micro.service.greeter&quot;</span>, service.Client())</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Greet ...</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Greet</span><span class="params">(ctx *gin.Context)</span></span> &#123;</span><br><span class="line">  name := ctx.Query(<span class="string">&quot;name&quot;</span>) <span class="comment">// ctx.Query will return the GET request query string</span></span><br><span class="line">  log.Println(<span class="string">&quot;Client handle Greet, name =&quot;</span>, name)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Client request the RPC server for response</span></span><br><span class="line">  res, err := client.Greet(context.TODO(), &amp;greeter.Request&#123;Name: name&#125;)</span><br><span class="line">  <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Print(err.Error())</span><br><span class="line">    <span class="comment">// return with 400 error code and error message</span></span><br><span class="line">    ctx.JSON(<span class="number">400</span>, gin.H&#123;<span class="string">&quot;message&quot;</span>: <span class="string">&quot;server error&quot;</span>&#125;)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// return 200 success code and the response from server</span></span><br><span class="line">  ctx.JSON(<span class="number">200</span>, gin.H&#123;<span class="string">&quot;message&quot;</span>: res.Greeting&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完成 <code>Greet</code> 函數後，我們可以定義 Gin 的 Router 如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> router &amp;&amp; <span class="built_in">cd</span> router</span><br><span class="line">vim router.go</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// greeter-api/router/router.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> router</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">  <span class="string">&quot;github.com/gin-gonic/gin&quot;</span></span><br><span class="line">  <span class="string">&quot;greeter-api/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// NewRouter ...</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewRouter</span><span class="params">()</span></span> *gin.Engine &#123;</span><br><span class="line">  route := gin.Default()</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// When GET /greeter, handle the request with the Greet function we create above</span></span><br><span class="line">  route.GET(<span class="string">&quot;/greeter&quot;</span>, client.Greet)</span><br><span class="line">  <span class="keyword">return</span> route</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最後編寫入口文件：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// greeter-api/main.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">  <span class="string">&quot;greeter-api/router&quot;</span></span><br><span class="line">  <span class="string">&quot;greeter-api/client&quot;</span></span><br><span class="line">  <span class="string">&quot;log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  <span class="comment">// Remember to call the Init() function to initialize the go-micro client service</span></span><br><span class="line">  client.Init()</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// Start Gin Router at port 3000</span></span><br><span class="line">  r := router.NewRouter()</span><br><span class="line">  <span class="keyword">if</span> err := r.Run(<span class="string">&quot;0.0.0.0:3000&quot;</span>); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Print(err.Error())</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完成後，檔案目錄結構應該如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── greeter-api</span><br><span class="line">│   ├── client</span><br><span class="line">│   │   └── greet.go</span><br><span class="line">│   ├── go.mod</span><br><span class="line">│   ├── go.sum</span><br><span class="line">│   ├── main.go</span><br><span class="line">│   ├── proto</span><br><span class="line">│   │   ├── greeter.pb.go</span><br><span class="line">│   │   ├── greeter.pb.micro.go</span><br><span class="line">│   │   └── greeter.proto</span><br><span class="line">│   └── router</span><br><span class="line">│       └── router.go</span><br><span class="line">└── greeter-service</span><br><span class="line">    ├── go.mod</span><br><span class="line">    ├── go.sum</span><br><span class="line">    ├── main.go</span><br><span class="line">    └── proto</span><br><span class="line">        ├── greeter.pb.go</span><br><span class="line">        ├── greeter.pb.micro.go</span><br><span class="line">        └── greeter.proto</span><br></pre></td></tr></table></figure>
+<h2 id="運行服務-2"><a class="markdownIt-Anchor" href="#運行服務-2"></a> 運行服務</h2>
+<p>試著執行 API Service：</p>
+<p>記得上一篇文章中的 Server 也要跑喔～</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">go run .</span><br><span class="line"></span><br><span class="line">[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.</span><br><span class="line"></span><br><span class="line">[GIN-debug] [WARNING] Running <span class="keyword">in</span> <span class="string">&quot;debug&quot;</span> mode. Switch to <span class="string">&quot;release&quot;</span> mode <span class="keyword">in</span> production.</span><br><span class="line"> - using <span class="built_in">env</span>:	<span class="built_in">export</span> GIN_MODE=release</span><br><span class="line"> - using code:	gin.SetMode(gin.ReleaseMode)</span><br><span class="line"></span><br><span class="line">[GIN-debug] GET    /greeter                  --&gt; greeter-api/client.Greet (3 handlers)</span><br><span class="line">[GIN-debug] Listening and serving HTTP on 0.0.0.0:3000</span><br></pre></td></tr></table></figure>
+<p>測試 API Server：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl <span class="string">&quot;http://localhost:3000/greeter?name=test&quot;</span></span><br><span class="line"></span><br><span class="line">&#123;<span class="string">&quot;message&quot;</span>:<span class="string">&quot;Hello, test&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+<hr />
+<p>下一篇文章：<a href="/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89">Go-Micro-手把手從開發到部署（下）</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8A%EF%BC%89/" title="Go-Micro 手把手從開發到部署（上）">https://blog.justin0u0.com/Go-Micro-手把手從開發到部署（上）/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Golang/" rel="tag"># Golang</a>
+              <a href="/tags/Go-Micro/" rel="tag"># Go-Micro</a>
+              <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/Service-mesh-%E6%9C%8D%E5%8B%99%E7%B6%B2%E6%A0%BC%E4%B9%8B%E4%BB%8B%E7%B4%B9-%E5%BE%AE%E6%9C%8D%E5%8B%99%E4%B8%AD%E7%9A%84-TCP/" rel="prev" title="Service mesh 服務網格之介紹--微服務中的 TCP">
+                  <i class="fa fa-angle-left"></i> Service mesh 服務網格之介紹--微服務中的 TCP
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/Go-Micro-%E6%89%8B%E6%8A%8A%E6%89%8B%E5%BE%9E%E9%96%8B%E7%99%BC%E5%88%B0%E9%83%A8%E7%BD%B2%EF%BC%88%E4%B8%8B%EF%BC%89/" rel="next" title="Go-Micro 手把手從開發到部署（下）">
+                  Go-Micro 手把手從開發到部署（下） <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">justin0u0</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/justin0u0" class="github-corner" title="在 GitHub 上關注我" aria-label="在 GitHub 上關注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"justin0u0","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/icon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/icon16.png">
+  <link rel="mask-icon" href="/images/icon32.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="資料副本（Replication）的意思是透過網路，將資料複製到多個節點（機器）上面儲存。Replication 有以下三個好處：  讓資料在地理位置上靠近使用者以降低 network latency。 當部分節點不可用時系統依然可以保持運作，提高可用性（Availability）。 分散 read queries，提高 read throughput。  Replication 的難處在於資料是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Designing Data-Intensive Application 第五章筆記">
+<meta property="og:url" content="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/index.html">
+<meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="資料副本（Replication）的意思是透過網路，將資料複製到多個節點（機器）上面儲存。Replication 有以下三個好處：  讓資料在地理位置上靠近使用者以降低 network latency。 當部分節點不可用時系統依然可以保持運作，提高可用性（Availability）。 分散 read queries，提高 read throughput。  Replication 的難處在於資料是">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/leader_follower.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/multi_leader.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/multi_leader_topologies.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/multi_leader_all_to_all_topology_wrong_order.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/strict_quorum_not_linearizable.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/consistent_hashing.png">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/lww_time_skew.png">
+<meta property="article:published_time" content="2022-02-23T02:22:39.000Z">
+<meta property="article:modified_time" content="2022-02-23T02:22:39.000Z">
+<meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="Notes">
+<meta property="article:tag" content="DDIA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/leader_follower.png">
+
+
+<link rel="canonical" href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/","path":"Designing-Data-Intensive-Application-第五章筆記/","title":"Designing Data-Intensive Application 第五章筆記"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Designing Data-Intensive Application 第五章筆記 | Justin0u0's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Justin0u0's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-cv"><a href="/assets/CV/CV.pdf" rel="section"><i class="fa fa-user fa-fw"></i>履歷</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#leader-and-followers"><span class="nav-number">1.</span> <span class="nav-text"> Leader and Followers</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#synchronous-versus-asynchonous-replication"><span class="nav-number">1.1.</span> <span class="nav-text"> Synchronous Versus Asynchonous Replication</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setting-up-new-followers"><span class="nav-number">1.2.</span> <span class="nav-text"> Setting Up New Followers</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#handling-node-outages"><span class="nav-number">1.3.</span> <span class="nav-text"> Handling Node Outages</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#follower-failure-catch-up-recovery"><span class="nav-number">1.3.1.</span> <span class="nav-text"> Follower failure: Catch-up recovery</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#leader-failure-failover"><span class="nav-number">1.3.2.</span> <span class="nav-text"> Leader failure: Failover</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#implementation-of-replication-logs"><span class="nav-number">1.4.</span> <span class="nav-text"> Implementation of Replication Logs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#statement-based-replication"><span class="nav-number">1.4.1.</span> <span class="nav-text"> Statement-based replication</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#write-ahead-log-wal-shipping"><span class="nav-number">1.4.2.</span> <span class="nav-text"> Write-ahead log (WAL) shipping</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#logical-log-replication"><span class="nav-number">1.4.3.</span> <span class="nav-text"> Logical log replication</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#trigger-based-replication"><span class="nav-number">1.4.4.</span> <span class="nav-text"> Trigger-based replication</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#problems-with-replication-log"><span class="nav-number">2.</span> <span class="nav-text"> Problems with Replication Log</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#reading-your-own-writes"><span class="nav-number">2.1.</span> <span class="nav-text"> Reading Your Own Writes</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monotonic-reads"><span class="nav-number">2.2.</span> <span class="nav-text"> Monotonic Reads</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#consistent-prefix-reads"><span class="nav-number">2.3.</span> <span class="nav-text"> Consistent Prefix Reads</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#solutions-for-replication-lag"><span class="nav-number">2.4.</span> <span class="nav-text"> Solutions for Replication Lag</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#multi-leader-replication"><span class="nav-number">3.</span> <span class="nav-text"> Multi-Leader Replication</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#use-cases-for-multi-leader"><span class="nav-number">3.1.</span> <span class="nav-text"> Use Cases for Multi-Leader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#handling-write-conflicts"><span class="nav-number">3.2.</span> <span class="nav-text"> Handling Write Conflicts</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#automatic-conflict-resolution"><span class="nav-number">3.2.1.</span> <span class="nav-text"> Automatic Conflict Resolution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multi-leader-replication-topologies"><span class="nav-number">3.3.</span> <span class="nav-text"> Multi-Leader Replication Topologies</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#leaderless-replication"><span class="nav-number">4.</span> <span class="nav-text"> Leaderless Replication</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#writing-to-the-database-when-a-node-is-down"><span class="nav-number">4.1.</span> <span class="nav-text"> Writing to the Database When a Node Is Down</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#read-repair-and-anti-entropy"><span class="nav-number">4.1.1.</span> <span class="nav-text"> Read repair and anti-entropy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#quorums-for-reading-and-writing"><span class="nav-number">4.1.2.</span> <span class="nav-text"> Quorums for reading and writing</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#limitations-of-quorum-consistency"><span class="nav-number">4.2.</span> <span class="nav-text"> Limitations of Quorum Consistency</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sloppy-quorums-and-hinted-handoff"><span class="nav-number">4.3.</span> <span class="nav-text"> Sloppy Quorums and Hinted Handoff</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#detecting-concurrent-writes"><span class="nav-number">4.4.</span> <span class="nav-text"> Detecting Concurrent Writes</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#last-write-wins"><span class="nav-number">4.4.1.</span> <span class="nav-text"> Last write wins</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mvcc"><span class="nav-number">4.4.2.</span> <span class="nav-text"> MVCC</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#summary"><span class="nav-number">5.</span> <span class="nav-text"> Summary</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="justin0u0"
+      src="/assets/avatar.jpg">
+  <p class="site-author-name" itemprop="name">justin0u0</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/justin0u0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:mail@justin0u0.com" title="E-Mail → mailto:mail@justin0u0.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/justin0u0" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.linkedin.com/in/justin0u0" title="LinkedIn → https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;justin0u0" rel="noopener me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Designing Data-Intensive Application 第五章筆記 | Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Designing Data-Intensive Application 第五章筆記
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2022-02-23 10:22:39" itemprop="dateCreated datePublished" datetime="2022-02-23T10:22:39+08:00">2022-02-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Notes/" itemprop="url" rel="index"><span itemprop="name">Notes</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="Designing-Data-Intensive-Application-第五章筆記/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>資料副本（Replication）的意思是透過網路，將資料複製到多個節點（機器）上面儲存。Replication 有以下三個好處：</p>
+<ol>
+<li>讓資料在地理位置上靠近使用者以降低 network latency。</li>
+<li>當部分節點不可用時系統依然可以保持運作，提高可用性（Availability）。</li>
+<li>分散 read queries，提高 read throughput。</li>
+</ol>
+<p>Replication 的難處在於資料是會更新的，因此如何透過網路同步這些資料的更新是最大的難點。本章節主要探討三種常見的 replication model，分別是 <strong>single-leader replication</strong>、<strong>multi-leader replication</strong> 以及 <strong>leaderless replication</strong>。</p>
+<span id="more"></span>
+<h1 id="leader-and-followers"><a class="markdownIt-Anchor" href="#leader-and-followers"></a> Leader and Followers</h1>
+<p>首先，只要每個 writes 都能被每個 replica 按照一樣的順序執行，那麼最後每個 replica 都會擁有相同的資料。</p>
+<p>因此最常見的 replica 方式即將某個節點視為 leader，所有的 client writes 都只能送給 leader，在 leader 確認資料寫入其本地的儲存後，由 leader 透過 replication log 或是 stream 向其他的 replicas（稱作 followers）送出資料變更的請求。每個 followers 只要在收到更新的 log 後按照與 leader 一樣的順序更新其本地的儲存即可。</p>
+<p>而 client 雖然只能寫入到 leader，但是可以透過 leader 或是 followers 來讀取。</p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/leader_follower.png" alt="Single-leader replication." /></p>
+<p>Leader-follower 模式可以透過讀寫分離來大幅降低資料庫的 loading，並且一般多數的 web application 都是 read-heavy 的，因此在 PostgreSQL、MySQL、MongoDB 等常見的 databases、或是 Kafka、RabbitMQ 等 message queue systems 中，leader-based replication 都是內建的 features。</p>
+<h2 id="synchronous-versus-asynchonous-replication"><a class="markdownIt-Anchor" href="#synchronous-versus-asynchonous-replication"></a> Synchronous Versus Asynchonous Replication</h2>
+<p>在 replication 的過程中，可以發現從 leader 寫入到 followers 寫入中間會有一段 delay。</p>
+<p>在 relational database 中，可以選擇使用 synchronous 或是 asynchronous 的方式來做 replication。</p>
+<ul>
+<li>Synchronous Replication：Leader 等到 followers 回覆資料寫入後才讓寫入可見並且回傳成功。</li>
+<li>Asynchronous Replication：Leader 確認寫入到本地儲存空間後立刻回傳成功。</li>
+</ul>
+<p>Synchronous 的好處能夠確保資料的一致性（Consistency），壞處是當 followers failure 時資料就無法寫入，降低系統的可用性（Availability）。</p>
+<p>因此所有的 followers 都使用 synchronous replication 是不可行的，否則一個 follower 的 outage 就會導致所有寫入無法執行。常見的配置包括：</p>
+<ul>
+<li>只有一個 follower 採用 synchronous，其他 followers 採用 asynchronous。有時稱作 <em>semi-synchronous</em> 的設定。</li>
+<li>全部的 followers 都是 asynchronous，可能會造成資料的遺失（寫入到 leader 後 leader failure，則這筆 commit 無法被提交到其他的 followers 而消失）。</li>
+</ul>
+<h2 id="setting-up-new-followers"><a class="markdownIt-Anchor" href="#setting-up-new-followers"></a> Setting Up New Followers</h2>
+<p>要在 zero-downtime 的情況下增加新的 follower，首先取得 leader 在某個時間點的 snapshot 並複製到 follower node 中，follower 開始向 leader 請求 snapshot 後的 replication log，例如 log 的索引值在 PostgreSQL 中稱作 LSN，最後同步完成。</p>
+<h2 id="handling-node-outages"><a class="markdownIt-Anchor" href="#handling-node-outages"></a> Handling Node Outages</h2>
+<h3 id="follower-failure-catch-up-recovery"><a class="markdownIt-Anchor" href="#follower-failure-catch-up-recovery"></a> Follower failure: Catch-up recovery</h3>
+<p>在 follower 的本地儲存中有紀錄哪些 commit 已經完成的 log，因此當 follower 重啟時可以從最後一個完成的 transaction 開始向 leader 請求所有的變更。</p>
+<h3 id="leader-failure-failover"><a class="markdownIt-Anchor" href="#leader-failure-failover"></a> Leader failure: Failover</h3>
+<p>Leader failure 後某個 follower 需要晉升成 leader，這個過程稱作 <em>failover</em>。</p>
+<p>Failover 的過程包含以下幾個步驟：</p>
+<ol>
+<li>偵測 leader 是否還正常運作：通常透過 heartbeat 與 timeout 達成。</li>
+<li>選擇一個新的 leader：通常稱作 <em>leader election</em>，新的 leader 最好的選擇是擁有最新資料的 follower。要讓所有 followers 取得新 leader 的共識是一個 <em>consensus problem</em>，會在後面的章節介紹到。</li>
+<li>重新設置系統：要讓 client 端、舊的 leader、其餘 followers 都能夠知道有新的 leader 以及新的 leader 是哪個節點。</li>
+</ol>
+<p>其中有一些重要的問題要注意：</p>
+<ul>
+<li>
+<p>採用 asynchronous replication 可能導致資料的遺失，違反 durability 的原則。</p>
+</li>
+<li>
+<p>就算 durability 的問題可以被允許，也要小心丟棄 writes 可能造成的問題。</p>
+<p>例如使用 autoincrementing ID 後，若新的 leader 使用到一些舊 leader 使用過的 ID，可能導致儲存在 Redis 快取中 ID 對應到的資料與 DB 中的資料不符而導致讀取到錯誤的資料（可能造成資料外洩）。</p>
+</li>
+<li>
+<p>要小心 <em>split brain</em> 的發生，也就是有兩個 nodes 任為自己是 leader 並同時接收 client 的寫入。</p>
+</li>
+<li>
+<p>Heartbeat timeout 的時間如果過短，會造成不必要的 failover（leader 可能只是 response time 增加）；過長會造成系統花更久的時間 recovery。</p>
+</li>
+</ul>
+<h2 id="implementation-of-replication-logs"><a class="markdownIt-Anchor" href="#implementation-of-replication-logs"></a> Implementation of Replication Logs</h2>
+<p>關於 replication logs 的實作有以下幾種：</p>
+<h3 id="statement-based-replication"><a class="markdownIt-Anchor" href="#statement-based-replication"></a> Statement-based replication</h3>
+<p>將修改相關的 statement 複製到 follower nodes，例如 SQL 中就是 <code>INSERT</code>、<code>UPDATE</code> 與 <code>DELETE</code>。這種方法會有一些問題：</p>
+<ul>
+<li>Nondeterministic functions 會得到不一樣的結果：例如 <code>NOW()</code> 或是 <code>RAND()</code>。</li>
+<li>一些 statements 的順序將不能改變，例如 <code>INSERT</code> autoincrementing column，或是基於一些欄位的 <code>UPDATE</code>。這會限制原本可以並行的 transactions 使他們一定要串行的執行。</li>
+</ul>
+<p>所以 leader 需要先將 nondeterministic statement 都先變成 deterministic log 才能送給 follower nodes。因此這個方法只有在少數情境下使用，例如 MySQL v5.1 之前。</p>
+<h3 id="write-ahead-log-wal-shipping"><a class="markdownIt-Anchor" href="#write-ahead-log-wal-shipping"></a> Write-ahead log (WAL) shipping</h3>
+<p>Followers 透過讀取 leader 的 WAL 來同步資料。被 PostgreSQL 以及 Oracle 使用。</p>
+<p>如此一來完全可以解決 statement-based replication 的問題，但是壞處是 WAL 是非常底層的格式，通常是紀錄 disk 的哪個 block 的數值變化。因此基本上跨版本之間的 WAL 是很有可能不相容的。</p>
+<p>如果 WAL 可以跨版本相容，那可以被用在 zero-downtime 升級。先將 followers 都升級後，再讓 leader failover 即可。</p>
+<h3 id="logical-log-replication"><a class="markdownIt-Anchor" href="#logical-log-replication"></a> Logical log replication</h3>
+<p>透過額外的 log 提供給 follower 使用，例如 MySQL 的 binlog。</p>
+<p>因為 logical log 與 storage engine 使用的格式完全不同，因此適合提供給外部的服務使用，例如寫到 warehouse 或是同步到其他 database 等等。這種技術被稱作 <em>capture data change</em>。</p>
+<h3 id="trigger-based-replication"><a class="markdownIt-Anchor" href="#trigger-based-replication"></a> Trigger-based replication</h3>
+<p>使用 database 的 trigger 註冊一個 application layer 的函數，讓資料更新時自動的呼叫。</p>
+<p>適合用在更彈性、更複雜的 replication 上，但是 overhead 較大。</p>
+<p>例如 Databus for Oracle、Bucardo for Postgres。</p>
+<h1 id="problems-with-replication-log"><a class="markdownIt-Anchor" href="#problems-with-replication-log"></a> Problems with Replication Log</h1>
+<p>Replicaiton 提供 fault-tolerance、提升 scalability 以及降低 network latency（地理位置上）。</p>
+<p>採用 leader-based replication 可以透過增加 followers 的數量提升 read scability，並且大多數網路應用程式都是 read-heavy 的。就如同前面提到的，使用 leader-based replication 必須採用 asynchronous 的模式，否則單一節點故障會使得整個系統無法運作。</p>
+<p>而後面介紹到的 multi-leader replication 或是 leaderless 也都採用 asynchronous 來保證 availability。</p>
+<p>採用 asynchronous 模式可能會讀到尚未更新的資料，造成資料庫間暫時的不一致（data inconsistency）。如果對資料庫的寫入停止，那 followers 終究會更新並且達到一致，這就是所謂的 <em>最終一致性 eventual consistency</em>。</p>
+<p>以下探討 <em>eventual consistency</em> 造成的幾個問題：</p>
+<h2 id="reading-your-own-writes"><a class="markdownIt-Anchor" href="#reading-your-own-writes"></a> Reading Your Own Writes</h2>
+<p>使用者送了一筆更新，但是下次讀取時沒有讀到。</p>
+<p>若想要達到 <em>read-your-writes consistency</em> or <em>read-after-writes consistency</em> 來避免這個問題，可以：</p>
+<ul>
+<li>當使用者讀取自己可以修改到的資料時，從 leader 讀取。例如個人資料只有使用者本人可以修改，因此只要是本人讀取時皆從 leader 讀取。但若資料可以被大多使用者修改則不適合這種方式（會變成每個 requests 都要從 leader 讀取）。</li>
+<li>由 client 提供上次 write 的時間，則 server 只回傳再這個時間之後的結果。若當前的 follower 還沒有更新到這個時間點，可以轉交 requests 給其他 followers 或是多等待。但如果使用者從多個裝置上操作，這個方法將難以達到。</li>
+</ul>
+<h2 id="monotonic-reads"><a class="markdownIt-Anchor" href="#monotonic-reads"></a> Monotonic Reads</h2>
+<p>若同一個使用者前後兩次 requests 讀到不同的 followers，可能造成第一次的 request 讀到比第二次 request 還要新的資料。</p>
+<p>若想要達到 <em>monotonic reads consistency</em> 來避免這個問題，可以讓同一個使用者永遠都只讀到同一個 replica，例如透過 hash user ID 來決定讀取的 replica，但這樣就必須考慮 replica failed 的時候這些 requests 要如何 re-route 到其他 replica 的問題。</p>
+<h2 id="consistent-prefix-reads"><a class="markdownIt-Anchor" href="#consistent-prefix-reads"></a> Consistent Prefix Reads</h2>
+<p>有因果關係的兩個更新，讀取時要保留相同的順序。</p>
+<p>這個情況在 single-leader replication 並不會發生，只有在資料庫有 partitioned 並且兩個更新被寫入到不同資料庫時才會發生。因此我們需要一些方式來追蹤有因果關係的寫入，方法會在本章節的後面提到。</p>
+<h2 id="solutions-for-replication-lag"><a class="markdownIt-Anchor" href="#solutions-for-replication-lag"></a> Solutions for Replication Lag</h2>
+<p>因此在使用 <em>eventual consistency</em> 的資料庫時，開發者必須思考這些 replication lag 會不會帶來問題。若有問題的話，則應該要考慮提供更強的 consistency。</p>
+<blockquote>
+<p>最後，如果你喜歡這篇文章，或是文章對你有幫助的話，可以幫我按個喜歡、或是留言！你的支持就是我寫作的最大動力。有任何想問的問題也可以在底下留言喔～</p>
+</blockquote>
+<h1 id="multi-leader-replication"><a class="markdownIt-Anchor" href="#multi-leader-replication"></a> Multi-Leader Replication</h1>
+<p>Single-leader replication 的主要缺點是所有的 write operations 都要透過 leader。</p>
+<p>一個簡單的想法就是使用多個 leaders，每個 leader 並且每個 leaders 都要把收到的 writes forward 給其他節點。</p>
+<h2 id="use-cases-for-multi-leader"><a class="markdownIt-Anchor" href="#use-cases-for-multi-leader"></a> Use Cases for Multi-Leader</h2>
+<p>多個 datacenter 的操作即是一個很適合 multi-leader replication 的應用場景。</p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/multi_leader.png" alt="Multi-leader replication." /></p>
+<p>可以考慮每個 datacenter 中只有一個 leader，在一個 data center 內使用 single-leader replication。而 datacenters 之間由 leader 複製 writes 給其他的 leaders。</p>
+<p>Multi-leader replication 比 single-leader replication 好的地方在於：</p>
+<ul>
+<li>Performance：若 datacenters 是跨國的，則可以選擇最近的 datacenter 進行讀寫大幅降低 network latency。</li>
+<li>Tolerance of datacenter outages：可以容忍整個 datacenter 的 failover。</li>
+<li>Tolerance of network problems：當 server 與 leader 之間有 network problems 時可以直接寫入到其他 leaders。</li>
+</ul>
+<p>使用 Multi-leader replication 最大的缺點在必須處理 concurrent writes，包含 conflict detection、conflict avoidance 以及 conflict resolution。這部分會在<a href="#handling-write-conflicts">接下來的篇幅中</a>提到。</p>
+<p>一些 database 是可以透過外部工具支援 multi-leader replication，例如 BDR for PostgreSQL。</p>
+<h2 id="handling-write-conflicts"><a class="markdownIt-Anchor" href="#handling-write-conflicts"></a> Handling Write Conflicts</h2>
+<p>假設兩個使用者同時對一個值做修改，而一個修改被成功寫到 leader 1，另一個修改被成功寫道 leader 2，這時就會產生衝突。要處理 write conflicts 有以下幾種方式：</p>
+<ol>
+<li>
+<p>Detect conflicts：可以透過 lock write operations 來偵測 conflicts，但是在 multi-leader replication 下使用 global lock 會喪失 multi-leader replication 的主要優點。</p>
+</li>
+<li>
+<p>Avoid conflicts：</p>
+<ol>
+<li>確保資料不會在兩個 datacenter 同時寫入（要考慮在兩地的 user 有多大機率寫入同一筆資料，若機率很小則適合）。</li>
+<li>利用 routing 使得同樣的資料被寫入到同一個 leader。壞處是對於同一筆資料來說其實就是 single-leader replication。</li>
+</ol>
+</li>
+<li>
+<p>Resolve conflicts：<br />
+以下是幾種可能發生的 conflicts 與常用的解決方案：</p>
+<ol>
+<li>
+<p>寫入同一筆資料：</p>
+<ol>
+<li><em>Last write wins (LWW)</em>：注意分散式系統下時間是不可靠的，可能會需要使用 logical clock。並且 <em>last write wins</em> 代表有 data loss 的可能性。</li>
+<li>Perserve all (<em>MVCC</em>)：保留全部的資訊並且交由 application layer 來解決衝突。</li>
+</ol>
+<p><em>LWW</em> 與 <em>MVCC</em> 會在 <a href="#leaderless-replication">Leaderless Replication</a> 中大量被使用並介紹。</p>
+</li>
+<li>
+<p>Autoincrementing ID：改使用 distributed sequence ID，例如 UUIDV1，Twitter’s Snowflake ID 等等。</p>
+</li>
+<li>
+<p>DDL Change：在某一 leader 修改 schema，例如 <code>ALTER TABLE ADD COLUMN</code> 或是 <code>ALTER TABLE ALTER COLUMN</code>。若指令本身需要 lock whole table 才能運作，那就會需要 global leaders lock。否則只將 DDL Change 複製到其他 leaders 就好。</p>
+</li>
+<li>
+<p>Trigger on slave：在 multi-leader replication 下使用 trigger，可能會造成重複的問題。例如 database 中有一 trigger 會在表 A 修改欄位後寫入一筆紀錄到表 B。假設 leader 1 修改表 A 後 trigger 而新增一筆紀錄到表 B，表 A 的修改與表 B 的修改都會被 replica 到 leader 2，而 leader 2 的 trigger 又會因為表 A 的修改而新增一筆紀錄到表 B，造成重複。因此在 multi-leader replication 中不能使用 trigger。</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="automatic-conflict-resolution"><a class="markdownIt-Anchor" href="#automatic-conflict-resolution"></a> Automatic Conflict Resolution</h3>
+<p>因為 resolve conflicts 的方式很多，而自己實作有時容易有 error 發生，而在某些情況下衝突是可以自動被解決的，以下有幾種方案：</p>
+<ol>
+<li>Conflict-free replicatec datatypes (CRDTs)：可以自動 resolve conflicts 的 data structure。Riak、Redis 中都有實作 CRDTs 來自動 resolve conflicts。</li>
+<li>Mergable persistent data structures：透過紀錄 version history，提供 three-way merge 的能力。<br />
+Three-way merge 是指除了兩個版本之外，再多加上一個 LSA（Base）的版本一起做比較（因此 CRDTs 是 two-way merge）。例如 Git 就是使用 three-way merge。</li>
+<li>Operational transformation：常被用於共同編輯的算法。</li>
+</ol>
+<h2 id="multi-leader-replication-topologies"><a class="markdownIt-Anchor" href="#multi-leader-replication-topologies"></a> Multi-Leader Replication Topologies</h2>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/multi_leader_topologies.png" alt="Multi-leader replication topologies." /></p>
+<p>使用環狀、星狀拓樸，寫入可能會經過同一個 node 多次，因此每個節點需要在自己處理過的資料上面加上自己的 node ID 的 tag。並且若一個節點 fail 可能會導致整個 cluster 無法運作。</p>
+<p>所以 multi-leader replication 比較喜歡採用 all-to-all 的拓樸形式，但是這種模式可能導致因果關係的順序有誤（環狀、星狀都一定不會有）。如下圖：</p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/multi_leader_all_to_all_topology_wrong_order.png" alt="All-to-all topology cause consistent prefix reads problem." /></p>
+<p>可以透過 version clock 來解決 <a href="#consistent-prefix-reads">consistent prefix reads</a> 的問題。</p>
+<h1 id="leaderless-replication"><a class="markdownIt-Anchor" href="#leaderless-replication"></a> Leaderless Replication</h1>
+<p>每個 replication 都允許讀寫。最著名的 leaderless replication 應用是 <a target="_blank" rel="noopener" href="https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf">Dynamo</a>。根據這篇 paper 的想法，有了 Riak、Cassandra、Voldermort 等 opensource 的 leaderless replication database。</p>
+<h2 id="writing-to-the-database-when-a-node-is-down"><a class="markdownIt-Anchor" href="#writing-to-the-database-when-a-node-is-down"></a> Writing to the Database When a Node Is Down</h2>
+<h3 id="read-repair-and-anti-entropy"><a class="markdownIt-Anchor" href="#read-repair-and-anti-entropy"></a> Read repair and anti-entropy</h3>
+<p>在 leaderless replication 中，寫入操作會一次寫到 N 個節點（N 不需要等於節點數量）。先不考慮 concurrent writes 的問題，假設有一節點正在重啟，那麼寫入操作會略過此節點的寫入。當此節點重啟完畢後，有以下兩個問題：</p>
+<ol>
+<li>
+<p>若 client 從此節點讀資料，可能會讀到舊的資料。<br />
+解決辦法：一次從多個節點讀取，透過 version 就可以知道哪個是最新的資料。</p>
+</li>
+<li>
+<p>此節點要如何同步沒更新到的資料？</p>
+<ol>
+<li>
+<p>Read repair：當 client 讀到舊的資料時，做一個寫入到 replica。適合大量 read 的情境。</p>
+</li>
+<li>
+<p>Anti-Entropy：用一個背景程序不斷檢查兩個節點之間的資料。會有 delay，但是很少被讀到的資料也能被同步。</p>
+ <div class="note info"><h4 id="merkle-tree"><a class="markdownIt-Anchor" href="#merkle-tree"></a> Merkle Tree</h4>
+<p>如何快速的比對兩個節點之間的資料呢？可以透過 merkle tree（雜湊樹）這個資料結構。</p>
+<ul>
+<li><code>IH: internal hash function</code></li>
+<li><code>LH: leaf hash function</code></li>
+<li><code>S1, S2, S3, S4, S5: data</code></li>
+</ul>
+<p>每個節點都對資料創建一個 merkle tree，因此若兩節點資料相同，只需要 <code>O(1)</code> 的時間就可以確認。若兩節點有一筆資料不同，也只需要 <code>O(logN)</code> 的時間就可以找到不同的資料。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">                    ROOT=IH(H+E)</span><br><span class="line">                     /        \</span><br><span class="line">                    /          \</span><br><span class="line">              H=IH(F+G)         E</span><br><span class="line">             /       \           \</span><br><span class="line">            /         \           \</span><br><span class="line">      F=IH(A+B)       G=IH(C+D)    E</span><br><span class="line">     /     \           /     \      \</span><br><span class="line">    /       \         /       \      \</span><br><span class="line">A=LH(S1)  B=LH(S2) C=LH(S3)  D=LH(S4) E=LH(S5)</span><br></pre></td></tr></table></figure>
+</div>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="quorums-for-reading-and-writing"><a class="markdownIt-Anchor" href="#quorums-for-reading-and-writing"></a> Quorums for reading and writing</h3>
+<p>若每一筆資料有 N 個副本，只要保證每次寫入 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span></span></span></span> 個副本並且每次讀入 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span> 個副本且 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>+</mo><mi>r</mi><mo>&gt;</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">w+r \gt n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>，則根據鴿籠原理至少有一個 read 可以讀到最新的資料。</p>
+<p>在 dynamo-style 資料庫中，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo separator="true">,</mo><mtext> </mtext><mi>r</mi><mo separator="true">,</mo><mtext> </mtext><mi>n</mi></mrow><annotation encoding="application/x-tex">w,\ r,\ n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span></span></span></span> 通常都是可以調整的，常見的配置是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>=</mo><mi>r</mi><mo>=</mo><mo stretchy="false">⌈</mo><mo stretchy="false">(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">⌉</mo></mrow><annotation encoding="application/x-tex">w=r=\lceil (n+1)/2 \rceil</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌈(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord">/2</span><span class="mclose">⌉</span></span></span></span>。只要節點數量 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≥</mo><mi>w</mi><mo>&amp;</mo><mi>n</mi><mo>≥</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">n \ge w\And n \ge r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">&amp;</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span>，系統就可以繼續運行。例如 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>5</mn><mo separator="true">,</mo><mtext> </mtext><mi>w</mi><mo>=</mo><mn>3</mn><mo separator="true">,</mo><mtext> </mtext><mi>r</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n=5,\ w=3,\ r=3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">5</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> 則可以容忍 2 個節點的 failure。</p>
+<div class="note warning"><h4 id="quorum"><a class="markdownIt-Anchor" href="#quorum"></a> Quorum</h4>
+<p>注意，在 Dynamo 的 paper 中提到的 quorum 與 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Quorum_(distributed_computing)">wiki 上的 quorum</a> 解釋上面有些不同。</p>
+<p>Wiki 上面的 quorum 利用 lock 會在 read/write 操作前進行 lock 的動作，因此若設置 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>+</mo><mi>r</mi><mo>&gt;</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">w+r \gt n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>，則讀與寫不可能並行。若再加上 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>+</mo><mi>w</mi><mo>&gt;</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">w+w \gt n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 的條件，則寫與寫也不可能並行。如此一來即可保證 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Serializability"><strong>serializability</strong></a>。</p>
+<p>但是在 Dynamo 的 paper 中並沒有提到要做讀寫之前需要 lock，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo separator="true">,</mo><mtext> </mtext><mi>r</mi></mrow><annotation encoding="application/x-tex">w,\ r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span> 只是用來確認寫入與讀取的節點數量而已，因此在 paper 中也有提及是使用 quorum-like technique 而已。<strong>因此 dynamo-style 的資料庫就算設置 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>+</mo><mi>r</mi><mo>&gt;</mo><mi>n</mi><mo>&amp;</mo><mi>w</mi><mo>+</mo><mi>w</mi><mo>&gt;</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">w+r \gt n \And w+w \gt n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">&amp;</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 也通常不保證 linearizability。</strong></p>
+</div>
+<h2 id="limitations-of-quorum-consistency"><a class="markdownIt-Anchor" href="#limitations-of-quorum-consistency"></a> Limitations of Quorum Consistency</h2>
+<p>採用 quorum 可能會有以下的問題：</p>
+<ul>
+<li>透過設置更小的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo separator="true">,</mo><mtext> </mtext><mi>r</mi></mrow><annotation encoding="application/x-tex">w,\ r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span>，可以提高系統的可用性以及降低延遲，但就有可能會讀到舊的資料。</li>
+<li>兩個寫入操作可能會造成衝突。在 <a href="#detecting-concurrent-writes">文章後段</a> 會介紹 LWW 與 MVCC 的做法來解決衝突。</li>
+<li>如果寫入操作在一些節點成功一些失敗，並且最後只寫入少於 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span></span></span></span> 個節點並回傳失敗。這些成功的寫入並無法被 rollback 造成資料不一致。</li>
+<li>就算採用 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>+</mo><mi>r</mi><mo>&gt;</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">w+r \gt n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>，dynamo-style 的資料庫並不保證 linearizability。<br />
+<img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/strict_quorum_not_linearizable.png" alt="Reader B read stale value although strict quorum is applied." /></li>
+</ul>
+<p>因此雖然正常情況下使用 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>+</mo><mi>r</mi><mo>&gt;</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">w+r \gt n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 的 quorum 配置可以確保讀到最新的值，但是實際上並沒有那麼簡單。Dynamo-style 資料庫通常需要應用能夠容忍最終一致性，而 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo separator="true">,</mo><mtext> </mtext><mi>r</mi></mrow><annotation encoding="application/x-tex">w,\ r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span> 的配置可以用來調整讀到舊資料的機率。</p>
+<h2 id="sloppy-quorums-and-hinted-handoff"><a class="markdownIt-Anchor" href="#sloppy-quorums-and-hinted-handoff"></a> Sloppy Quorums and Hinted Handoff</h2>
+<p>一般情況下，database cluster 會有很多節點，而每個寫入操作只需要 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 個副本，透過 <a target="_blank" rel="noopener" href="https://justin0u0.notion.site/Consistent-Hashing-a9969a175f464d008d1c18e347b210db">consistent hashing</a> 可以決定資料要被寫到哪 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 個節點。</p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/consistent_hashing.png" alt="Consistent hashing shows that data with key K must write to node A, B and C." /></p>
+<p>若 client 因為網路問題無法連接到這 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 個節點，我們可以回傳 error 告知失敗。或是允許寫入到這 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 個節點以外的節點，稱作 <em>sloppy quorum</em>。</p>
+<p>例如上圖，資料要被寫到 A、B、C 節點。當 A 節點不可用時，可以先暫時寫入到節點 D 的獨立儲存空間，並且紀錄原節點是 A 節點。如此一來當 D 節點發現 A 節點恢復時，就會將資料重新寫回 A 節點並將 D 節點內的資料刪除。這種方式就稱作 <em>hinted handoff</em>。</p>
+<h2 id="detecting-concurrent-writes"><a class="markdownIt-Anchor" href="#detecting-concurrent-writes"></a> Detecting Concurrent Writes</h2>
+<p>考慮兩個 clients 想寫入 <code>set(x, 1)</code> 與 <code>set(x, 2)</code>，因為網路速度的不同，不同節點可能收到不一樣的順序，導致最後兩個節點的資料是不一致的。</p>
+<p>因此這裡介紹 LWW 與 MVCC 兩種方式：</p>
+<h3 id="last-write-wins"><a class="markdownIt-Anchor" href="#last-write-wins"></a> Last write wins</h3>
+<p>在每個 writes 上面都附加一個 timestamp，當 conflict 發生時，選擇較新的 write。LWW 可以達成最終一致性，但壞處是會造成資料的遺失。</p>
+<p>由於在分散式系統下每個節點的時間都是不一樣的，因此甚至可能造成有因果關係的 writes 的時間是對調的。</p>
+<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/lww_time_skew.png" alt="A cause B but timestamp of A is after B." /></p>
+<p>Cassandra 即選擇 LWW 來解決衝突，至於為什麼 cassandra 不選擇接下來要介紹的 <em>vector clock</em>，可以參考這篇 <a target="_blank" rel="noopener" href="https://www.datastax.com/blog/why-cassandra-doesnt-need-vector-clocks">Why Cassandra Doesn’t Need Vector Clocks</a>。</p>
+<h3 id="mvcc"><a class="markdownIt-Anchor" href="#mvcc"></a> MVCC</h3>
+<p>MVCC 的想法為如果有衝突發生，那麼就偵測衝突並且保留全部的版本，在下一次 client 讀取這筆資料時就將全部版本返回交由 client 來解決衝突。</p>
+<p>所以首先要定義對於同一筆資料何謂衝突？<strong>Concurrent write</strong> 這個詞彙看似指的是時間上的同時發生，但若把時間的粒度縮小來看兩個寫入並不會完全同時發生。因此 concurrent write 的定義應該是兩個寫入是沒有因果關係的，因此這兩個寫入誰先誰後都沒有問題，所以才會照成衝突。</p>
+<p>使用 <strong><a target="_blank" rel="noopener" href="https://justin0u0.notion.site/Vector-Clock-8f7434edf4e34ed5a2649f13c496d31a">vector clocks/version vectors</a></strong> 為每個 key 維護多個版本號碼，當發生衝突時都保留。</p>
+<p>這種做法可以保證資料不會遺失，但是 client 必須自己解決衝突。</p>
+<p>Dynamo 的 paper 中即使用此方法來偵測衝突的發生，Voldermort、Riak 都是採用此做法。</p>
+<h1 id="summary"><a class="markdownIt-Anchor" href="#summary"></a> Summary</h1>
+<p>總結 replication 帶來的好處有：</p>
+<ul>
+<li>High availability：就算有部分節點停止也能正常運作。</li>
+<li>Latency：透過縮短地理上的距離來降低延遲。</li>
+<li>Scalability：可以透過增加機器的數量來提升讀寫能力。</li>
+</ul>
+<p>而常見的三種 replication 模式包含：</p>
+<ul>
+<li>Single-leader replication：只有一個 leader 節點並且所有的寫入操作只能透過 leader，由 leader 將資料複製到其他的 follower 節點。配置簡單且不需要考慮 concurrent writes 的問題；但只能提升 read scalability，並且要考慮 leader failure 的問題</li>
+<li>Multi-leader replication：有多個 leader 節點，適合在 datacenter 使用以降低寫入的 latency，有更高的可用性。但是必須處理 concurrent writes 的問題。</li>
+<li>Leaderless replication：可以在任何 nodes 進行讀寫，有更高的 availability 以及更低的 consistency，適合能容忍 eventual consistency 的應用使用。</li>
+</ul>
+<p>對於 replication lag，使用時要考慮是否能接受 eventual consistency，否則需要考慮提高 consistency level：</p>
+<ul>
+<li>Read-after-write consistency：使用者必須讀到自己寫入的資料。</li>
+<li>Monotonic reads consistency：讀到的資料不能回朔。</li>
+<li>Consistency prefix reads consistency：有因果關係的資料要正確。</li>
+</ul>
+<p>本文的圖片來源（Image credits）：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://dataintensive.net/">https://dataintensive.net/</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf">https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf</a></li>
+</ul>
+<blockquote>
+<p>最後，如果你喜歡這篇文章，或是文章對你有幫助的話，可以幫我按個喜歡、或是留言！你的支持就是我寫作的最大動力。有任何想問的問題也可以在底下留言喔～</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%94%E7%AB%A0%E7%AD%86%E8%A8%98/" title="Designing Data-Intensive Application 第五章筆記">https://blog.justin0u0.com/Designing-Data-Intensive-Application-第五章筆記/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Notes/" rel="tag"># Notes</a>
+              <a href="/tags/DDIA/" rel="tag"># DDIA</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/Dcard-Backend-%E5%AF%A6%E7%BF%92%E5%BF%83%E5%BE%97/" rel="prev" title="Dcard Backend 實習心得">
+                  <i class="fa fa-angle-left"></i> Dcard Backend 實習心得
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/LeetCode-K-Inverse-Pairs-Array/" rel="next" title="LeetCode 629 - K Inverse Pairs Array">
+                  LeetCode 629 - K Inverse Pairs Array <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">justin0u0</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 強力驅動
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/justin0u0" class="github-corner" title="在 GitHub 上關注我" aria-label="在 GitHub 上關注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"justin0u0","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

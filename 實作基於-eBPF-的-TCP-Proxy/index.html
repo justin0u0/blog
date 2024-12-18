@@ -20,23 +20,31 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"blog.justin0u0.com","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500,"line":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"none","post_body":"none","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"trigger":"auto"}}</script><script src="/js/config.js"></script>
 
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Justin0u0&#39;s Blog">
-<meta property="og:url" content="https://blog.justin0u0.com/categories/Golang/index.html">
+    <meta name="description" content="前言 eBPF 是一個作為新一代的 Linux 拓展機制，雖然提供了很強大的功能，但是對於初學者來說學習曲線還是有點高，網路上的資源也相對較少（各種 GPT 在當時甚至產了一堆不能用的 Code）。 想當初參考著 Isovalent 的影片 A Load Balancer from scratch 嘗試用 XDP 這個 program type 實作一個 TCP Proxy，卻發現竟然會有掉封包">
+<meta property="og:type" content="article">
+<meta property="og:title" content="實作基於 eBPF 的 TCP Proxy">
+<meta property="og:url" content="https://blog.justin0u0.com/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/index.html">
 <meta property="og:site_name" content="Justin0u0&#39;s Blog">
+<meta property="og:description" content="前言 eBPF 是一個作為新一代的 Linux 拓展機制，雖然提供了很強大的功能，但是對於初學者來說學習曲線還是有點高，網路上的資源也相對較少（各種 GPT 在當時甚至產了一堆不能用的 Code）。 想當初參考著 Isovalent 的影片 A Load Balancer from scratch 嘗試用 XDP 這個 program type 實作一個 TCP Proxy，卻發現竟然會有掉封包">
 <meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://blog.justin0u0.com/assets/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/kernel-packet-receiving-flow-with-ebpf-hooks.png">
+<meta property="article:published_time" content="2024-12-07T08:49:06.000Z">
+<meta property="article:modified_time" content="2024-12-07T08:49:06.000Z">
 <meta property="article:author" content="justin0u0">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="eBPF">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.justin0u0.com/assets/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/kernel-packet-receiving-flow-with-ebpf-hooks.png">
 
 
-<link rel="canonical" href="https://blog.justin0u0.com/categories/Golang/">
+<link rel="canonical" href="https://blog.justin0u0.com/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-TW","comments":"","permalink":"","path":"categories/Golang/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://blog.justin0u0.com/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/","path":"實作基於-eBPF-的-TCP-Proxy/","title":"實作基於 eBPF 的 TCP Proxy"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>分類: Golang | Justin0u0's Blog</title>
+<title>實作基於 eBPF 的 TCP Proxy | Justin0u0's Blog</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4S93K767LK"></script>
   <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-4S93K767LK","only_pageview":false,"measure_protocol_api_secret":"Sxv0_DP4S3SnySukEYzr1w"}</script>
@@ -125,7 +133,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目錄
@@ -138,6 +146,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text"> 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%81%E5%8C%85%E6%8E%A5%E6%94%B6%E6%B5%81%E7%A8%8B%E5%92%8C-ebpf-hook-points"><span class="nav-number">2.</span> <span class="nav-text"> 封包接收流程和 eBPF Hook Points</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -152,7 +161,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-count">58</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
@@ -163,7 +172,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
@@ -193,51 +202,152 @@
 
     </div>
 
-    <div class="main-inner category posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
+
+
+<div class="post-block">
   
   
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        <h1 class="collection-header">Golang
-          <small>分類</small>
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="實作基於 eBPF 的 TCP Proxy | Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          實作基於 eBPF 的 TCP Proxy
         </h1>
-      </div>
 
-      
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2024-12-07 16:49:06" itemprop="dateCreated datePublished" datetime="2024-12-07T16:49:06+08:00">2024-12-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/eBPF/" itemprop="url" rel="index"><span itemprop="name">eBPF</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="實作基於-eBPF-的-TCP-Proxy/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="前言"><a class="markdownIt-Anchor" href="#前言"></a> 前言</h1>
+<p>eBPF 是一個作為新一代的 Linux 拓展機制，雖然提供了很強大的功能，但是對於初學者來說學習曲線還是有點高，網路上的資源也相對較少（各種 GPT 在當時甚至產了一堆不能用的 Code）。</p>
+<p>想當初參考著 Isovalent 的影片 <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=L3_AOFSNKK8">A Load Balancer from scratch</a> 嘗試用 <strong>XDP</strong> 這個 program type 實作一個 TCP Proxy，卻發現竟然會有掉封包的問題，後來才發現 XDP 根本就不能拿來做 per-packet 的 TCP Proxy 或是 Load Balancer，直接被誤導…。</p>
+<p>這篇文章會用 eBPF 的 <strong>SK_SKB</strong> 這個 program type 來實作一個 TCP proxy，最後也會跟 user-space 的 TCP proxy 做效能比較。</p>
+<p>如果對 eBPF 完全不認識的話，可以先看看 eBPF 的<a target="_blank" rel="noopener" href="https://ebpf.io/what-is-ebpf/">簡介</a>。</p>
+<span id="more"></span>
+<h1 id="封包接收流程和-ebpf-hook-points"><a class="markdownIt-Anchor" href="#封包接收流程和-ebpf-hook-points"></a> 封包接收流程和 eBPF Hook Points</h1>
+<p>eBPF 允許使用者撰寫一些程式碼，並在 Linux Kernel 預先定義好的 hooks 被觸發的時候執行這個程式碼。例如 system call 被執行的時候、socket 收到 TCP 封包的時候。所以要實作一個 TCP Proxy，我們必須先了解 Linux Kernel 的封包接收的流程，以及 eBPF 可以在哪些步驟有提供 hooks 可以使用。</p>
+<p>簡易的封包接收流程如下圖：</p>
+<p><img data-src="/assets/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/kernel-packet-receiving-flow-with-ebpf-hooks.png" alt="Kernel 封包接收流程和 eBPF Hooks" /></p>
+<ol>
+<li>首先，</li>
+</ol>
+<blockquote>
+<p>最後，如果你喜歡這篇文章，或是文章對你有幫助的話，可以幫我按個喜歡、或是留言！你的支持就是我寫作的最大動力。有任何想問的問題也可以在底下留言喔～</p>
+</blockquote>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-01-30T17:03:16+08:00"
-              content="2021-01-30">
-          01-30
-        </time>
-      </div>
+    
+    
+    
 
-      <div class="post-title">
-          <a class="post-title-link" href="/MacOS-%E4%BD%BF%E7%94%A8-Homebrew-%E7%AE%A1%E7%90%86%E5%A4%9A%E5%80%8B-Golang-%E7%89%88%E6%9C%AC/" itemprop="url">
-            <span itemprop="name">MacOS 使用 Homebrew 管理多個 Golang 版本</span>
-          </a>
-      </div>
+    <footer class="post-footer">
+          
 
-      
-    </header>
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>justin0u0
+  </li>
+  <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://blog.justin0u0.com/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/" title="實作基於 eBPF 的 TCP Proxy">https://blog.justin0u0.com/實作基於-eBPF-的-TCP-Proxy/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.tw" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Go/" rel="tag"># Go</a>
+              <a href="/tags/eBPF/" rel="tag"># eBPF</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/Raycast-%E8%B6%85%E8%A9%B3%E7%B4%B0%E4%BB%8B%E7%B4%B9%EF%BC%81%E5%BF%AB%E9%80%9F%E6%8F%90%E5%8D%87%E7%94%9F%E7%94%A2%E5%8A%9B%E7%9A%84%E8%B6%85%E5%A5%BD%E7%94%A8%E5%B7%A5%E5%85%B7%EF%BC%81/" rel="prev" title="Raycast 超詳細介紹！快速提升生產力的超好用工具！">
+                  <i class="fa fa-angle-left"></i> Raycast 超詳細介紹！快速提升生產力的超好用工具！
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
   </article>
+</div>
 
-    </div>
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
   </div>
   
-  
-  
-
 </div>
   </main>
 

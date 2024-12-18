@@ -152,7 +152,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-count">58</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
@@ -163,7 +163,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
@@ -194,6 +194,109 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/avatar.jpg">
+      <meta itemprop="name" content="justin0u0">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Justin0u0's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/" class="post-title-link" itemprop="url">實作基於 eBPF 的 TCP Proxy</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2024-12-07 16:49:06" itemprop="dateCreated datePublished" datetime="2024-12-07T16:49:06+08:00">2024-12-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/eBPF/" itemprop="url" rel="index"><span itemprop="name">eBPF</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="實作基於-eBPF-的-TCP-Proxy/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="前言"><a class="markdownIt-Anchor" href="#前言"></a> 前言</h1>
+<p>eBPF 是一個作為新一代的 Linux 拓展機制，雖然提供了很強大的功能，但是對於初學者來說學習曲線還是有點高，網路上的資源也相對較少（各種 GPT 在當時甚至產了一堆不能用的 Code）。</p>
+<p>想當初參考著 Isovalent 的影片 <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=L3_AOFSNKK8">A Load Balancer from scratch</a> 嘗試用 <strong>XDP</strong> 這個 program type 實作一個 TCP Proxy，卻發現竟然會有掉封包的問題，後來才發現 XDP 根本就不能拿來做 per-packet 的 TCP Proxy 或是 Load Balancer，直接被誤導…。</p>
+<p>這篇文章會用 eBPF 的 <strong>SK_SKB</strong> 這個 program type 來實作一個 TCP proxy，最後也會跟 user-space 的 TCP proxy 做效能比較。</p>
+<p>如果對 eBPF 完全不認識的話，可以先看看 eBPF 的<a target="_blank" rel="noopener" href="https://ebpf.io/what-is-ebpf/">簡介</a>。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1130,113 +1233,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AD%86%E8%A8%98/#more" rel="contents">
-                閱讀全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://blog.justin0u0.com/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/assets/avatar.jpg">
-      <meta itemprop="name" content="justin0u0">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Justin0u0's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Justin0u0's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/" class="post-title-link" itemprop="url">Designing Data-Intensive Application 第一章筆記</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">發表於</span>
-
-      <time title="創建時間：2021-07-24 21:55:03" itemprop="dateCreated datePublished" datetime="2021-07-24T21:55:03+08:00">2021-07-24</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分類於</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Notes/" itemprop="url" rel="index"><span itemprop="name">Notes</span></a>
-        </span>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="Designing-Data-Intensive-Application-第一章筆記/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-</div>
-
-            <div class="post-description">現在的軟體基本上都不是 CPU Bound，而是 Data-Intensive 的，因此大多數的應用程式會依靠多種工具來滿足不同情境下的資料使用。
-本章節重點先放在三項設計系統時的要點：可靠性（Reliability）、可擴展性（Scalability）以及可維護性（Maintainability）。
-</div>
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <img data-src="/assets/Designing-Data-Intensive-Application-第一章筆記/book-cover.png" width="50%">
-<h1 id="introduction"><a class="markdownIt-Anchor" href="#introduction"></a> Introduction</h1>
-<p>現在的軟體基本上都不是 CPU Bound，而是 Data-Intensive 的，也就是大多數的瓶頸都在資料的量而不是計算的量。因此大多數的應用程式會依靠多種工具來滿足不同情境下的資料使用。</p>
-<p>例如一個後端可能會用到 MySQL、PostgreSQL 來儲存資料，用 Redis 來做快取，用 ElasticSearch 來做搜尋引擎，用 RabbitMQ、NATS 來做異步的消息傳輸。有各種工具可以滿足不同需求的資料使用方式，因此我們需要知道在設計不同需求的系統時，要如何挑選、使用這些技術與工具。下圖即是一種可能的系統架構：</p>
-<p><img data-src="/assets/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/system.png" alt="" /></p>
-<p>本章節重點先放在三項設計系統時的要點：可靠性（Reliability）、可擴展性（Scalability）以及可維護性（Maintainability）。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/Designing-Data-Intensive-Application-%E7%AC%AC%E4%B8%80%E7%AB%A0%E7%AD%86%E8%A8%98/#more" rel="contents">
                 閱讀全文 &raquo;
               </a>
             </div>

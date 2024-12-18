@@ -2,12 +2,12 @@
 title: Go-Micro 手把手從開發到部署（下）
 date: 2020-10-07 09:27:56
 tags:
-  - Golang
-  - Go-Micro
+  - Go
+  - Microservices
   - Kubernetes
   - Docker
 categories:
-  - Go-Micro
+  - Backend
 ---
 
 本篇文章主要著重在部署上一篇文章所完成的 Go-Micro 微服務。

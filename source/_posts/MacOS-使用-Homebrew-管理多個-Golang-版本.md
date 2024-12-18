@@ -2,11 +2,11 @@
 title: MacOS 使用 Homebrew 管理多個 Golang 版本
 date: 2021-01-30 17:03:16
 tags:
-- Golang
+- Go
 - Homebrew
 - MacOS
 categories:
-- Golang
+- Others
 ---
 
 在網路上很多文章使用 `brew switch` 來切換 Golang 的 version，但是在 brew v2.6.0 後 `brew switch` 指令已經被廢棄（[https://brew.sh/2020/12/01/homebrew-2.6.0/](https://brew.sh/2020/12/01/homebrew-2.6.0/)）。

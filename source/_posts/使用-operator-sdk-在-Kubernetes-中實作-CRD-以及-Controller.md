@@ -4,7 +4,7 @@ date: 2021-02-01 18:32:14
 tags:
   - Kubernetes
   - operator-sdk
-  - Golang
+  - Go
 categories: Kubernetes
 ---
 

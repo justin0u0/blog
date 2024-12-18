@@ -3,6 +3,25 @@
   font-style: italic;
 }
 
+.katex-display {
+  display: block;
+  margin: 1em 0;
+  text-align: center;
+  overflow-x: auto; /* Add horizontal scrolling for small screens */
+}
+
+.katex-display > .katex {
+  display: block;
+  text-align: center;
+  white-space: normal; /* Allow text wrapping */
+  word-break: break-word; /* Ensure long expressions break appropriately */
+}
+
+.katex .base {
+  white-space: normal; /* Allow wrapping within base elements */
+  overflow-wrap: anywhere; /* Break math expressions gracefully */
+}
+
 pre {-moz-tab-size: 2;} /* Firefox */
 pre {tab-size: 2;}
 

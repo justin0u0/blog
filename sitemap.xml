@@ -2,15 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://blog.justin0u0.com/%E5%AF%A6%E4%BD%9C%E5%9F%BA%E6%96%BC-eBPF-%E7%9A%84-TCP-Proxy/</loc>
-    
-    <lastmod>2024-12-07</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.justin0u0.com/Raycast-%E8%B6%85%E8%A9%B3%E7%B4%B0%E4%BB%8B%E7%B4%B9%EF%BC%81%E5%BF%AB%E9%80%9F%E6%8F%90%E5%8D%87%E7%94%9F%E7%94%A2%E5%8A%9B%E7%9A%84%E8%B6%85%E5%A5%BD%E7%94%A8%E5%B7%A5%E5%85%B7%EF%BC%81/</loc>
     
     <lastmod>2023-01-22</lastmod>
@@ -776,13 +767,6 @@
     <priority>0.2</priority>
   </url>
   
-  <url>
-    <loc>https://blog.justin0u0.com/tags/eBPF/</loc>
-    <lastmod>2024-12-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
 
   
   <url>
@@ -822,13 +806,6 @@
   
   <url>
     <loc>https://blog.justin0u0.com/categories/Backend/</loc>
-    <lastmod>2024-12-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.justin0u0.com/categories/eBPF/</loc>
     <lastmod>2024-12-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
